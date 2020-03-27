@@ -6,6 +6,7 @@
   "scripts": {
     "build": "rm -rf ./build/public && npx tsc && npm run build --prefix client",
     "start": "npx ts-node ./server/index.ts",
+    "deploy": "gcloud app deploy -v=production --promote",
     "dev": "concurrently \"npm run start\" \"npm run start --prefix client\""
   },
   "author": "",
