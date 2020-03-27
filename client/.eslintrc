@@ -1,0 +1,26 @@
+{
+  "env": {
+    "es6": true,
+    "browser": true,
+    "node": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true,
+      "modules": true
+    }
+  },
+  "extends": "react-app",
+  "globals": {
+    "Atomics": "readonly",
+    "SharedArrayBuffer": "readonly"
+  },
+  "plugins": ["babel"],
+  "rules": {
+    "no-unused-expressions": 0,
+    "babel/no-unused-expressions": 0,
+    "indent": "off"
+  }
+}
