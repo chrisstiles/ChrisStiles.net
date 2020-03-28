@@ -2,6 +2,7 @@ import path from 'path';
 import express, { Express, Request, Response } from 'express';
 import compression from 'compression';
 import gatsbyExpress from 'gatsby-plugin-express';
+import redirectWWW from 'express-naked-redirect';
 
 export class Server {
   private app: Express;
@@ -13,6 +14,10 @@ export class Server {
 
     this.app.use(compression());
     this.app.use(express.static(publicPath));
+
+    if (process.env.NODE_ENV === 'production') {
+      this.app.use(redirectWWW());
+    }
 
     this.app.get('/api', (req: Request, res: Response): void => {
       res.send('You have reached the API!');

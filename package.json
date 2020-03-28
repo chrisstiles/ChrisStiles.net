@@ -33,6 +33,7 @@
     "compression": "^1.7.4",
     "concurrently": "^5.1.0",
     "express": "^4.17.1",
+    "express-naked-redirect": "^0.1.4",
     "gatsby-plugin-express": "^1.1.6",
     "typescript": "^3.8.3"
   }
