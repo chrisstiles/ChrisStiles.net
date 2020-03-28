@@ -1,6 +1,6 @@
 import path from 'path';
 import express, { Express, Request, Response } from 'express';
-import { compression } from 'compression';
+import compression from 'compression';
 import gatsbyExpress from 'gatsby-plugin-express';
 
 export class Server {
