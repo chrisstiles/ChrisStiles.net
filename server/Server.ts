@@ -1,5 +1,6 @@
 import path from 'path';
 import express, { Express, Request, Response } from 'express';
+import { compression } from 'compression';
 import gatsbyExpress from 'gatsby-plugin-express';
 
 export class Server {
@@ -10,6 +11,7 @@ export class Server {
 
     const publicPath = path.resolve('./') + '/client/public';
 
+    this.app.use(compression());
     this.app.use(express.static(publicPath));
 
     this.app.get('/api', (req: Request, res: Response): void => {
