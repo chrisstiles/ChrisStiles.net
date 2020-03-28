@@ -7,7 +7,7 @@
     "build": "rm -rf ./build/public && npx tsc && npm run build --prefix client",
     "deploy": "gcloud app deploy -v=production --promote",
     "dev": "concurrently \"npm run start\" \"npm run start --prefix client\"",
-    "gcp-build": "npm run build",
+    "gcp-build": "npm install --prefix client && npm run build",
     "start": "npx ts-node ./server/index.ts"
   },
   "author": "",
