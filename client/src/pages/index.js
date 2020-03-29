@@ -5,12 +5,6 @@ import Layout from '../components/layout';
 import Image from '../components/image';
 import SEO from '../components/seo';
 
-setTimeout(() => {
-  fetch('/api/')
-    .then(r => r.text())
-    .then(console.log);
-}, 3000);
-
 const IndexPage = () => (
   <Layout>
     <SEO title="Home" />
