@@ -22,17 +22,17 @@ export class Server {
     this.app.use(compression());
     this.app.use(express.static(publicPath));
 
-    this.app.get('/api', (req: Request, res: Response): void => {
+    this.app.get('/api/test', (req: Request, res: Response): void => {
       res.send('You have reached the API!');
     });
 
-    // this.app.use(
-    //   gatsbyExpress(path.resolve('./') + '/build/routes.json', {
-    //     publicDir: publicPath,
-    //     template: `${publicPath}/404/index.html`,
-    //     redirectSlashes: true
-    //   })
-    // );
+    this.app.use(
+      gatsbyExpress(path.resolve('./') + '/build/routes.json', {
+        publicDir: publicPath,
+        template: `${publicPath}/404/index.html`,
+        redirectSlashes: true
+      })
+    );
   }
 
   public start(port: number): void {

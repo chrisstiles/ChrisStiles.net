@@ -2,11 +2,35 @@ runtime: nodejs12
 env: standard
 instance_class: F1
 handlers:
+  # Backend API
+  - url: /(api)/.*
+    script: auto
+    secure: always
+
+  # Index files
+  - url: /([^/.]+)/?$
+    static_files: client/public/\1/index.html
+    upload: client/public/(.+)/index.html
+    expiration: '15m'
+    secure: always
+    require_matching_file: true
+
+  # Site root
   - url: /
     static_files: client/public/index.html
     upload: client/public/index.html
+    expiration: '15m'
     secure: always
+    require_matching_file: true
+
+  # Everything else
   - url: /(.*)
     static_files: client/public/\1
     upload: client/public/(.*)
+    secure: always
+    require_matching_file: true
+
+  # Fallback to server
+  - url: /.*
+    script: auto
     secure: always

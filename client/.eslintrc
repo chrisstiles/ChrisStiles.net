@@ -22,6 +22,6 @@
     "no-unused-expressions": 0,
     "babel/no-unused-expressions": 0,
     "indent": "off",
-    "react/jsx-fragments": [true, "syntax"]
+    "react/jsx-fragments": [1, "element"]
   }
 }
