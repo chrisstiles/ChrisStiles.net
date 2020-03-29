@@ -21,6 +21,7 @@
   "rules": {
     "no-unused-expressions": 0,
     "babel/no-unused-expressions": 0,
-    "indent": "off"
+    "indent": "off",
+    "react/jsx-fragments": [true, "syntax"]
   }
 }

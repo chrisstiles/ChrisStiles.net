@@ -1,16 +1,15 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "baseUrl": "./",
-    "outDir": "build",
     "target": "es6",
+    "outDir": "",
     "moduleResolution": "node",
     "esModuleInterop": true,
     "lib": ["es6"],
     "allowJs": true,
     "forceConsistentCasingInFileNames": true,
-    "allowSyntheticDefaultImports": true
-  },
-  "include": ["./server/**.ts"],
-  "exclude": ["./client", "node_modules"]
+    "allowSyntheticDefaultImports": true,
+    "jsx": "react",
+    "noEmit": true
+  }
 }
