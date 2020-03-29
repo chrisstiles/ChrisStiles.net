@@ -2,15 +2,9 @@ runtime: nodejs12
 env: standard
 instance_class: F1
 handlers:
-  - url: /.*
-    script: auto
-    secure: always
-    redirect_http_response_code: '301'
-  - url: .*
-    script: auto
-automatic_scaling:
-  min_idle_instances: automatic
-  max_idle_instances: automatic
-  min_pending_latency: automatic
-  max_pending_latency: automatic
-network: {}
+  - url: /
+  static_files: client/public/index.html
+  upload: www/index.html
+  - url: /(.*)
+    static_files: client/public/\1
+    upload: www/(.*)

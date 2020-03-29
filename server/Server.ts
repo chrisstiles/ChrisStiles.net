@@ -26,13 +26,13 @@ export class Server {
       res.send('You have reached the API!');
     });
 
-    this.app.use(
-      gatsbyExpress(path.resolve('./') + '/build/routes.json', {
-        publicDir: publicPath,
-        template: `${publicPath}/404/index.html`,
-        redirectSlashes: true
-      })
-    );
+    // this.app.use(
+    //   gatsbyExpress(path.resolve('./') + '/build/routes.json', {
+    //     publicDir: publicPath,
+    //     template: `${publicPath}/404/index.html`,
+    //     redirectSlashes: true
+    //   })
+    // );
   }
 
   public start(port: number): void {
