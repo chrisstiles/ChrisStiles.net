@@ -3,8 +3,10 @@ env: standard
 instance_class: F1
 handlers:
   - url: /
-  static_files: client/public/index.html
-  upload: client/public/index.html
+    static_files: client/public/index.html
+    upload: client/public/index.html
+    secure: always
   - url: /(.*)
     static_files: client/public/\1
     upload: client/public/(.*)
+    secure: always
