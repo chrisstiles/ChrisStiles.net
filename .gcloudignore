@@ -4,5 +4,4 @@
 .cache/
 node_modules/
 .DS_Store
-public/
-build/
+client/
