@@ -18,5 +18,9 @@
       "jsx": true,
       "modules": true
     }
+  },
+  "plugins": ["prettier"],
+  "rules": {
+    "prettier/prettier": "off"
   }
 }

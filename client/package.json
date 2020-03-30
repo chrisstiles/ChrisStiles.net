@@ -25,8 +25,7 @@
   "scripts": {
     "build": "gatsby build",
     "develop": "gatsby develop -o",
-    "format": "prettier --write \"**/*.{js,jsx,json,md}\"",
-    "postbuild": "mv gatsby-express.json ../build/routes.json",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
     "start": "npm run develop",
     "serve": "gatsby serve",
     "clean": "gatsby clean",

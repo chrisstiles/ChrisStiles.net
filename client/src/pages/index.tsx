@@ -7,7 +7,7 @@ export default function Home() {
   return (
     <Layout>
       <SEO title="Home" />
-      <h1>Testing 2</h1>
+      <h1>Testing 3</h1>
       <p>Using typescript</p>
       <Link to="/test">Test Page</Link>
       <p>Test 2</p>
