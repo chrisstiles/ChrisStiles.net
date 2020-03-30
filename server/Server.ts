@@ -35,6 +35,11 @@ export class Server {
 
     this.app.use(compression());
     this.app.use(express.static(publicPath));
+
+    this.app.get('/api/test', (req: Request, res: Response): void => {
+      res.send('You have reached the API!!');
+    });
+
     this.app.use(
       gatsbyExpress(pageRoutesPath, {
         publicDir: publicPath,
@@ -42,10 +47,6 @@ export class Server {
         redirectSlashes: true
       })
     );
-
-    this.app.get('/api/test', (req: Request, res: Response): void => {
-      res.send('You have reached the API!!');
-    });
   }
 
   public start(port: number): void {
