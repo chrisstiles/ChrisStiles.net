@@ -9,24 +9,24 @@ handlers:
 
   # Index files
   - url: /([^/.]+)/?$
-    static_files: client/public/\1/index.html
-    upload: client/public/(.+)/index.html
+    static_files: build/public/\1/index.html
+    upload: build/public/(.+)/index.html
     expiration: '15m'
     secure: always
     require_matching_file: true
 
   # Site root
   - url: /
-    static_files: client/public/index.html
-    upload: client/public/index.html
+    static_files: build/public/index.html
+    upload: build/public/index.html
     expiration: '15m'
     secure: always
     require_matching_file: true
 
   # Everything else
   - url: /(.*)
-    static_files: client/public/\1
-    upload: client/public/(.*)
+    static_files: build/public/\1
+    upload: build/public/(.*)
     secure: always
     require_matching_file: true
 

@@ -20,15 +20,15 @@ export class Server {
       })
     );
 
-    const clientPath = path.resolve('./', 'client');
-    const publicPath = `${clientPath}/public`;
-    const cachePath = `${clientPath}/.cache`;
+    const isProd = process.env.NODE_ENV !== 'production';
+    const clientPath = path.resolve('./', isProd ? 'build/public' : 'client');
+    const publicPath = isProd ? clientPath : `${clientPath}/public`;
     const pageRoutesPath = `${clientPath}/gatsby-routes.json`;
 
     // Build client app if routes file doesn't exist
-    if (!fs.existsSync(pageRoutesPath)) {
+    if (!isProd && !fs.existsSync(pageRoutesPath)) {
       execSync(
-        `rm -rf ${cachePath} ${publicPath} && npm run build --prefix client`,
+        `rm -rf ${clientPath}/.cache ${publicPath} && npm run build --prefix client`,
         { stdio: 'inherit' }
       );
     }
