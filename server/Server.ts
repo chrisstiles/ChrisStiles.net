@@ -20,7 +20,7 @@ export class Server {
       })
     );
 
-    const isProd = process.env.NODE_ENV !== 'production';
+    const isProd = process.env.NODE_ENV === 'production';
     const clientPath = path.resolve('./', isProd ? 'build/public' : 'client');
     const publicPath = isProd ? clientPath : `${clientPath}/public`;
     const pageRoutesPath = `${clientPath}/gatsby-routes.json`;
