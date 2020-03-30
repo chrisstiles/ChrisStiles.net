@@ -4,4 +4,4 @@ steps:
     args: ['run', 'build']
   - name: 'gcr.io/cloud-builders/gcloud'
     args: ['app', 'deploy', '-v=production', '--promote']
-    timeout: 800s
+    timeout: 500s
