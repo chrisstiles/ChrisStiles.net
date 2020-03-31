@@ -2,6 +2,8 @@ import React from 'react';
 import Layout from '@components/Layout';
 import SEO from '@components/SEO';
 import styles from './Home.module.scss';
+import space from './space.jpg';
+import classNames from 'classnames';
 
 export default function Home() {
   return (
@@ -19,29 +21,56 @@ export default function Home() {
 
 function SVGClip() {
   return (
-    <div className={styles.clip}>
-      <div className={styles.bgWrapper}>
-        <div className={styles.bg} />
+    <React.Fragment>
+      <div className={styles.clip}>
+        <div className={styles.bgWrapper}>
+          <div className={styles.bg} />
+        </div>
+        <svg width="0" height="0">
+          <defs>
+            <clipPath id="text-clip">
+              <text x="50" y="133" fontWeight="900" fontSize="100px">
+                HTML Clip
+              </text>
+            </clipPath>
+          </defs>
+        </svg>
       </div>
-      <svg width="0" height="0">
-        <defs>
-          <clipPath id="text-clip">
-            <text x="50" y="133" fontWeight="900" fontSize="100px">
-              Chris Stiles
-            </text>
-            {/* <rect x="100" y="400" width="250" height="250" /> */}
-          </clipPath>
-        </defs>
 
-        {/* <rect
-          className={styles.rect}
-          x="0"
-          y="0"
-          width="900"
-          height="500"
-          clipPath="url(#text-clip)"
-        /> */}
-      </svg>
-    </div>
+      <div
+        className={classNames(styles.clip, styles.bgAnimation)}
+        style={{
+          backgroundImage: `url(${space})`,
+          backgroundAttachment: 'fixed',
+          backgroundRepeat: 'repeat'
+        }}
+      >
+        <svg width="100%" height="100%">
+          <defs>
+            <mask id="svg-clip">
+              <rect x="0" y="0" width="100%" height="100%" fill="#FFF" />
+              <text
+                x="50"
+                y="133"
+                fontWeight="900"
+                fontSize="100px"
+                fill="#000"
+              >
+                SVG Clip
+              </text>
+            </mask>
+          </defs>
+
+          <rect
+            x="0"
+            y="0"
+            width="100%"
+            height="100%"
+            fill="#fff"
+            mask="url(#svg-clip)"
+          />
+        </svg>
+      </div>
+    </React.Fragment>
   );
 }
