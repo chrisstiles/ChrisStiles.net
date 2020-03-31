@@ -1,5 +1,4 @@
 import React, { useRef, useEffect } from 'react';
-import ReactDOM from 'react-dom';
 import Layout from '@components/Layout';
 import SEO from '@components/SEO';
 import styles from './Home.module.scss';
@@ -15,16 +14,9 @@ export default function Home() {
         <div className={styles.content}>
           {/* <h1>Chris Stiles</h1> */}
           <SVGClip />
-          <svg width="100%" height="100%" className={styles.overlay}>
-            <rect
-              width="100%"
-              height="100%"
-              fill="#fff"
-              mask="url(#overlay-clip)"
-            />
-          </svg>
         </div>
       </section>
+      <FixedBackground />
     </Layout>
   );
 }
@@ -46,18 +38,16 @@ function SVGClip() {
         {/* <div className={styles.bgWrapper}>
           <div className={styles.bg} />
         </div> */}
-        <svg width="100%" height="100%">
+        <svg width="100%" height="300px">
           <defs>
-            <mask id="overlay-clip">
+            <mask id="overlay-mask">
               <rect x="0" y="0" width="100%" height="100%" fill="#FFF" />
-              <text
-                x="50"
-                y="133"
-                fontWeight="900"
-                fontSize="100px"
-                fill="#000"
-              >
-                Overlay Clip
+              <text x="0" y="80" fontWeight="900" fontSize="110px" fill="#000">
+                Chris
+              </text>
+
+              <text x="0" y="173" fontWeight="900" fontSize="110px" fill="#000">
+                Stiles
               </text>
 
               {/* <rect
@@ -68,8 +58,33 @@ function SVGClip() {
                 className={styles.rectAnimation}
               /> */}
             </mask>
+
+            <clipPath id="overlay-clip">
+              <text x="50" y="133" fontWeight="900" fontSize="100px">
+                Overlay Clip
+              </text>
+            </clipPath>
           </defs>
+
+          <rect
+            width="100%"
+            height="100%"
+            x="0"
+            y="0"
+            fill="#2a3352"
+            // fill="red"
+            mask="url(#overlay-mask)"
+          />
         </svg>
+
+        {/* <svg width="100%" height="100%" className={styles.overlay}>
+          <rect
+            width="100%"
+            height="100%"
+            fill="#2a3352"
+            mask="url(#overlay-mask)"
+          />
+        </svg> */}
 
         {/* <svg width="100%" height="100%" className={styles.overlay}>
           <rect
@@ -125,16 +140,35 @@ function SVGClip() {
           />
         </svg>
       </div> */}
-      <FixedBackground />
     </React.Fragment>
   );
 }
 
 function FixedBackground() {
-  // return ReactDOM.createPortal(<div className={styles.bg} />, document.body)
   return (
-    <div className={styles.fixedBgWraooer}>
-      <div className={styles.fixedBg} />
+    <div className={styles.fixedBgWrapper}>
+      <svg width="100%" height="100%">
+        <defs>
+          <pattern
+            id="polka-dots"
+            x="0"
+            y="0"
+            width="10"
+            height="10"
+            patternUnits="userSpaceOnUse"
+          >
+            <rect x="3" y="3" width="2" height="2" fill="#000" />
+          </pattern>
+        </defs>
+
+        <rect
+          x="0"
+          y="0"
+          width="100%"
+          height="100%"
+          fill="url(#polka-dots)"
+        ></rect>
+      </svg>
     </div>
   );
 }

@@ -6,18 +6,69 @@
 /* Hero */
 
 .hero {
+  display: flex;
+  justify-content: center;
+
+  &:before,
+  &:after {
+    content: '';
+    background-color: #2a3352;
+    flex-grow: 1;
+  }
   // background-color: #2a3352;
 }
 
 .content {
   height: 2000px;
+  width: 100%;
+  max-width: 1200px;
+  flex-grow: 0;
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  margin-top: 200px;
-  color: red;
+  // margin-top: 200px;
+  // padding-top: 200px;
   position: relative;
+  z-index: 200;
+
+  &:before,
+  &:after {
+    content: '';
+    background-color: #2a3352;
+    width: 100%;
+  }
+
+  &:before {
+    height: 400px;
+    flex-grow: 0;
+    flex-shrink: 0;
+  }
+
+  &:after {
+    flex-grow: 1;
+  }
+
+  // background-color: #2a3352;
+  // background-clip: text;
+  // -webkit-background-clip: text;
+  // background-clip: url(#overlay-clip);
+  // -webkit-background-clip: url(#overlay-clip);
+
+  // &:before {
+  //   content: '';
+  //   position: absolute;
+  //   top: 0;
+  //   bottom: 0;
+  //   left: 0;
+  //   right: 0;
+  //   background-color: #2a3352;
+  //   // clip-path: url(#overlay-clip);
+  //   // -webkit-clip-path: url(#overlay-clip);
+  //   // background-clip: url(#overlay-clip);
+  //   // -webkit-background-clip: url(#overlay-clip);
+  // }
 
   h1 {
     font-size: 120px;
@@ -35,29 +86,18 @@
 
 .clip {
   position: relative;
-  // height: 400px;
   width: 100%;
 
   svg {
     transform: translateZ(0);
-    // width: 900px;
-    // height: 500px;
+    display: block;
 
     text {
-      // width: 900px;
-      // height: 500px;
-      // fill: url('./space.jpg');
-      // font-family: 'poppins';
       font-family: 'Poppins', sans-serif;
       font-weight: 900;
       text-transform: uppercase;
     }
   }
-}
-
-.rect {
-  // fill: red;
-  // fill: url('./space.jpg');
 }
 
 .bgWrapper {
@@ -135,7 +175,7 @@
   }
 }
 
-.fixedBgWraooer {
+.fixedBgWrapper {
   position: fixed;
   top: 0;
   left: 0;
@@ -143,6 +183,8 @@
   right: 0;
   overflow: hidden;
   z-index: -1;
+  background-color: #48f3ca;
+  pointer-events: none;
 
   .fixedBg {
     position: absolute;
@@ -155,10 +197,31 @@
     // animation: bgMove 10s linear infinite;
     animation: move 10s linear infinite;
   }
+
+  svg {
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: 0;
+    bottom: 0;
+    animation: movingDots 1.5s linear infinite;
+  }
+}
+
+@keyframes movingDots {
+  0% {
+    transform: translate(0, 0);
+  }
+
+  100% {
+    transform: translate(-10px, -10px);
+  }
 }
 
 .overlay {
   position: absolute;
+  width: 100%;
+  height: 100%;
   top: 0;
   left: 0;
   right: 0;
