@@ -38,10 +38,13 @@
   width: 100%;
 
   svg {
-    width: 900px;
-    height: 500px;
+    transform: translateZ(0);
+    // width: 900px;
+    // height: 500px;
 
     text {
+      // width: 900px;
+      // height: 500px;
       // fill: url('./space.jpg');
       // font-family: 'poppins';
       font-family: 'Poppins', sans-serif;
@@ -53,7 +56,7 @@
 
 .rect {
   // fill: red;
-  fill: url('./space.jpg');
+  // fill: url('./space.jpg');
 }
 
 .bgWrapper {
@@ -61,9 +64,9 @@
   height: 500px;
   width: 900px;
   top: 0;
-  bottom: 0;
+  // bottom: 0;
   left: 0;
-  right: 0;
+  // right: 0;
   z-index: 300;
   // background-color: yellow;
   // background-image: url('./space.jpg');
@@ -71,6 +74,7 @@
   clip-path: url(#text-clip);
   -webkit-clip-path: url(#text-clip);
   pointer-events: none;
+  transform: translateZ(0);
   // background-repeat: repeat;
   // animation: move 10s linear;
 }

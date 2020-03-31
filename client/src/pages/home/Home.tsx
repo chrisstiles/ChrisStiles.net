@@ -23,7 +23,7 @@ function SVGClip() {
       <div className={styles.bgWrapper}>
         <div className={styles.bg} />
       </div>
-      <svg viewBox="0 0 900 500">
+      <svg width="0" height="0">
         <defs>
           <clipPath id="text-clip">
             <text x="50" y="133" fontWeight="900" fontSize="100px">
