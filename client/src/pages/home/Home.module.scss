@@ -139,7 +139,7 @@
   position: fixed;
   top: 0;
   left: 0;
-  bottom: 0;
+  bottom: -200px;
   right: 0;
   overflow: hidden;
   z-index: -1;
@@ -147,12 +147,13 @@
   .fixedBg {
     position: absolute;
     top: 0;
-    left: -100px;
+    left: -200px;
     bottom: 0;
-    right: -100px;
+    right: -200px;
     background-image: url('./space.jpg');
     background-repeat: repeat;
-    animation: bgMove 10s linear infinite;
+    // animation: bgMove 10s linear infinite;
+    animation: move 10s linear infinite;
   }
 }
 
