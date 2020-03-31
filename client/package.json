@@ -4,16 +4,22 @@
   "description": "ChrisStiles.net frontend",
   "author": "Chris Stiles <chrisstiles92@gmail.com>",
   "dependencies": {
+    "classnames": "^2.2.6",
     "gatsby": "^2.19.45",
     "gatsby-image": "^2.2.44",
+    "gatsby-plugin-alias-imports": "^1.0.5",
     "gatsby-plugin-express": "^1.1.6",
     "gatsby-plugin-manifest": "^2.2.48",
     "gatsby-plugin-offline": "^3.0.41",
     "gatsby-plugin-react-helmet": "^3.1.24",
+    "gatsby-plugin-sass": "^2.2.1",
+    "gatsby-plugin-scss-typescript": "^4.0.10",
     "gatsby-plugin-sharp": "^2.4.13",
     "gatsby-plugin-typescript": "^2.3.1",
+    "gatsby-plugin-typescript-scss-modules": "^1.0.7",
     "gatsby-source-filesystem": "^2.1.56",
     "gatsby-transformer-sharp": "^2.3.19",
+    "node-sass": "^4.13.1",
     "prop-types": "^15.7.2",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
@@ -32,7 +38,9 @@
     "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 1"
   },
   "devDependencies": {
+    "@types/classnames": "^2.2.10",
     "@types/node": "^13.9.5",
+    "@types/node-sass": "^4.11.0",
     "@types/react": "^16.9.27",
     "@types/react-dom": "^16.9.5",
     "@typescript-eslint/eslint-plugin": "^2.25.0",
@@ -43,6 +51,7 @@
     "eslint-plugin-import": "^2.20.1",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-react": "^7.19.0",
-    "eslint-plugin-react-hooks": "^2.5.1"
+    "eslint-plugin-react-hooks": "^2.5.1",
+    "typescript-plugin-css-modules": "^2.2.0"
   }
 }

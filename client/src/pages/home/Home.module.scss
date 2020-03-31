@@ -1,0 +1,23 @@
+/* --------------------------- */
+/* Home Page */
+/* --------------------------- */
+
+/* --------------------------- */
+/* Hero */
+
+.hero {
+  height: 700px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #2a3352;
+  color: #fff;
+
+  h1 {
+    font-size: 120px;
+    font-weight: 900;
+    font-family: 'poppins';
+    text-transform: uppercase;
+  }
+}
