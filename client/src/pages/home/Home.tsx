@@ -24,31 +24,37 @@ export default function Home() {
 }
 
 function SVGClip() {
-  const rectRef = useRef<SVGRectElement>(null);
+  // const circleRef = useRef<SVGRectElement>(null);
 
-  // useEffect(() => {
-  //   console.log(rectRef.current);
-  // }, []);
-
-  // console.log('Here');
+  useEffect(() => {
+    // console.log(rectRef.current);
+    gsap.to('.circle', {
+      duration: 1.2,
+      attr: { r: 200 },
+      ease: 'power4.inOut',
+      delay: 0.5
+    });
+  }, []);
 
   return (
     <React.Fragment>
       <div className={styles.clip}>
-        <svg width="100%" height="300px">
+        <svg width="100%" height="600px">
           <defs>
             <mask id="overlay-mask">
               <rect x="0" y="0" width="100%" height="100%" fill="#FFF" />
               <text x="0" y="80" fontWeight="900" fontSize="110px" fill="#000">
                 Chris Stiles
               </text>
+
+              <circle cx="80%" cy="200" r="0" fill="#000" className="circle" />
             </mask>
 
-            <clipPath id="overlay-clip">
+            {/* <clipPath id="overlay-clip">
               <text x="50" y="133" fontWeight="900" fontSize="100px">
                 Overlay Clip
               </text>
-            </clipPath>
+            </clipPath> */}
           </defs>
 
           <rect
@@ -68,7 +74,8 @@ function SVGClip() {
 function FixedBackground() {
   return (
     <div className={styles.fixedBgWrapper}>
-      <svg width="0" height="0">
+      <div className={styles.fixedBg} />
+      {/* <svg width="0" height="0">
         <defs>
           <pattern
             id="polka-dots"
@@ -85,7 +92,7 @@ function FixedBackground() {
 
       <svg width="100%" height="100%">
         <rect x="0" y="0" width="100%" height="100%" fill="url(#polka-dots)" />
-      </svg>
+      </svg> */}
     </div>
   );
 }

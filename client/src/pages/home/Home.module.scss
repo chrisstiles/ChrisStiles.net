@@ -95,6 +95,19 @@ $dotColor: #a54c4c;
   background-color: $accentColor;
   pointer-events: none;
 
+  .fixedBg {
+    position: absolute;
+    width: calc(100% + 40px);
+    height: 110vh;
+    margin-left: -20px;
+    margin-top: -20px;
+    background-image: url('./images/dot.png');
+    background-size: 10px 10px;
+    background-repeat: repeat;
+    animation: movingDots 1.5s linear infinite;
+    will-change: transform;
+  }
+
   svg {
     position: absolute;
     top: -2px;
