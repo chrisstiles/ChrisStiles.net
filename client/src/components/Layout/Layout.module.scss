@@ -32,3 +32,11 @@ body {
   font-weight: 400;
   font-family: 'Poppins', sans-serif;
 }
+
+::selection {
+  background: #fff14b;
+}
+
+::-moz-selection {
+  background: #fff14b;
+}
