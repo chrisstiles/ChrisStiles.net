@@ -1,10 +1,7 @@
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 import Layout from '@components/Layout';
 import SEO from '@components/SEO';
 import styles from './Home.module.scss';
-import space from './space.jpg';
-import classNames from 'classnames';
-import gsap from 'gsap';
 
 export default function Home() {
   return (
@@ -12,87 +9,10 @@ export default function Home() {
       <Layout>
         <SEO title="Home" />
         <section className={styles.hero}>
-          <div className={styles.content}>
-            <h1>Chris Stiles</h1>
-            <SVGClip />
-          </div>
+          <h1>Chris Stiles</h1>
+          <div className={styles.content}>Home here</div>
         </section>
       </Layout>
-      <FixedBackground />
     </React.Fragment>
-  );
-}
-
-function SVGClip() {
-  // const circleRef = useRef<SVGRectElement>(null);
-
-  useEffect(() => {
-    // console.log(rectRef.current);
-    gsap.to('.circle', {
-      duration: 1.2,
-      attr: { r: 200 },
-      ease: 'power4.inOut',
-      delay: 0.5
-    });
-  }, []);
-
-  return (
-    <React.Fragment>
-      <div className={styles.clip}>
-        <svg width="100%" height="600px">
-          <defs>
-            <mask id="overlay-mask">
-              <rect x="0" y="0" width="100%" height="100%" fill="#FFF" />
-              <text x="0" y="80" fontWeight="900" fontSize="110px" fill="#000">
-                Chris Stiles
-              </text>
-
-              <circle cx="80%" cy="200" r="0" fill="#000" className="circle" />
-            </mask>
-
-            {/* <clipPath id="overlay-clip">
-              <text x="50" y="133" fontWeight="900" fontSize="100px">
-                Overlay Clip
-              </text>
-            </clipPath> */}
-          </defs>
-
-          <rect
-            width="100%"
-            height="100%"
-            x="0"
-            y="0"
-            fill={styles.bgColor}
-            mask="url(#overlay-mask)"
-          />
-        </svg>
-      </div>
-    </React.Fragment>
-  );
-}
-
-function FixedBackground() {
-  return (
-    <div className={styles.fixedBgWrapper}>
-      <div className={styles.fixedBg} />
-      {/* <svg width="0" height="0">
-        <defs>
-          <pattern
-            id="polka-dots"
-            x="0"
-            y="0"
-            width="10"
-            height="10"
-            patternUnits="userSpaceOnUse"
-          >
-            <circle cx="2" cy="2" r="1.8" fill={styles.dotColor} />
-          </pattern>
-        </defs>
-      </svg>
-
-      <svg width="100%" height="100%">
-        <rect x="0" y="0" width="100%" height="100%" fill="url(#polka-dots)" />
-      </svg> */}
-    </div>
   );
 }

@@ -1,3 +1,5 @@
+const postcssCustomProperties = require('postcss-custom-properties');
+
 module.exports = {
   siteMetadata: {
     title: 'Chris Stiles',
@@ -17,7 +19,12 @@ module.exports = {
         path: `${__dirname}/src/images`
       }
     },
-    'gatsby-plugin-sass',
+    {
+      resolve: 'gatsby-plugin-sass',
+      options: {
+        postCssPlugins: [postcssCustomProperties()]
+      }
+    },
     'gatsby-transformer-sharp',
     'gatsby-plugin-sharp',
     {
@@ -49,7 +56,8 @@ module.exports = {
       resolve: 'gatsby-plugin-alias-imports',
       options: {
         alias: {
-          '@components': 'src/components'
+          '@components': 'src/components',
+          '@styles': 'src/styles'
         },
         extensions: ['.js', '.ts', '.tsx', '.scss']
       }

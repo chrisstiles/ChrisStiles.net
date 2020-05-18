@@ -1,9 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet';
 import { useStaticQuery, graphql } from 'gatsby';
 
-function SEO({ description, lang, meta, title }) {
+export default function SEO({ description, lang, meta, title }: SEOProps) {
   const { site } = useStaticQuery(
     graphql`
       query {
@@ -28,35 +27,35 @@ function SEO({ description, lang, meta, title }) {
       titleTemplate={`%s | ${site.siteMetadata.title}`}
       meta={[
         {
-          name: `description`,
+          name: 'description',
           content: metaDescription
         },
         {
-          property: `og:title`,
+          property: 'og:title',
           content: title
         },
         {
-          property: `og:description`,
+          property: 'og:description',
           content: metaDescription
         },
         {
-          property: `og:type`,
+          property: 'og:type',
           content: `website`
         },
         {
-          name: `twitter:card`,
+          name: 'twitter:card',
           content: `summary`
         },
         {
-          name: `twitter:creator`,
+          name: 'twitter:creator',
           content: site.siteMetadata.author
         },
         {
-          name: `twitter:title`,
+          name: 'twitter:title',
           content: title
         },
         {
-          name: `twitter:description`,
+          name: 'twitter:description',
           content: metaDescription
         }
       ].concat(meta)}
@@ -64,17 +63,16 @@ function SEO({ description, lang, meta, title }) {
   );
 }
 
+type SEOProps = {
+  lang: string;
+  meta: [{ name: string; content: string }];
+  title: string;
+  description: string;
+};
+
 SEO.defaultProps = {
-  lang: `en`,
-  meta: [],
-  description: ``
+  title: 'Chris Stiles',
+  description: '',
+  lang: 'en',
+  meta: []
 };
-
-SEO.propTypes = {
-  description: PropTypes.string,
-  lang: PropTypes.string,
-  meta: PropTypes.arrayOf(PropTypes.object),
-  title: PropTypes.string.isRequired
-};
-
-export default SEO;

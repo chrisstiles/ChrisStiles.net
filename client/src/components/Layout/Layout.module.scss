@@ -2,7 +2,20 @@
 /* Layout */
 /* --------------------------- */
 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;800;900&display=swap');
+/* --------------------------- */
+/* Fonts */
+
+@import url('https://use.typekit.net/gse1fwz.css');
+@import url('https://use.typekit.net/gse1fwz.css');
+
+/* --------------------------- */
+/* Imports */
+
+@import '@styles/variables';
+@import '@styles/colors';
+
+/* --------------------------- */
+/* General Styles */
 
 *,
 *:before,
@@ -11,10 +24,8 @@
   padding: 0;
   box-sizing: border-box;
   background-repeat: no-repeat;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-family: sans-serif;
   text-rendering: optimizeLegibility;
 }
 
@@ -30,13 +41,17 @@ body {
   margin: 0;
   padding: 0;
   font-weight: 400;
-  font-family: 'Poppins', sans-serif;
+  font-family: var(--font);
+  font-display: swap;
+  background-color: var(--bg);
+  color: #fff;
+  font-size: 18px;
 }
 
 ::selection {
-  background: #fff14b;
+  background: var(--highlight);
 }
 
 ::-moz-selection {
-  background: #fff14b;
+  background: var(--highlight);
 }
