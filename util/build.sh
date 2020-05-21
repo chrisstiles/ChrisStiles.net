@@ -9,7 +9,10 @@ npm install
 npx tsc
 
 # Build front end
-npm install --prefix client
-npm run build --prefix client
+cd client
+gatsby clean
+npm install
+npm run build
+cd ..
 cp -R ./client/public ./build/public/
 cp ./client/gatsby-routes.json ./build/public
