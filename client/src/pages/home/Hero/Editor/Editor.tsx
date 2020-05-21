@@ -7,7 +7,12 @@ export default React.memo(function Editor() {
       <div className={styles.top}>
         <span className={styles.dots} />
       </div>
-      <div className={styles.code}>Code here</div>
+      <div className={styles.code}>
+        <div>test code</div>
+        <div>test code</div>
+        <div>test code</div>
+        <div>test code</div>
+      </div>
       <div className={styles.terminal} />
     </div>
   );
