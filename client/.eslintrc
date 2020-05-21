@@ -17,12 +17,12 @@
     "Atomics": "readonly",
     "SharedArrayBuffer": "readonly"
   },
-  "plugins": ["babel"],
+  "plugins": ["babel", "prettier"],
   "rules": {
     "no-unused-expressions": 0,
     "babel/no-unused-expressions": 0,
     "indent": "off",
     "react/jsx-fragments": [1, "element"],
-    "prettier/prettier": "off"
+    "prettier/prettier": "error"
   }
 }

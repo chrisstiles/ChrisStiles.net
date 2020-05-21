@@ -1,0 +1,95 @@
+/* --------------------------- */
+/* Editor */
+/* --------------------------- */
+
+@import '@styles/variables';
+
+$borderRadius: 6px;
+
+.wrapper {
+  width: 570px;
+  flex-grow: 0;
+  margin-top: -90px;
+  position: relative;
+
+  &:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: -1;
+    border-radius: $borderRadius;
+    transform: translate(15px, 15px);
+    background-color: rgba(#121820, 0.65);
+  }
+}
+
+/* --------------------------- */
+/* Top Bar */
+
+.top {
+  background-color: #e7edf3;
+  border-top-left-radius: $borderRadius;
+  border-top-right-radius: $borderRadius;
+  display: flex;
+  align-items: center;
+  height: 50px;
+  padding: 0 25px;
+}
+
+.dots {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: currentColor;
+  color: #c7cdd3;
+  position: relative;
+  flex-grow: 0;
+  margin-left: 10px;
+
+  &:before,
+  &:after {
+    content: '';
+    background-color: currentColor;
+    position: absolute;
+    border-radius: 50%;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    flex-grow: 0;
+  }
+
+  $offset: 6px;
+
+  &:before {
+    transform: translateX(calc(-100% - #{$offset}));
+  }
+
+  &:after {
+    transform: translateX(calc(100% + #{$offset}));
+  }
+}
+
+/* --------------------------- */
+/* Code */
+
+.code {
+  background-color: #f9fafc;
+  height: 254px;
+  color: #8792a0;
+  font-family: var(--font-code);
+  font-weight: 500;
+}
+
+/* --------------------------- */
+/* Terminal */
+
+.terminal {
+  background-color: #263241;
+  border-bottom-left-radius: $borderRadius;
+  border-bottom-right-radius: $borderRadius;
+  height: 90px;
+}

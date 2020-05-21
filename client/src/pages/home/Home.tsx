@@ -1,18 +1,15 @@
 import React from 'react';
-import Layout from '@components/Layout';
+import Layout from '@layout';
 import SEO from '@components/SEO';
-import styles from './Home.module.scss';
+import Header from './Header';
+import Hero from './Hero';
+// import styles from './Home.module.scss';
 
 export default function Home() {
   return (
-    <React.Fragment>
-      <Layout>
-        <SEO title="Home" />
-        <section className={styles.hero}>
-          <h1>Chris Stiles</h1>
-          <div className={styles.content}>Home here</div>
-        </section>
-      </Layout>
-    </React.Fragment>
+    <Layout header={<Header />}>
+      <SEO title="Home" />
+      <Hero />
+    </Layout>
   );
 }

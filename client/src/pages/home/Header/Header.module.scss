@@ -1,0 +1,46 @@
+/* --------------------------- */
+/* Header */
+/* --------------------------- */
+
+@import '@styles/variables';
+
+.header {
+  font-family: var(--font-code);
+  display: flex;
+  align-items: center;
+  margin-top: 80px;
+  margin-bottom: 140px;
+}
+
+.logo {
+  margin-right: 25px;
+}
+
+.items {
+  display: flex;
+  list-style: none;
+  align-items: center;
+  text-transform: uppercase;
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0.15em;
+
+  li {
+    margin-right: 23px;
+
+    &:after {
+      content: '/';
+      margin-left: 25px;
+      opacity: 0.3;
+      font-weight: 800;
+    }
+
+    &:last-child {
+      margin-right: 0;
+
+      &:after {
+        display: none;
+      }
+    }
+  }
+}

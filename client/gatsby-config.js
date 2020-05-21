@@ -25,6 +25,7 @@ module.exports = {
         postCssPlugins: [postcssCustomProperties()]
       }
     },
+    'gatsby-plugin-react-svg',
     'gatsby-transformer-sharp',
     'gatsby-plugin-sharp',
     {
@@ -57,6 +58,8 @@ module.exports = {
       options: {
         alias: {
           '@components': 'src/components',
+          '@layout': 'src/components/Layout',
+          '@images': 'src/images',
           '@styles': 'src/styles'
         },
         extensions: ['.js', '.ts', '.tsx', '.scss']
