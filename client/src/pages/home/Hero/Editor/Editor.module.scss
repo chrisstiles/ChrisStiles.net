@@ -78,18 +78,7 @@ $borderRadius: 6px;
 
 .code {
   background-color: #f9fafc;
-  height: 254px;
-  color: #8792a0;
   font-family: var(--font-code);
-  font-weight: 500;
-
-  div {
-    counter-increment: num;
-
-    &:before {
-      content: counter(num);
-    }
-  }
 }
 
 /* --------------------------- */
