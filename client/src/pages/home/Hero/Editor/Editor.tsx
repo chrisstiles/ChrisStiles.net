@@ -21,10 +21,10 @@ export default React.memo(function Editor() {
           language="scss"
           content={`
             h1 {
-              color:#fff;
+              color: #fff;
 
               span {
-                color:red;
+                color: red;
               }
             }
           `}

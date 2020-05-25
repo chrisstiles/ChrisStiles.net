@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { formatCode } from './formatting';
+import { formatCode } from '@utils/codeFormatting';
 import styles from './Code.module.scss';
 import Prism from 'prismjs';
 import classNames from 'classnames';
@@ -14,7 +14,7 @@ export default function Code({ language, content }: CodeProps) {
   return (
     <pre className={classNames(styles.wrapper, 'line-numbers')}>
       <code ref={ref} className={`language-${language}`}>
-        {formatCode(content, language)}
+        {formatCode(content)}
       </code>
     </pre>
   );

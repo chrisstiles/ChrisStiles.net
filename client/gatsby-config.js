@@ -60,7 +60,8 @@ module.exports = {
           '@components': 'src/components',
           '@layout': 'src/components/Layout',
           '@images': 'src/images',
-          '@styles': 'src/styles'
+          '@styles': 'src/styles',
+          '@utils': 'src/utils'
         },
         extensions: ['.js', '.ts', '.tsx', '.scss']
       }

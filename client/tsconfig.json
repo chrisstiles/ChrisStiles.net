@@ -16,7 +16,8 @@
     "paths": {
       "@components/*": ["components/*"],
       "@images/*": ["images/*"],
-      "@layout": ["components/Layout"]
+      "@layout": ["components/Layout"],
+      "@utils/*": ["utils/*"]
     },
     "plugins": [{ "name": "typescript-plugin-css-modules" }]
   },

@@ -20,6 +20,22 @@
 }
 
 :global {
+  /* --------------------------- */
+  /* HTML */
+
+  .language-html {
+    .punctuation {
+      color: #7cd3f5;
+    }
+
+    .tag {
+      color: #f16572;
+    }
+  }
+
+  /* --------------------------- */
+  /* Line Numbers */
+
   .line-numbers {
     position: relative;
     padding-left: 3.8em;

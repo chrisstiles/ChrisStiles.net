@@ -1,8 +1,8 @@
 import Prism from 'prismjs';
 import 'prismjs/components/prism-scss';
 
-export function formatCode(code: string, language: string = 'css') {
-  if (!code.trim()) {
+export function formatCode(code: string) {
+  if (!code?.trim()) {
     return '';
   }
 
