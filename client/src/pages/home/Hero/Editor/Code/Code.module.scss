@@ -47,6 +47,46 @@ $lineNumbersWidth: 45px;
     margin-left: -$lineNumbersWidth;
     padding-left: $lineNumbersWidth;
     width: 100%;
+
+    @keyframes blink {
+      0% {
+        opacity: 0;
+      }
+
+      50% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+      }
+    }
+
+    &:global(.has-caret):after,
+    :global(.caret) {
+      content: '';
+      display: none;
+      line-height: 0;
+      height: 18px;
+      width: 1px;
+      vertical-align: middle;
+      background: #797979;
+      margin-top: -3px;
+      margin-left: 2px;
+      animation: blink 0.75s step-end infinite;
+
+      @at-root .visible & {
+        display: inline-block;
+      }
+
+      @at-root :global(.stopped:not(.showCaret)) & {
+        visibility: hidden;
+      }
+
+      &:first-child {
+        margin-left: 0;
+      }
+    }
   }
 }
 

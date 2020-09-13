@@ -1,5 +1,5 @@
-// import Prism from 'prismjs';
-// import 'prismjs/components/prism-scss';
+import Prism from 'prismjs';
+import 'prismjs/components/prism-scss';
 
 export function formatCode(code: string) {
   if (!code?.trim()) {
@@ -77,37 +77,28 @@ export function html(
 }
 
 // Init Prism highlighting
-// let hasAddedHooks = false;
+let hasAddedHooks = false;
 
-// if (!hasAddedHooks) {
-//   hasAddedHooks = true;
+if (!hasAddedHooks) {
+  hasAddedHooks = true;
 
-//   Prism.hooks.add('after-highlight', function (env) {
-//     const pre = env.element.parentElement;
+  // Add cursor caret, this can be added to a specific
+  // line and will default to displaying at the end of the string
+  const caretString = '*|*';
 
-//     if (
-//       !pre ||
-//       !/pre/i.test(pre.nodeName) ||
-//       !pre.classList.contains('line-numbers')
-//     ) {
-//       return;
-//     }
+  Prism.hooks.add('before-highlight', env => {
+    env.hasSetCaretPosition = env.code.includes(caretString);
+  });
 
-//     const linesNum = 1 + env.code.split('\n').length;
-//     let lineNumbersWrapper;
-//     const arr = new Array(linesNum);
-//     const lines = arr.join('<span></span>');
-
-//     lineNumbersWrapper = document.createElement('span');
-//     lineNumbersWrapper.className = 'line-numbers-rows';
-//     lineNumbersWrapper.innerHTML = lines;
-
-//     if (pre.hasAttribute('data-start')) {
-//       pre.style.counterReset =
-//         'linenumber ' +
-//         (parseInt(pre.getAttribute('data-start'), 10) - 1);
-//     }
-
-//     env.element.appendChild(lineNumbersWrapper);
-//   });
-// }
+  Prism.hooks.add('before-insert', env => {
+    if (env.hasSetCaretPosition) {
+      env.element.classList.remove('has-caret');
+      env.highlightedCode = env.highlightedCode.replace(
+        caretString,
+        '<span class="caret"></span>'
+      );
+    } else {
+      env.element.classList.add('has-caret');
+    }
+  });
+}

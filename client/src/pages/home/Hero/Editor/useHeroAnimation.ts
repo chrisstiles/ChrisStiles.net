@@ -9,9 +9,10 @@ export enum Language {
 
 export default function useHeroAnimation({
   startDelay = 0,
-  minTypingDelay = 70,
-  maxTypingDelay = 200
+  minTypingDelay = 60,
+  maxTypingDelay = 150
 }: HeroAnimationConfig = {}) {
+  const [hasStarted, setHasStarted] = useState(startDelay === 0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
@@ -56,18 +57,29 @@ export default function useHeroAnimation({
 
         text
           .split('')
-          .reduce((prevPromise: Promise<void>, nextText: string) => {
-            return prevPromise.then(() => {
-              return new Promise(resolve => {
-                setTimeout(() => {
-                  requestAnimationFrame(() => {
-                    fn(text => text + nextText);
-                    resolve(nextText);
-                  });
-                }, random(minTypingDelay, maxTypingDelay));
+          .reduce(
+            (
+              prevPromise: Promise<void>,
+              nextText: string,
+              index: number
+            ) => {
+              return prevPromise.then(() => {
+                return new Promise(resolve => {
+                  const delay =
+                    index === 0
+                      ? 0
+                      : random(minTypingDelay, maxTypingDelay);
+                  setTimeout(() => {
+                    requestAnimationFrame(() => {
+                      fn(text => text + nextText);
+                      resolve(nextText);
+                    });
+                  }, delay);
+                });
               });
-            });
-          }, Promise.resolve())
+            },
+            Promise.resolve()
+          )
           .then(() => resolve());
       });
     },
@@ -123,7 +135,10 @@ export default function useHeroAnimation({
 
   // Start running animation initially after a delay
   useEffect(() => {
-    setTimeout(() => setIsPlaying(true), startDelay);
+    setTimeout(() => {
+      setHasStarted(true);
+      setIsPlaying(true);
+    }, startDelay);
   }, [startDelay]);
 
   // If the animation pauses and plays again, play a queued animation
@@ -149,17 +164,19 @@ export default function useHeroAnimation({
 
   const _setIsPlaying = useCallback(
     (shouldPlay: boolean) => {
-      if (!isComplete) {
+      if (hasStarted && !isComplete) {
         setIsPlaying(shouldPlay);
       }
     },
-    [isComplete]
+    [hasStarted, isComplete]
   );
 
   return {
     currentView,
     html,
     scss,
+    isPlaying,
+    isComplete,
     setCurrentView,
     setIsPlaying: _setIsPlaying
   };
@@ -174,12 +191,13 @@ type Step = {
 
 const steps: Step[] = [
   { text: '<h1>', view: Language.HTML },
-  { text: '<h1></h1>', instant: true, delay: 3000 },
+  { text: '<h1>*|*</h1>', instant: true },
   {
     instant: true,
+    delay: 500,
     text: `
       <h1>
-
+        *|*
       </h1>
     `
   }

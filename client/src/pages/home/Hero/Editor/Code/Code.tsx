@@ -29,7 +29,7 @@ export default function Code({
       <pre className={styles.code}>
         <code
           ref={ref}
-          className={`language-${language}`}
+          className={`has-caret language-${language}`}
         >
           {code}
         </code>
