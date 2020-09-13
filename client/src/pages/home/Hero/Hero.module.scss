@@ -2,11 +2,21 @@
 /* Hero */
 /* --------------------------- */
 
-.hero {
+@import '@styles/colors';
+
+.top {
   display: flex;
 }
 
 .content {
   padding-right: 80px;
   flex-grow: 1;
+}
+
+.bottom {
+  margin-top: 110px;
+  text-align: center;
+  color: var(--light-grey);
+  font-weight: 500;
+  font-size: 22px;
 }

@@ -17,12 +17,20 @@
     "Atomics": "readonly",
     "SharedArrayBuffer": "readonly"
   },
-  "plugins": ["babel", "prettier"],
+  "plugins": ["babel"],
   "rules": {
     "no-unused-expressions": 0,
     "babel/no-unused-expressions": 0,
-    "indent": "off",
     "react/jsx-fragments": [1, "element"],
-    "prettier/prettier": "error"
+    "indent": [1, 2],
+    "react/jsx-closing-bracket-location": [1, "line-aligned"],
+    "react/jsx-first-prop-new-line": [1, "multiline"],
+    "react/jsx-max-props-per-line": [
+      1,
+      {
+        "maximum": 1,
+        "when": "always"
+      }
+    ]
   }
 }

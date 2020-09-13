@@ -6,12 +6,12 @@
 /* Fonts */
 
 @import url('https://use.typekit.net/gse1fwz.css');
-@import url('https://use.typekit.net/gse1fwz.css');
 
 /* --------------------------- */
 /* Imports */
 
 @import '@styles/variables';
+@import '@styles/mixins';
 @import '@styles/colors';
 
 /* --------------------------- */
@@ -48,12 +48,9 @@ body {
   font-size: 18px;
 }
 
-::selection {
-  background: var(--highlight);
-}
-
-::-moz-selection {
-  background: var(--highlight);
+@include highlight {
+  background-color: var(--highlight-dark);
+  color: #fff;
 }
 
 :global {

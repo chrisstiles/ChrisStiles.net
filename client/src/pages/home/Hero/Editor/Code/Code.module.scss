@@ -6,68 +6,115 @@
 @import '@styles/mixins';
 
 .wrapper {
-  max-height: 255px;
-  overflow-y: auto;
-  padding: 20px;
+  $translate: 80px;
+  overflow: hidden;
   font-size: 15px;
   line-height: 1.3;
   color: #000;
-  border-bottom: 1px solid #dedede;
+  height: 100%;
+  margin-right: 2px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX($translate);
+  transition: all 0.3s cubic-bezier(0.21, 0.94, 0.14, 1);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 
-  &:last-child {
-    border-bottom: 0;
+  &.visible {
+    opacity: 1;
+    transform: translateX(0) !important;
+    pointer-events: auto;
+    overflow-y: auto;
+  }
+
+  &:first-child {
+    transform: translateX(-$translate);
   }
 }
+
+$lineNumbersWidth: 45px;
+
+.code {
+  padding: 20px 20px 20px 0;
+  display: flex;
+  align-items: flex-start;
+
+  code {
+    order: 2;
+    margin-left: -$lineNumbersWidth;
+    padding-left: $lineNumbersWidth;
+    width: 100%;
+  }
+}
+
+/* --------------------------- */
+/* Line Numbers */
+
+.lineNumbers {
+  @include noSelect;
+  flex-grow: 0;
+  flex-shrink: 0;
+  pointer-events: none;
+  margin-right: 15px;
+  padding-bottom: 10px;
+  width: $lineNumbersWidth;
+  border-right: 1px solid #d9dee4;
+  font-weight: 500;
+  order: 1;
+
+  > span {
+    pointer-events: none;
+    display: block;
+    counter-increment: lineNumber;
+
+    &:before {
+      content: counter(lineNumber);
+      color: #8792a0;
+      display: block;
+      padding-right: 0.7em;
+      text-align: right;
+    }
+  }
+}
+
+/* --------------------------- */
+/* Syntax Highlighting */
 
 :global {
   /* --------------------------- */
   /* HTML */
 
   .language-html {
+    color: #002339;
+
     .punctuation {
-      color: #7cd3f5;
+      color: #3e3e3e;
     }
 
     .tag {
-      color: #f16572;
+      color: #0444ac;
     }
   }
 
   /* --------------------------- */
-  /* Line Numbers */
+  /* SCSS */
 
-  .line-numbers {
-    position: relative;
-    padding-left: 3.8em;
-    counter-reset: lineNumber;
+  .language-scss {
+    color: #174781;
 
-    > code {
-      position: relative;
+    .selector {
+      color: #0444ac;
     }
 
-    .line-numbers-rows {
-      @include noSelect;
-      position: absolute;
-      pointer-events: none;
-      top: 0;
-      left: -3.8em;
-      width: 3em;
-      border-right: 1px solid #d9dee4;
-      font-weight: 500;
+    .property {
+      color: #dc3eb7;
+    }
 
-      > span {
-        pointer-events: none;
-        display: block;
-        counter-increment: lineNumber;
-
-        &:before {
-          content: counter(lineNumber);
-          color: #8792a0;
-          display: block;
-          padding-right: 0.7em;
-          text-align: right;
-        }
-      }
+    .punctuation {
+      color: #002339;
     }
   }
 }

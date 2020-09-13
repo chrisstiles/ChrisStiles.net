@@ -18,6 +18,13 @@ export default function Content({
   );
 }
 
+export function Section(props: ContentProps) {
+  return <Content
+    tag="section"
+    {...props}
+  />;
+}
+
 Content.defaultProps = {
   tag: 'div'
 };
@@ -26,5 +33,5 @@ type ContentProps = {
   className?: string;
   children: React.ReactNode;
   style?: React.CSSProperties;
-  tag: keyof JSX.IntrinsicElements;
+  tag?: keyof JSX.IntrinsicElements;
 };
