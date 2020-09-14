@@ -1,5 +1,5 @@
-import Prism from 'prismjs';
-import 'prismjs/components/prism-scss';
+// import Prism from 'prismjs';
+// import 'prismjs/components/prism-scss';
 
 export function formatCode(code: string) {
   if (!code?.trim()) {
@@ -74,31 +74,4 @@ export function html(
     .join('\n');
 
   return test;
-}
-
-// Init Prism highlighting
-let hasAddedHooks = false;
-
-if (!hasAddedHooks) {
-  hasAddedHooks = true;
-
-  // Add cursor caret, this can be added to a specific
-  // line and will default to displaying at the end of the string
-  const caretString = '*|*';
-
-  Prism.hooks.add('before-highlight', env => {
-    env.hasSetCaretPosition = env.code.includes(caretString);
-  });
-
-  Prism.hooks.add('before-insert', env => {
-    if (env.hasSetCaretPosition) {
-      env.element.classList.remove('has-caret');
-      env.highlightedCode = env.highlightedCode.replace(
-        caretString,
-        '<span class="caret"></span>'
-      );
-    } else {
-      env.element.classList.add('has-caret');
-    }
-  });
 }

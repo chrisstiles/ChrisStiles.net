@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './Title.module.scss';
 
-export default function Title() {
+export default function Title({ text }: TitleProps) {
   return (
     <code className={styles.title}>
       <span className={styles.red}>this</span>
@@ -13,3 +13,7 @@ export default function Title() {
     </code>
   );
 }
+
+type TitleProps = {
+  text: string;
+};

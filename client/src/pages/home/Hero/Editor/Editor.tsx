@@ -4,7 +4,7 @@ import Code from './Code';
 import styles from './Editor.module.scss';
 import classNames from 'classnames';
 
-export default React.memo(function Editor() {
+export default React.memo(function Editor({ setState }: EditorProps) {
   const {
     currentView,
     html,
@@ -13,7 +13,7 @@ export default React.memo(function Editor() {
     isPlaying,
     isComplete,
     setIsPlaying
-  } = useHeroAnimation();
+  } = useHeroAnimation({ setState });
 
   const handleButtonClick = useCallback(
     (view: Language) => {
@@ -99,11 +99,8 @@ export default React.memo(function Editor() {
   );
 });
 
-type TabProps = {
-  language: Language;
-  currentView: Language;
-  children?: React.ReactNode;
-  onClick: (x: Language) => void;
+type EditorProps = {
+  setState: (value: any, name?: any) => void;
 };
 
 function Tab({ language, currentView, children, onClick }: TabProps) {
@@ -118,3 +115,10 @@ function Tab({ language, currentView, children, onClick }: TabProps) {
     </button>
   );
 }
+
+type TabProps = {
+  language: Language;
+  currentView: Language;
+  children?: React.ReactNode;
+  onClick: (x: Language) => void;
+};

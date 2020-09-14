@@ -58,8 +58,9 @@ module.exports = {
       options: {
         alias: {
           '@components': 'src/components',
-          '@layout': 'src/components/Layout',
+          '@helpers$': 'src/utils/helpers',
           '@images': 'src/images',
+          '@layout': 'src/components/Layout',
           '@styles': 'src/styles',
           '@utils': 'src/utils'
         },

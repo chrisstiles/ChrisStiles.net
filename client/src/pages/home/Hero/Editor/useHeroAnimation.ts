@@ -1,4 +1,10 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  useMemo
+} from 'react';
 import { random } from 'lodash';
 
 export enum Language {
@@ -7,11 +13,14 @@ export enum Language {
   JavaScript = 'js'
 }
 
-export default function useHeroAnimation({
-  startDelay = 0,
-  minTypingDelay = 40,
-  maxTypingDelay = 150
-}: HeroAnimationConfig = {}) {
+export default function useHeroAnimation(
+  {
+    startDelay = 0,
+    minTypingDelay = 40,
+    maxTypingDelay = 150,
+    setState
+  }: HeroAnimationConfig = { setState: () => {} }
+) {
   const [hasStarted, setHasStarted] = useState(startDelay === 0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
@@ -21,6 +30,36 @@ export default function useHeroAnimation({
   const [scss, setScss] = useState('');
   const timer = useRef(null);
   const queuedAnimation = useRef(null);
+  const isPlayingRef = useRef(isPlaying);
+
+  const steps: Step[] = useMemo(
+    () => [
+      { text: '<h1>', view: Language.HTML },
+      { text: '<h1>*|*</h1>', instant: true, delay: 500 },
+      {
+        instant: true,
+        delay: 500,
+        text: `
+          <h1>
+            *|*
+          </h1>
+        `
+      },
+      {
+        text: `
+          <h1>
+            [-Good ideas need great developers-]
+          </h1>
+        `,
+        delay: 500,
+        outputText: true,
+        onType: (headlineText: string) => {
+          setState({ headlineText });
+        }
+      }
+    ],
+    []
+  );
 
   // Queue the next step in the animation
   const queue = useCallback(
@@ -32,12 +71,18 @@ export default function useHeroAnimation({
           queuedAnimation.current = null;
           clearTimeout(timer.current);
 
-          timer.current = setTimeout(() => {
+          const run = () => {
             requestAnimationFrame(() => {
               fn();
               resolve();
             });
-          }, delay);
+          };
+
+          if (delay === 0) {
+            run();
+          } else {
+            timer.current = setTimeout(run, delay);
+          }
         };
 
         if (!isPlaying) {
@@ -58,7 +103,8 @@ export default function useHeroAnimation({
   }
 
   const type = useCallback(
-    async (text: string, view: Language) => {
+    async (step: Step, view: Language) => {
+      const { text } = step;
       const fn = view === Language.HTML ? setHtml : setScss;
       const splitLines: string[] = text.split('\n');
       const lines: TypedLine[] = [];
@@ -94,14 +140,10 @@ export default function useHeroAnimation({
         await updateText();
       }
 
-      return new Promise(resolve => {
+      return new Promise(async resolve => {
         const typeLine = async (line: TypedLine) => {
           return new Promise(resolve => {
-            if (!line.shouldType) {
-              resolve();
-              return;
-            }
-
+            line.text += '*|*';
             const text = line.match ?? line.text;
 
             text
@@ -127,28 +169,29 @@ export default function useHeroAnimation({
                         line.text.substring(start);
 
                       await updateText(delay);
-                      resolve(nextText);
+
+                      if (step.onType) {
+                        step.onType(line.text.replace('*|*', ''));
+                      }
+
+                      if (isPlayingRef.current) {
+                        resolve(nextText);
+                      } else {
+                        queuedAnimation.current = () =>
+                          resolve(nextText);
+                      }
                     });
                   });
                 },
                 Promise.resolve()
               )
-              .then(() => resolve());
+              .then(resolve);
           });
         };
 
-        return lines
-          .reduce(
-            (prevPromise: Promise<void>, nextLine: TypedLine) => {
-              return prevPromise.then(() => {
-                return typeLine(nextLine).then(() =>
-                  resolve(nextLine)
-                );
-              });
-            },
-            Promise.resolve()
-          )
-          .then(() => resolve());
+        Promise.all(
+          lines.filter(({ shouldType }) => shouldType).map(typeLine)
+        ).then(resolve);
       });
     },
     [minTypingDelay, maxTypingDelay, queue]
@@ -178,7 +221,7 @@ export default function useHeroAnimation({
               const fn = view === Language.HTML ? setHtml : setScss;
               await queue(() => fn(step.text), 0);
             } else {
-              await type(step.text, view);
+              await type(step, view);
             }
 
             if (shoudIncrement) {
@@ -211,6 +254,8 @@ export default function useHeroAnimation({
 
   // If the animation pauses and plays again, play a queued animation
   useEffect(() => {
+    isPlayingRef.current = isPlaying;
+
     if (isPlaying && queuedAnimation.current) {
       queuedAnimation.current();
     }
@@ -255,6 +300,8 @@ type Step = {
   view?: Language;
   instant?: boolean;
   delay?: number;
+  outputText?: boolean;
+  onType?: (text: string) => void;
 };
 
 /*
@@ -266,30 +313,9 @@ Caret position: *|*
 
 */
 
-const steps: Step[] = [
-  { text: '<h1>', view: Language.HTML },
-  { text: '<h1>*|*</h1>', instant: true },
-  {
-    instant: true,
-    delay: 500,
-    text: `
-      <h1>
-        *|*
-      </h1>
-    `
-  },
-  {
-    text: `
-      <h1>
-        [-Good ideas need great developers-]
-      </h1>
-    `,
-    delay: 500
-  }
-];
-
 type HeroAnimationConfig = {
   startDelay?: number;
   minTypingDelay?: number;
   maxTypingDelay?: number;
+  setState: (value: any, name?: any) => void;
 };

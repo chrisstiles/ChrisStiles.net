@@ -5,7 +5,10 @@ import styles from './Header.module.scss';
 
 export default function Header() {
   return (
-    <Content tag="header" className={styles.header}>
+    <Content
+      tag="header"
+      className={styles.header}
+    >
       <Logo className={styles.logo} />
       <ul className={styles.items}>
         <li>Developer</li>
@@ -15,3 +18,7 @@ export default function Header() {
     </Content>
   );
 }
+
+type HeadlineProps = {
+  text: string;
+};

@@ -13,11 +13,9 @@
     "noImplicitAny": true,
     "noEmit": true,
     "baseUrl": "./src",
-    "compilerOptions": {
-      "preserveConstEnums": true
-    },
     "paths": {
       "@components/*": ["components/*"],
+      "@helpers": ["utils/helpers"],
       "@images/*": ["images/*"],
       "@layout": ["components/Layout"],
       "@utils/*": ["utils/*"]

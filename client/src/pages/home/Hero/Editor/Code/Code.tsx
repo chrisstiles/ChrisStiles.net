@@ -1,9 +1,19 @@
-import React, { useEffect, useRef, useMemo } from 'react';
+import React, { useRef, useMemo } from 'react';
 import { html } from '@utils/codeFormatting';
 import styles from './Code.module.scss';
 import Prism from 'prismjs';
 import 'prismjs/components/prism-scss';
 import classNames from 'classnames';
+
+interface Tokens {
+  [key: string]: { pattern: RegExp };
+}
+
+const tokens: Tokens = {
+  caret: {
+    pattern: /\*\|\*/
+  }
+};
 
 export default function Code({
   language,
@@ -11,14 +21,27 @@ export default function Code({
   isVisible
 }: CodeProps) {
   const ref = useRef<HTMLElement>();
-  const [code, lines] = useMemo((): [string, string[]] => {
-    const code = html`${content}`;
-    return [code, code.split('\n')];
-  }, [content]);
 
-  useEffect(() => {
-    Prism.highlightElement(ref.current);
-  }, [language, code]);
+  // Extend Prism's language grammar for custom functionality
+  const grammar = useMemo(() => {
+    return Prism.languages.extend(language, tokens);
+  }, [language]);
+
+  const [code, lines] = useMemo((): [string, string[]] => {
+    const formattedCode = html`${content}`;
+    let highlightedCode = Prism.highlight(
+      formattedCode,
+      grammar,
+      language
+    );
+
+    Object.keys(tokens).forEach((key: keyof Tokens) => {
+      const regex = new RegExp(tokens[key].pattern, 'g');
+      highlightedCode = highlightedCode.replace(regex, '');
+    });
+
+    return [highlightedCode, formattedCode.split('\n')];
+  }, [content, grammar, language]);
 
   return (
     <div
@@ -29,10 +52,9 @@ export default function Code({
       <pre className={styles.code}>
         <code
           ref={ref}
-          className={`has-caret language-${language}`}
-        >
-          {code}
-        </code>
+          className={`language-${language}`}
+          dangerouslySetInnerHTML={{ __html: code }}
+        />
         <div className={styles.lineNumbers}>
           {!lines.length ? (
             <span />
