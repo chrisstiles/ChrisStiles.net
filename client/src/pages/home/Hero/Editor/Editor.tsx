@@ -62,7 +62,6 @@ export default React.memo(function Editor() {
       })}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      // onMouseLeave={() => setIsPlaying(true)}
     >
       <div className={styles.top}>
         <span className={styles.dots} />

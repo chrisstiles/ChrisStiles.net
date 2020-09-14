@@ -9,7 +9,7 @@ export enum Language {
 
 export default function useHeroAnimation({
   startDelay = 0,
-  minTypingDelay = 60,
+  minTypingDelay = 40,
   maxTypingDelay = 150
 }: HeroAnimationConfig = {}) {
   const [hasStarted, setHasStarted] = useState(startDelay === 0);
@@ -50,32 +50,100 @@ export default function useHeroAnimation({
     [isPlaying]
   );
 
-  const type = useCallback(
-    (text, view) => {
-      return new Promise(resolve => {
-        const fn = view === Language.HTML ? setHtml : setScss;
+  interface TypedLine {
+    text: string;
+    shouldType: boolean;
+    start?: number;
+    match?: string;
+  }
 
-        text
-          .split('')
-          .reduce(
-            (
-              prevPromise: Promise<void>,
-              nextText: string,
-              index: number
-            ) => {
-              return prevPromise.then(() => {
-                return new Promise(resolve => {
-                  const delay =
-                    index === 0
-                      ? 0
-                      : random(minTypingDelay, maxTypingDelay);
-                  setTimeout(() => {
-                    requestAnimationFrame(() => {
-                      fn(text => text + nextText);
+  const type = useCallback(
+    async (text: string, view: Language) => {
+      const fn = view === Language.HTML ? setHtml : setScss;
+      const splitLines: string[] = text.split('\n');
+      const lines: TypedLine[] = [];
+
+      const updateText = async (delay = 0) => {
+        return queue(() => {
+          fn(lines.map(({ text }) => text).join('\n'));
+        }, delay);
+      };
+
+      if (splitLines.length === 1 && !text.match(/\[-/)) {
+        lines.push({ text: '', match: text, shouldType: true });
+      } else {
+        splitLines.forEach(line => {
+          const match = line.match(/\[-(.*)-\]/);
+
+          if (match) {
+            lines.push({
+              text: line.replace(match[0], ''),
+              match: match[1],
+              start: match.index,
+              shouldType: true
+            });
+          } else {
+            lines.push({
+              text: line,
+              shouldType: false
+            });
+          }
+        });
+
+        // Set initial content
+        await updateText();
+      }
+
+      return new Promise(resolve => {
+        const typeLine = async (line: TypedLine) => {
+          return new Promise(resolve => {
+            if (!line.shouldType) {
+              resolve();
+              return;
+            }
+
+            const text = line.match ?? line.text;
+
+            text
+              .split('')
+              .reduce(
+                (
+                  prevPromise: Promise<void>,
+                  nextText: string,
+                  charIndex: number
+                ) => {
+                  return prevPromise.then(() => {
+                    return new Promise(async resolve => {
+                      const delay =
+                        charIndex === 0
+                          ? 0
+                          : random(minTypingDelay, maxTypingDelay);
+
+                      const start = (line.start ?? 0) + charIndex;
+
+                      line.text =
+                        line.text.substring(0, start) +
+                        nextText +
+                        line.text.substring(start);
+
+                      await updateText(delay);
                       resolve(nextText);
                     });
-                  }, delay);
-                });
+                  });
+                },
+                Promise.resolve()
+              )
+              .then(() => resolve());
+          });
+        };
+
+        return lines
+          .reduce(
+            (prevPromise: Promise<void>, nextLine: TypedLine) => {
+              return prevPromise.then(() => {
+                return typeLine(nextLine).then(() =>
+                  resolve(nextLine)
+                );
               });
             },
             Promise.resolve()
@@ -83,7 +151,7 @@ export default function useHeroAnimation({
           .then(() => resolve());
       });
     },
-    [minTypingDelay, maxTypingDelay]
+    [minTypingDelay, maxTypingDelay, queue]
   );
 
   // Handle updating specific step
@@ -108,7 +176,7 @@ export default function useHeroAnimation({
           return queue(async () => {
             if (step.instant) {
               const fn = view === Language.HTML ? setHtml : setScss;
-              fn(step.text);
+              await queue(() => fn(step.text), 0);
             } else {
               await type(step.text, view);
             }
@@ -189,6 +257,15 @@ type Step = {
   delay?: number;
 };
 
+/*
+
+Special character keys:
+
+Typewriter text: [-  -]
+Caret position: *|*
+
+*/
+
 const steps: Step[] = [
   { text: '<h1>', view: Language.HTML },
   { text: '<h1>*|*</h1>', instant: true },
@@ -200,6 +277,14 @@ const steps: Step[] = [
         *|*
       </h1>
     `
+  },
+  {
+    text: `
+      <h1>
+        [-Good ideas need great developers-]
+      </h1>
+    `,
+    delay: 500
   }
 ];
 
