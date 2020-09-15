@@ -1,10 +1,20 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useRef,
+  useState,
+  useImperativeHandle,
+  RefObject
+} from 'react';
 import useHeroAnimation, { Language } from './useHeroAnimation';
 import Code from './Code';
 import styles from './Editor.module.scss';
 import classNames from 'classnames';
 
 export default React.memo(function Editor({ setState }: EditorProps) {
+  const htmlTab = useRef<TabHandle>();
+  const scssTab = useRef<TabHandle>();
+  const mouse = useRef<HTMLDivElement>();
+
   const {
     currentView,
     html,
@@ -13,7 +23,7 @@ export default React.memo(function Editor({ setState }: EditorProps) {
     isPlaying,
     isComplete,
     setIsPlaying
-  } = useHeroAnimation({ setState });
+  } = useHeroAnimation({ setState, htmlTab, scssTab, mouse });
 
   const handleButtonClick = useCallback(
     (view: Language) => {
@@ -63,10 +73,17 @@ export default React.memo(function Editor({ setState }: EditorProps) {
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
+      <div
+        ref={mouse}
+        className={styles.mouse}
+      >
+        <div className={styles.pulse} />
+      </div>
       <div className={styles.top}>
         <span className={styles.dots} />
         <div className={styles.tabs}>
           <Tab
+            ref={htmlTab}
             language={Language.HTML}
             currentView={currentView}
             onClick={handleButtonClick}
@@ -74,6 +91,7 @@ export default React.memo(function Editor({ setState }: EditorProps) {
             index.html
           </Tab>
           <Tab
+            ref={scssTab}
             language={Language.SCSS}
             currentView={currentView}
             onClick={handleButtonClick}
@@ -103,22 +121,36 @@ type EditorProps = {
   setState: (value: any, name?: any) => void;
 };
 
-function Tab({ language, currentView, children, onClick }: TabProps) {
-  return (
-    <button
-      className={classNames(styles.tab, {
-        [styles.active]: currentView === language
-      })}
-      onClick={() => onClick(language)}
-    >
-      {children}
-    </button>
-  );
-}
+const Tab = React.forwardRef<TabHandle, TabProps>(
+  ({ language, currentView, children, onClick }, ref) => {
+    const el = useRef<HTMLButtonElement>();
+    const [isHovered, setIsHovered] = useState(false);
+
+    useImperativeHandle(ref, () => ({ setIsHovered, el }));
+
+    return (
+      <button
+        ref={el}
+        className={classNames(styles.tab, {
+          [styles.hover]: isHovered,
+          [styles.active]: currentView === language
+        })}
+        onClick={() => onClick(language)}
+      >
+        {children}
+      </button>
+    );
+  }
+);
+
+export type TabHandle = {
+  setIsHovered(x: boolean): void;
+  el: RefObject<HTMLButtonElement>;
+};
 
 type TabProps = {
   language: Language;
   currentView: Language;
   children?: React.ReactNode;
-  onClick: (x: Language) => void;
+  onClick(x: Language): void;
 };

@@ -1,6 +1,15 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  useMemo,
+  RefObject
+} from 'react';
 import useAnimationSteps, { Step } from './useAnimationSteps';
+import Mouse from './Mouse';
 import { random } from 'lodash';
+import { TabHandle } from './Editor';
 
 export enum Language {
   HTML = 'html',
@@ -12,11 +21,20 @@ export default function useHeroAnimation({
   startDelay = 0,
   minTypingDelay = 40,
   maxTypingDelay = 150,
+  htmlTab,
+  scssTab,
+  mouse: _mouse,
   setState
 }: HeroAnimationConfig) {
   // The list of steps that runs one at a time
   // to build the entire hero animation
   const steps = useAnimationSteps(setState);
+
+  // This object manages the simulated mouse element
+  const mouse = useMemo(() => {
+    console.log('Generating mouse');
+    return new Mouse(_mouse, htmlTab, scssTab);
+  }, [_mouse, htmlTab, scssTab]);
 
   const [hasStarted, setHasStarted] = useState(startDelay === 0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -166,6 +184,7 @@ export default function useHeroAnimation({
         return Promise.resolve();
       }
 
+      // Type text into an editor view
       if (step.text) {
         // Get the current view and update it if needed
         let view: Language;
@@ -193,8 +212,23 @@ export default function useHeroAnimation({
 
         return Promise.resolve();
       }
+
+      // Switch to a different tab with mouse animation
+      if (step.view && step.view !== currentView) {
+        // await mouse.clickTab(step.view);
+        return queue(async () => {
+          await mouse.clickTab(step.view);
+          setCurrentView(step.view);
+
+          if (shoudIncrement) {
+            setStepIndex(i => i + 1);
+          }
+        }, step.delay);
+      }
     },
     [
+      mouse,
+      currentView,
       setIsPlaying,
       setCurrentView,
       queue,
@@ -217,10 +251,16 @@ export default function useHeroAnimation({
   useEffect(() => {
     isPlayingRef.current = isPlaying;
 
-    if (isPlaying && queuedAnimation.current) {
-      queuedAnimation.current();
+    if (isPlaying) {
+      mouse.play();
+
+      if (queuedAnimation.current) {
+        queuedAnimation.current();
+      }
+    } else {
+      mouse.pause();
     }
-  }, [isPlaying]);
+  }, [isPlaying, mouse]);
 
   useEffect(() => {
     if (isPlaying) {
@@ -256,16 +296,19 @@ export default function useHeroAnimation({
   };
 }
 
-interface TypedLine {
+type TypedLine = {
   text: string;
   shouldType: boolean;
   start?: number;
   match?: string;
-}
+};
 
 type HeroAnimationConfig = {
   startDelay?: number;
   minTypingDelay?: number;
   maxTypingDelay?: number;
-  setState: (value: any, name?: string) => void;
+  mouse: RefObject<HTMLDivElement>;
+  htmlTab: RefObject<TabHandle>;
+  scssTab: RefObject<TabHandle>;
+  setState(value: any, name?: string): void;
 };

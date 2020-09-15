@@ -37,7 +37,8 @@ export default function useAnimationState(
         onType: (headlineText: string) => {
           setState({ headlineText });
         }
-      }
+      },
+      { view: Language.SCSS, delay: 500 }
     ],
     [setState]
   );
@@ -51,5 +52,5 @@ export type Step = {
   instant?: boolean;
   delay?: number;
   outputText?: boolean;
-  onType?: (text: string) => void;
+  onType?(text: string): void;
 };

@@ -59,6 +59,7 @@ module.exports = {
         alias: {
           '@components': 'src/components',
           '@helpers$': 'src/utils/helpers',
+          '@hooks': 'src/hooks',
           '@images': 'src/images',
           '@layout': 'src/components/Layout',
           '@styles': 'src/styles',
