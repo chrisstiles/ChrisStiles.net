@@ -1,10 +1,5 @@
-import {
-  useState,
-  useRef,
-  useEffect,
-  useCallback,
-  useMemo
-} from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import useAnimationSteps, { Step } from './useAnimationSteps';
 import { random } from 'lodash';
 
 export enum Language {
@@ -13,14 +8,16 @@ export enum Language {
   JavaScript = 'js'
 }
 
-export default function useHeroAnimation(
-  {
-    startDelay = 0,
-    minTypingDelay = 40,
-    maxTypingDelay = 150,
-    setState
-  }: HeroAnimationConfig = { setState: () => {} }
-) {
+export default function useHeroAnimation({
+  startDelay = 0,
+  minTypingDelay = 40,
+  maxTypingDelay = 150,
+  setState
+}: HeroAnimationConfig) {
+  // The list of steps that runs one at a time
+  // to build the entire hero animation
+  const steps = useAnimationSteps(setState);
+
   const [hasStarted, setHasStarted] = useState(startDelay === 0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
@@ -31,35 +28,6 @@ export default function useHeroAnimation(
   const timer = useRef(null);
   const queuedAnimation = useRef(null);
   const isPlayingRef = useRef(isPlaying);
-
-  const steps: Step[] = useMemo(
-    () => [
-      { text: '<h1>', view: Language.HTML },
-      { text: '<h1>*|*</h1>', instant: true, delay: 500 },
-      {
-        instant: true,
-        delay: 500,
-        text: `
-          <h1>
-            *|*
-          </h1>
-        `
-      },
-      {
-        text: `
-          <h1>
-            [-Good ideas need great developers-]
-          </h1>
-        `,
-        delay: 500,
-        outputText: true,
-        onType: (headlineText: string) => {
-          setState({ headlineText });
-        }
-      }
-    ],
-    []
-  );
 
   // Queue the next step in the animation
   const queue = useCallback(
@@ -94,13 +62,6 @@ export default function useHeroAnimation(
     },
     [isPlaying]
   );
-
-  interface TypedLine {
-    text: string;
-    shouldType: boolean;
-    start?: number;
-    match?: string;
-  }
 
   const type = useCallback(
     async (step: Step, view: Language) => {
@@ -273,7 +234,7 @@ export default function useHeroAnimation(
         setIsComplete(true);
       }
     }
-  }, [isPlaying, stepIndex, handleStep]);
+  }, [steps, isPlaying, stepIndex, handleStep]);
 
   const _setIsPlaying = useCallback(
     (shouldPlay: boolean) => {
@@ -295,27 +256,16 @@ export default function useHeroAnimation(
   };
 }
 
-type Step = {
-  text?: string;
-  view?: Language;
-  instant?: boolean;
-  delay?: number;
-  outputText?: boolean;
-  onType?: (text: string) => void;
-};
-
-/*
-
-Special character keys:
-
-Typewriter text: [-  -]
-Caret position: *|*
-
-*/
+interface TypedLine {
+  text: string;
+  shouldType: boolean;
+  start?: number;
+  match?: string;
+}
 
 type HeroAnimationConfig = {
   startDelay?: number;
   minTypingDelay?: number;
   maxTypingDelay?: number;
-  setState: (value: any, name?: any) => void;
+  setState: (value: any, name?: string) => void;
 };
