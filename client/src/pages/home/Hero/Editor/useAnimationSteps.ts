@@ -15,6 +15,8 @@ export default function useAnimationState(
 ): Step[] {
   const steps: Step[] = useMemo(
     () => [
+      { view: Language.SCSS, delay: 500 },
+      { view: Language.HTML, delay: 500 },
       { text: '<h1>', view: Language.HTML },
       { text: '<h1>*|*</h1>', instant: true, delay: 500 },
       {

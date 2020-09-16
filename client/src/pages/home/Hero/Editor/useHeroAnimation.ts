@@ -32,7 +32,6 @@ export default function useHeroAnimation({
 
   // This object manages the simulated mouse element
   const mouse = useMemo(() => {
-    console.log('Generating mouse');
     return new Mouse(_mouse, htmlTab, scssTab);
   }, [_mouse, htmlTab, scssTab]);
 

@@ -36,7 +36,12 @@ export default class Mouse {
     this.mouse.style.opacity = '0';
   }
 
-  private async animateTo(el?: HTMLElement, duration?: number) {
+  private async animateTo(
+    el: HTMLElement,
+    opts: AnimationOptions = {}
+  ) {
+    let { duration, onUpdate, onComplete } = opts;
+
     if (!el) {
       return Promise.reject('Element not found');
     }
@@ -60,7 +65,7 @@ export default class Mouse {
       );
 
       if (duration === undefined) {
-        const baseDuration = 0.7;
+        const baseDuration = 0.4;
         const baseDistance = 200;
         const distance = Math.max(
           Math.abs(currentX - x),
@@ -76,9 +81,15 @@ export default class Mouse {
         x,
         y,
         duration,
-        ease: 'power4.inOut',
+        ease: 'power3.out',
+        onUpdate,
         onComplete: () => {
           this.animation = null;
+
+          if (onComplete) {
+            onComplete();
+          }
+
           resolve();
         }
       });
@@ -86,7 +97,7 @@ export default class Mouse {
   }
 
   // Animates mouse to element and clicks it
-  async clickElement(el?: HTMLElement) {
+  async clickElement(el: HTMLElement, opts: AnimationOptions = {}) {
     if (!el) {
       return Promise.reject('Element not found');
     }
@@ -94,7 +105,7 @@ export default class Mouse {
     this.show();
 
     return new Promise(async resolve => {
-      await this.animateTo(el);
+      await this.animateTo(el, opts);
       this.hide();
       resolve();
     });
@@ -108,7 +119,30 @@ export default class Mouse {
       return Promise.reject('Tab not found');
     }
 
-    return this.clickElement(tab.el.current);
+    const tabRect = tab.el.current.getBoundingClientRect();
+    let hasHovered = false;
+
+    return this.clickElement(tab.el.current, {
+      onUpdate: () => {
+        if (!hasHovered) {
+          const mouseRect = this.mouse.getBoundingClientRect();
+          const xOverlap =
+            mouseRect.left < tabRect.left + tabRect.width &&
+            mouseRect.left + mouseRect.width > tabRect.left;
+
+          const yOverlap =
+            mouseRect.top < tabRect.top + tabRect.height;
+
+          if (xOverlap && yOverlap) {
+            tab.setIsHovered(true);
+            hasHovered = true;
+          }
+        }
+      },
+      onComplete: () => {
+        tab.setIsHovered(false);
+      }
+    });
   }
 
   play() {
@@ -123,3 +157,9 @@ export default class Mouse {
     this.hide();
   }
 }
+
+type AnimationOptions = {
+  duration?: number;
+  onUpdate?: gsap.Callback;
+  onComplete?: gsap.Callback;
+};
