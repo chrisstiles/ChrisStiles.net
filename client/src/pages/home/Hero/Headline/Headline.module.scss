@@ -12,7 +12,9 @@
   transform-origin: top right;
   transform: skewY(-3.5deg);
 
-  span {
-    color: var(--accent);
+  &.showColor {
+    span {
+      color: var(--accent);
+    }
   }
 }

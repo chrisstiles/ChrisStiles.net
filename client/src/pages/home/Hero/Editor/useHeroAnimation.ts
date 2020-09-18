@@ -86,9 +86,15 @@ export default function useHeroAnimation({
       const fn = view === Language.HTML ? setHtml : setScss;
       const splitLines: string[] = text.split('\n');
       const lines: TypedLine[] = [];
+      let hasStarted = false;
 
       const updateText = async (delay = 0) => {
         return queue(() => {
+          if (!hasStarted) {
+            hasStarted = true;
+            step.onStart?.();
+          }
+
           fn(lines.map(({ text }) => text).join('\n'));
         }, delay);
       };
@@ -198,10 +204,15 @@ export default function useHeroAnimation({
           return queue(async () => {
             if (step.instant) {
               const fn = view === Language.HTML ? setHtml : setScss;
-              await queue(() => fn(step.text), 0);
+              await queue(() => {
+                step.onStart?.();
+                fn(step.text);
+              }, 0);
             } else {
               await type(step, view);
             }
+
+            step.onComplete?.();
 
             if (shoudIncrement) {
               setStepIndex(i => i + 1);
@@ -214,10 +225,11 @@ export default function useHeroAnimation({
 
       // Switch to a different tab with mouse animation
       if (step.view && step.view !== currentView) {
-        // await mouse.clickTab(step.view);
         return queue(async () => {
+          step.onStart?.();
           await mouse.clickTab(step.view);
           setCurrentView(step.view);
+          step.onComplete?.();
 
           if (shoudIncrement) {
             setStepIndex(i => i + 1);

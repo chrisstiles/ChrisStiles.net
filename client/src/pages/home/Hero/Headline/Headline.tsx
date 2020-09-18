@@ -1,7 +1,11 @@
 import React, { useMemo } from 'react';
 import styles from './Headline.module.scss';
+import classNames from 'classnames';
 
-export default function Headline({ text }: HeadlineProps) {
+export default function Headline({
+  text,
+  showSpanColor
+}: HeadlineProps) {
   const content = useMemo(() => {
     if (!text.trim()) {
       return text;
@@ -24,9 +28,18 @@ export default function Headline({ text }: HeadlineProps) {
     return [top, <br key="br" />, bottom].flat();
   }, [text]);
 
-  return <h1 className={styles.headline}>{content}</h1>;
+  return (
+    <h1
+      className={classNames(styles.headline, {
+        [styles.showColor]: showSpanColor
+      })}
+    >
+      {content}
+    </h1>
+  );
 }
 
 type HeadlineProps = {
   text: string;
+  showSpanColor: boolean;
 };

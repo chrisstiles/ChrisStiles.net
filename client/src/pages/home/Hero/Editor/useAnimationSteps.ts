@@ -36,11 +36,17 @@ export default function useAnimationState(
         `,
         delay: 500,
         outputText: true,
-        onType: (headlineText: string) => {
+        onType(headlineText: string) {
           setState({ headlineText });
         }
       },
-      { view: Language.SCSS, delay: 500 }
+      {
+        view: Language.SCSS,
+        delay: 500,
+        onComplete() {
+          setState({ showSpanColor: true });
+        }
+      }
     ],
     [setState]
   );
@@ -54,5 +60,7 @@ export type Step = {
   instant?: boolean;
   delay?: number;
   outputText?: boolean;
+  onStart?(): void;
+  onComplete?(): void;
   onType?(text: string): void;
 };

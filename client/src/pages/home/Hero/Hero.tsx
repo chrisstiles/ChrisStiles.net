@@ -20,7 +20,10 @@ export default function Hero() {
       <div className={styles.top}>
         <div className={styles.content}>
           <Title text={state.titleText} />
-          <Headline text={state.headlineText} />
+          <Headline
+            text={state.headlineText}
+            showSpanColor={state.showSpanColor}
+          />
         </div>
         <Editor setState={setState} />
       </div>
@@ -34,10 +37,12 @@ export default function Hero() {
 
 const initialState: HeroState = {
   titleText: '',
-  headlineText: ''
+  headlineText: '',
+  showSpanColor: false
 };
 
 type HeroState = {
   titleText: string;
   headlineText: string;
+  showSpanColor: boolean;
 };
