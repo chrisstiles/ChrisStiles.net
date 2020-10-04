@@ -96,6 +96,19 @@ export default class Mouse {
     });
   }
 
+  // Fires click animation
+  async click() {
+    return new Promise(resolve => {
+      gsap.to(this.mouse, {
+        scale: 0.8,
+        duration: 0.1,
+        yoyo: true,
+        repeat: 1,
+        onComplete: resolve
+      });
+    });
+  }
+
   // Animates mouse to element and clicks it
   async clickElement(el: HTMLElement, opts: AnimationOptions = {}) {
     if (!el) {
@@ -106,6 +119,7 @@ export default class Mouse {
 
     return new Promise(async resolve => {
       await this.animateTo(el, opts);
+      await this.click();
       this.hide();
       resolve();
     });

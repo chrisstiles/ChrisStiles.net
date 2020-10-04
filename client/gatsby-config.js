@@ -63,6 +63,7 @@ module.exports = {
           '@images': 'src/images',
           '@layout': 'src/components/Layout',
           '@styles': 'src/styles',
+          '@templates': 'src/templates',
           '@utils': 'src/utils'
         },
         extensions: ['.js', '.ts', '.tsx', '.scss']

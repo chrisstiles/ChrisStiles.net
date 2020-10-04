@@ -22,7 +22,12 @@ export default function Hero() {
           <Title text={state.titleText} />
           <Headline
             text={state.headlineText}
+            boldText={state.boldText}
+            shrinkText={state.shrinkText}
+            skewText={state.skewText}
+            uppercaseText={state.uppercaseText}
             showSpanColor={state.showSpanColor}
+            showBoundingBox={state.showBoundingBox}
           />
         </div>
         <Editor setState={setState} />
@@ -38,11 +43,21 @@ export default function Hero() {
 const initialState: HeroState = {
   titleText: '',
   headlineText: '',
-  showSpanColor: false
+  boldText: false,
+  shrinkText: false,
+  skewText: false,
+  uppercaseText: false,
+  showSpanColor: false,
+  showBoundingBox: true
 };
 
 type HeroState = {
   titleText: string;
   headlineText: string;
+  boldText: boolean;
+  shrinkText: boolean;
+  skewText: boolean;
+  uppercaseText: boolean;
   showSpanColor: boolean;
+  showBoundingBox: boolean;
 };

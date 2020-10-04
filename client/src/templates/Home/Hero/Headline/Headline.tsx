@@ -4,7 +4,12 @@ import classNames from 'classnames';
 
 export default function Headline({
   text,
-  showSpanColor
+  boldText,
+  shrinkText,
+  skewText,
+  uppercaseText,
+  showSpanColor,
+  showBoundingBox
 }: HeadlineProps) {
   const content = useMemo(() => {
     if (!text.trim()) {
@@ -31,15 +36,36 @@ export default function Headline({
   return (
     <h1
       className={classNames(styles.headline, {
-        [styles.showColor]: showSpanColor
+        [styles.showColor]: showSpanColor,
+        [styles.bold]: boldText,
+        [styles.shrink]: shrinkText,
+        [styles.skew]: skewText,
+        [styles.uppercase]: uppercaseText
       })}
     >
-      {content}
+      <div className={styles.content}>{content}</div>
+      <BoundingBox isVisible={showBoundingBox} />
     </h1>
+  );
+}
+
+function BoundingBox({ isVisible = true }) {
+  return !isVisible ? null : (
+    <div className={styles.box}>
+      <div className={styles.handle} />
+      <div className={styles.handle} />
+      <div className={styles.handle} />
+      <div className={styles.handle} />
+    </div>
   );
 }
 
 type HeadlineProps = {
   text: string;
+  boldText: boolean;
+  shrinkText: boolean;
+  skewText: boolean;
+  uppercaseText: boolean;
   showSpanColor: boolean;
+  showBoundingBox: boolean;
 };

@@ -1,2 +1,2 @@
-import index from './home';
-export default index;
+import Home from '../templates/Home';
+export default Home;

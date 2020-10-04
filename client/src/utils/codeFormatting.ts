@@ -1,43 +1,41 @@
-// import Prism from 'prismjs';
-// import 'prismjs/components/prism-scss';
+export default function formatCode(code: string, language: string) {
+  code = code.trim();
 
-export function formatCode(code: string) {
-  if (!code?.trim()) {
-    return '';
+  if (language === 'html') {
+    return html(code);
+  } else {
+    return scss(code);
   }
-
-  const firstLine = code.split('\n').filter(c => c)[0];
-  console.log(firstLine);
-
-  if (!firstLine?.trim()) {
-    return code;
-  }
-
-  const index = firstLine.search(/[^\s\r]/);
-
-  if (index <= 0) {
-    return code;
-  }
-
-  const arr = new Array(index).fill('  ');
-  const regex = new RegExp(arr.join(''), 'g');
-
-  return code.replace(regex, '').trim();
 }
 
-// Template literal tag for formatting HTML
-export function html(
-  strings: TemplateStringsArray,
-  ...values: string[]
-) {
+function scss(str: string) {
+  let selectorCount = 0;
+
+  return str
+    .split(/\r\n|\r|\n/)
+    .map(str => {
+      str = str.trim();
+
+      if (str.includes('}')) {
+        selectorCount--;
+      }
+
+      const indents = new Array(selectorCount + 1).join('  ');
+      str = indents + str;
+
+      if (str.includes('{')) {
+        selectorCount++;
+      }
+
+      return str;
+    })
+    .join('\n');
+}
+
+function html(str: string) {
   const tags: string[] = [];
 
-  const test = strings
-    .map((str, i) => {
-      return str + (values[i] || '');
-    })
-    .join('')
-    .trim()
+  return str
     .split(/\r\n|\r|\n/)
     .map(str => {
       str = str.trim();
@@ -72,6 +70,4 @@ export function html(
       return str;
     })
     .join('\n');
-
-  return test;
 }

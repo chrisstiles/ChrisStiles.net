@@ -1,7 +1,7 @@
 import React, { useRef, useMemo } from 'react';
-import { html } from '@utils/codeFormatting';
 import styles from './Code.module.scss';
 import Prism from 'prismjs';
+import dedent from 'dedent';
 import 'prismjs/components/prism-scss';
 import classNames from 'classnames';
 
@@ -28,7 +28,7 @@ export default function Code({
   }, [language]);
 
   const [code, lines] = useMemo((): [string, string[]] => {
-    const formattedCode = html`${content}`;
+    const formattedCode = dedent(content);
     let highlightedCode = Prism.highlight(
       formattedCode,
       grammar,
