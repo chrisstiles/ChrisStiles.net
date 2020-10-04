@@ -1,6 +1,10 @@
 import { RefObject } from 'react';
 import { TabHandle } from '../Editor';
 import { Language } from '../useHeroAnimation';
+import {
+  pulseAnimationDuration,
+  clickColor
+} from '../Editor.module.scss';
 import gsap from 'gsap';
 
 export default class Mouse {
@@ -18,22 +22,32 @@ export default class Mouse {
 
   private _mouse: RefObject<HTMLDivElement>;
   private get mouse() {
-    return this._mouse.current;
+    return this._mouse?.current ?? null;
   }
 
   private animation: gsap.core.Tween | null;
 
-  private tabs: { [key in Language]?: RefObject<TabHandle> };
+  private tabs: {
+    [key in Language]?: RefObject<TabHandle>;
+  };
   private getTab(language: Language): TabHandle | null {
     return this.tabs[language]?.current ?? null;
   }
 
+  private isVisible = false;
+
   private show() {
-    this.mouse.style.opacity = '1';
+    if (!this.isVisible && this.mouse) {
+      this.isVisible = true;
+      this.mouse.style.opacity = '1';
+    }
   }
 
   private hide() {
-    this.mouse.style.opacity = '0';
+    if (this.isVisible && this.mouse) {
+      this.isVisible = false;
+      this.mouse.style.opacity = '0';
+    }
   }
 
   private async animateTo(
@@ -97,14 +111,39 @@ export default class Mouse {
   }
 
   // Fires click animation
-  async click() {
+  private pulseTimer: ReturnType<typeof setTimeout> = null;
+
+  async click(hideAfterClick = true) {
+    clearTimeout(this.pulseTimer);
+
     return new Promise(resolve => {
       gsap.to(this.mouse, {
         scale: 0.8,
-        duration: 0.1,
+        color: clickColor,
+        duration: 0.15,
         yoyo: true,
         repeat: 1,
-        onComplete: resolve
+        onStart: () => {
+          this.mouse.classList.add('click');
+
+          if (hideAfterClick) {
+            gsap.to(this.mouse, {
+              opacity: 0,
+              duration: 0.15,
+              delay: 0.1
+            });
+          }
+        },
+        onComplete: () => {
+          this.pulseTimer = setTimeout(() => {
+            if (this.mouse) {
+              this.mouse.classList.remove('click');
+              this.mouse.style.color = null;
+            }
+          }, parseInt(pulseAnimationDuration));
+
+          resolve();
+        }
       });
     });
   }
@@ -120,7 +159,6 @@ export default class Mouse {
     return new Promise(async resolve => {
       await this.animateTo(el, opts);
       await this.click();
-      this.hide();
       resolve();
     });
   }

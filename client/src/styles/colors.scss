@@ -2,11 +2,24 @@
 /* Colors */
 /* --------------------------- */
 
+$colors: (
+  'bg': #1f2732,
+  'bg-dark': #18212b,
+  'light-grey': #9ab5d2,
+  'accent': #33edc0,
+  'accent-dark': #33e6b9,
+  'highlight-light': #ffd901,
+  'highlight-dark': #077bff
+);
+
 :root {
-  --bg: #1f2732;
-  --bg-dark: #18212b;
-  --light-grey: #9ab5d2;
-  --accent: #33edc0;
-  --highlight-light: #ffd901;
-  --highlight-dark: #077bff;
+  @each $name, $color in $colors {
+    --#{$name}: #{$color};
+  }
+}
+
+:export {
+  @each $name, $color in $colors {
+    #{$name}: #{$color};
+  }
 }

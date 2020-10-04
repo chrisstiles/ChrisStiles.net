@@ -19,6 +19,7 @@
       "@hooks/*": ["hooks/*"],
       "@images/*": ["images/*"],
       "@layout": ["components/Layout"],
+      "@styles/*": ["styles/*"],
       "@templates": ["components/templates/*"],
       "@utils/*": ["utils/*"]
     },
