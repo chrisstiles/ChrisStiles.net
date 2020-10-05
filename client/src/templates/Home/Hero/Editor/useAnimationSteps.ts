@@ -72,12 +72,14 @@ export default function useAnimationState(
       {
         text: `
           <h1>
-            Good ideas need [-great-] developers
+            Good ideas need [-<span>great</span>-] developers
           </h1>
         `,
         delay: 1650,
         onType(headlineText: string) {
-          setState({ headlineText });
+          setState({
+            headlineText: headlineText.replace(/<\/?s?p?a?n?>?/g, '')
+          });
         }
       },
       {

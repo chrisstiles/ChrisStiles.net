@@ -166,7 +166,7 @@ export default class Mouse {
           if (hideAfterClick) {
             this.hideTimer = setTimeout(
               () => this.hide(),
-              isDoubleClick ? 250 : 100
+              isDoubleClick ? 400 : 250
             );
           }
         },
