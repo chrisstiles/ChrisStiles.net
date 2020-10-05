@@ -72,13 +72,35 @@ export default function useAnimationState(
       {
         text: `
           <h1>
-            Good ideas need [-<span>great</span>-] developers
+            Good ideas need [-<span>-] developers
           </h1>
         `,
         delay: 1650,
         onType(headlineText: string) {
           setState({
-            headlineText: headlineText.replace(/<\/?s?p?a?n?>?/g, '')
+            headlineText: stripSpan(headlineText)
+          });
+        }
+      },
+      {
+        text: `
+          <h1>
+            Good ideas need <span>*|*</span> developers
+          </h1>
+        `,
+        instant: true,
+        delay: 100
+      },
+      {
+        text: `
+          <h1>
+            Good ideas need <span>[-great-]</span> developers
+          </h1>
+        `,
+        delay: 500,
+        onType(headlineText: string) {
+          setState({
+            headlineText: stripSpan(headlineText)
           });
         }
       },
@@ -211,3 +233,7 @@ export type Step = {
   onType?(text: string): void;
   onMouseDown?(): void;
 };
+
+function stripSpan(text: string) {
+  return text.replace(/<\/?s?p?a?n?>?/g, '');
+}
