@@ -10,7 +10,10 @@ import Code from './Code';
 import styles from './Editor.module.scss';
 import classNames from 'classnames';
 
-export default React.memo(function Editor({ setState }: EditorProps) {
+export default React.memo(function Editor({
+  setState,
+  showSelectHighlight = false
+}: EditorProps) {
   const htmlTab = useRef<TabHandle>();
   const scssTab = useRef<TabHandle>();
   const mouse = useRef<HTMLDivElement>();
@@ -68,7 +71,8 @@ export default React.memo(function Editor({ setState }: EditorProps) {
     <div
       className={classNames(styles.wrapper, {
         stopped: !isPlaying || isComplete,
-        showCaret: !isComplete && forceCaretVisible
+        showCaret: !isComplete && forceCaretVisible,
+        selectText: showSelectHighlight
       })}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -119,6 +123,7 @@ export default React.memo(function Editor({ setState }: EditorProps) {
 
 type EditorProps = {
   setState: (value: any, name?: any) => void;
+  showSelectHighlight: boolean;
 };
 
 const Tab = React.forwardRef<TabHandle, TabProps>(

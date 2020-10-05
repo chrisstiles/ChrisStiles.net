@@ -2,7 +2,7 @@ import { RefObject } from 'react';
 import { TabHandle } from '../Editor';
 import { Language } from '../useHeroAnimation';
 import {
-  pulseAnimationDuration,
+  clickPulseDuration,
   clickColor
 } from '../Editor.module.scss';
 import gsap from 'gsap';
@@ -39,7 +39,7 @@ export default class Mouse {
   private show() {
     if (!this.isVisible && this.mouse) {
       this.isVisible = true;
-      this.mouse.style.opacity = '1';
+      this.mouse.style.opacity = '0.85';
     }
   }
 
@@ -50,10 +50,15 @@ export default class Mouse {
     }
   }
 
+  private currentX = 0;
+  private currentY = 0;
+
   private async animateTo(
     el: HTMLElement,
     opts: AnimationOptions = {}
   ) {
+    this.show();
+
     let { duration, onUpdate, onComplete } = opts;
 
     if (!el) {
@@ -61,35 +66,40 @@ export default class Mouse {
     }
 
     return new Promise(resolve => {
-      const currentX = this.mouse.offsetLeft;
-      const currentY = this.mouse.offsetTop;
+      const mouseRect = this.mouse.getBoundingClientRect();
+      const elRect = el.getBoundingClientRect();
 
       const x = Math.round(
-        el.offsetLeft +
-          el.offsetWidth / 2 -
-          currentX -
-          this.mouse.offsetWidth / 2
+        elRect.left +
+          elRect.width / 2 -
+          mouseRect.left -
+          mouseRect.width / 2 +
+          this.currentX
       );
 
       const y = Math.round(
-        el.offsetTop +
-          el.offsetHeight / 2 -
-          currentY -
-          this.mouse.offsetHeight / 2
+        elRect.top +
+          elRect.height / 2 -
+          mouseRect.top -
+          mouseRect.height / 2 +
+          this.currentY
       );
 
       if (duration === undefined) {
         const baseDuration = 0.4;
         const baseDistance = 200;
         const distance = Math.max(
-          Math.abs(currentX - x),
-          Math.abs(currentY - y)
+          Math.abs(this.mouse.offsetLeft - x),
+          Math.abs(this.mouse.offsetTop - y)
         );
 
         duration = Math.round(
           (baseDuration * distance) / baseDistance
         );
       }
+
+      this.currentX = x;
+      this.currentY = y;
 
       this.animation = gsap.to(this.mouse, {
         x,
@@ -110,11 +120,31 @@ export default class Mouse {
     });
   }
 
+  play() {
+    if (this.animation) {
+      this.show();
+      this.animation.play();
+    }
+  }
+
+  pause() {
+    this.animation?.pause();
+    this.hide();
+  }
+
   // Fires click animation
   private pulseTimer: ReturnType<typeof setTimeout> = null;
-
-  async click(hideAfterClick = true) {
+  private mouseDownTimer: ReturnType<typeof setTimeout> = null;
+  private hideTimer: ReturnType<typeof setTimeout> = null;
+  private async animateClick(
+    hideAfterClick = true,
+    isDoubleClick = false,
+    mouseDownCallback?: () => void
+  ) {
     clearTimeout(this.pulseTimer);
+    clearTimeout(this.mouseDownTimer);
+    clearTimeout(this.hideTimer);
+    const className = isDoubleClick ? 'doubleClick' : 'click';
 
     return new Promise(resolve => {
       gsap.to(this.mouse, {
@@ -122,30 +152,57 @@ export default class Mouse {
         color: clickColor,
         duration: 0.15,
         yoyo: true,
-        repeat: 1,
+        repeat: isDoubleClick ? 2 : 1,
         onStart: () => {
-          this.mouse.classList.add('click');
+          this.mouse.classList.add(className);
+
+          if (mouseDownCallback) {
+            this.mouseDownTimer = setTimeout(
+              mouseDownCallback,
+              isDoubleClick ? 400 : 100
+            );
+          }
 
           if (hideAfterClick) {
-            gsap.to(this.mouse, {
-              opacity: 0,
-              duration: 0.15,
-              delay: 0.1
-            });
+            this.hideTimer = setTimeout(
+              () => this.hide(),
+              isDoubleClick ? 250 : 100
+            );
           }
         },
         onComplete: () => {
+          let delay = parseInt(clickPulseDuration);
+
+          if (isDoubleClick) {
+            delay *= 2;
+          }
+
           this.pulseTimer = setTimeout(() => {
             if (this.mouse) {
-              this.mouse.classList.remove('click');
+              this.mouse.classList.remove(className);
               this.mouse.style.color = null;
             }
-          }, parseInt(pulseAnimationDuration));
+          }, delay);
 
           resolve();
         }
       });
     });
+  }
+
+  async click(hideAfterClick = true, mouseDownCallback?: () => void) {
+    return this.animateClick(
+      hideAfterClick,
+      false,
+      mouseDownCallback
+    );
+  }
+
+  async doubleClick(
+    hideAfterClick = true,
+    mouseDownCallback?: () => void
+  ) {
+    return this.animateClick(hideAfterClick, true, mouseDownCallback);
   }
 
   // Animates mouse to element and clicks it
@@ -197,16 +254,15 @@ export default class Mouse {
     });
   }
 
-  play() {
-    if (this.animation) {
-      this.show();
-      this.animation.play();
-    }
-  }
-
-  pause() {
-    this.animation?.pause();
-    this.hide();
+  async selectElement(
+    el: HTMLElement,
+    mouseDownCallback?: () => void
+  ) {
+    return new Promise(async resolve => {
+      await this.animateTo(el);
+      await this.doubleClick(true, mouseDownCallback);
+      resolve();
+    });
   }
 }
 

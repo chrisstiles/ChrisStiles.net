@@ -11,7 +11,10 @@ interface Tokens {
 
 const tokens: Tokens = {
   caret: {
-    pattern: /\*\|\*/
+    pattern: /\*\|\*/g
+  },
+  select: {
+    pattern: /\(-(.*)-\)/
   }
 };
 
@@ -36,8 +39,24 @@ export default function Code({
     );
 
     Object.keys(tokens).forEach((key: keyof Tokens) => {
-      const regex = new RegExp(tokens[key].pattern, 'g');
-      highlightedCode = highlightedCode.replace(regex, '');
+      // const regex = new RegExp(tokens[key].pattern);
+      const { pattern } = tokens[key];
+      const match = highlightedCode.match(pattern);
+
+      if (match) {
+        if (match.length === 1 || pattern.flags.includes('g')) {
+          // Replace contents with empty string
+          highlightedCode = highlightedCode.replace(pattern, '');
+        } else {
+          // Replace with matched content
+          for (let i = 1; i < match.length; i++) {
+            highlightedCode = highlightedCode.replace(
+              pattern,
+              match[i]
+            );
+          }
+        }
+      }
     });
 
     return [highlightedCode, formattedCode.split('\n')];

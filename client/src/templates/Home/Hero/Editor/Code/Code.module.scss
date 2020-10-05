@@ -89,6 +89,13 @@ $lineNumbersWidth: 45px;
 }
 
 /* --------------------------- */
+/* Selected Text */
+
+:global(.selectText .select) {
+  background-color: var(--highlight-light);
+}
+
+/* --------------------------- */
 /* Line Numbers */
 
 .lineNumbers {

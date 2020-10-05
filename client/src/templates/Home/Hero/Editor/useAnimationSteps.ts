@@ -1,12 +1,18 @@
 import { useMemo } from 'react';
 import { Language } from './useHeroAnimation';
 
+export enum StepType {
+  Text = 'text',
+  Select = 'select'
+}
+
 /*
 
 Special character keys:
 
 Typewriter text: [-  -]
 Caret position: *|*
+Select text: (- -)
 
 */
 
@@ -29,11 +35,47 @@ export default function useAnimationState(
       {
         text: `
           <h1>
-            [-Good ideas need great developers-]
+            [-Good ideas need good developers-]
           </h1>
         `,
         delay: 500,
         outputText: true,
+        onType(headlineText: string) {
+          setState({ headlineText });
+        }
+      },
+      {
+        text: `
+          <h1>
+            Good ideas need (-good-) developers
+          </h1>
+        `,
+        onMouseDown() {
+          setState({ selectSpan: true });
+        }
+      },
+      {
+        text: `
+          <h1>
+            Good ideas need *|* developers
+          </h1>
+        `,
+        instant: true,
+        delay: 700,
+        onStart() {
+          setState({ selectSpan: false });
+        },
+        onComplete() {
+          setState({ headlineText: 'Good ideas need developers' });
+        }
+      },
+      {
+        text: `
+          <h1>
+            Good ideas need [-great-] developers
+          </h1>
+        `,
+        delay: 1650,
         onType(headlineText: string) {
           setState({ headlineText });
         }
@@ -112,7 +154,7 @@ export default function useAnimationState(
             font-size: 3.3em;
             text-transform: upprcase;
             transform: skewY(-3.5deg);
-            
+
             [-span {-]
           }
         `
@@ -124,7 +166,7 @@ export default function useAnimationState(
             font-size: 3.3em;
             text-transform: upprcase;
             transform: skewY(-3.5deg);
-            
+
             span {*|*}
           }
         `,
@@ -161,7 +203,9 @@ export type Step = {
   instant?: boolean;
   delay?: number;
   outputText?: boolean;
+  type?: StepType;
   onStart?(): void;
   onComplete?(): void;
   onType?(text: string): void;
+  onMouseDown?(): void;
 };

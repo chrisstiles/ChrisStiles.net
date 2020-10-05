@@ -4,6 +4,7 @@ import classNames from 'classnames';
 
 export default function Headline({
   text,
+  selectSpan,
   boldText,
   shrinkText,
   skewText,
@@ -36,6 +37,7 @@ export default function Headline({
   return (
     <h1
       className={classNames(styles.headline, {
+        [styles.selectSpan]: selectSpan,
         [styles.showColor]: showSpanColor,
         [styles.bold]: boldText,
         [styles.shrink]: shrinkText,
@@ -62,6 +64,7 @@ function BoundingBox({ isVisible = true }) {
 
 type HeadlineProps = {
   text: string;
+  selectSpan: boolean;
   boldText: boolean;
   shrinkText: boolean;
   skewText: boolean;

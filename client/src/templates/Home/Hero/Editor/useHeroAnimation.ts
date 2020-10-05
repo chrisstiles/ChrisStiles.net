@@ -6,7 +6,10 @@ import {
   useMemo,
   RefObject
 } from 'react';
-import useAnimationSteps, { Step } from './useAnimationSteps';
+import useAnimationSteps, {
+  Step,
+  StepType
+} from './useAnimationSteps';
 import Mouse from './Mouse';
 import { random } from 'lodash';
 import { TabHandle } from './Editor';
@@ -107,7 +110,7 @@ export default function useHeroAnimation({
 
           if (match) {
             lines.push({
-              text: line.replace(match[0], ''),
+              text: line.replace(match[0], '*|*'),
               match: match[1],
               start: match.index,
               shouldType: true
@@ -127,7 +130,6 @@ export default function useHeroAnimation({
       return new Promise(async resolve => {
         const typeLine = async (line: TypedLine) => {
           return new Promise(resolve => {
-            line.text += '*|*';
             const text = line.match ?? line.text;
 
             text
@@ -153,10 +155,7 @@ export default function useHeroAnimation({
                         line.text.substring(start);
 
                       await updateText(delay);
-
-                      if (step.onType) {
-                        step.onType(line.text.replace('*|*', ''));
-                      }
+                      step.onType?.(line.text.replace('*|*', ''));
 
                       if (isPlayingRef.current) {
                         resolve(nextText);
@@ -201,8 +200,12 @@ export default function useHeroAnimation({
 
         // Update editor text
         if (step.text) {
+          const shouldSelectText =
+            step.type === StepType.Select ||
+            step.text?.match(/\(-(.*)-\)/);
+
           return queue(async () => {
-            if (step.instant) {
+            if (step.instant || shouldSelectText) {
               const fn = view === Language.HTML ? setHtml : setScss;
               await queue(() => {
                 step.onStart?.();
@@ -210,6 +213,24 @@ export default function useHeroAnimation({
               }, 0);
             } else {
               await type(step, view);
+            }
+
+            if (shouldSelectText) {
+              const el: HTMLElement = document.querySelector(
+                '.token.select'
+              );
+
+              if (el) {
+                await mouse.selectElement(el, () => {
+                  setState({ showSelectHighlight: true });
+                  step?.onMouseDown();
+                });
+              } else {
+                console.error('Select element not found');
+                setState({ showSelectHighlight: false });
+              }
+            } else {
+              setState({ showSelectHighlight: false });
             }
 
             step.onComplete?.();
@@ -246,6 +267,7 @@ export default function useHeroAnimation({
       setHtml,
       setScss,
       setStepIndex,
+      setState,
       type
     ]
   );

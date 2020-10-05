@@ -139,7 +139,8 @@ $borderRadius: 6px;
 /* --------------------------- */
 /* Mouse */
 
-$pulseAnimationDuration: 600ms;
+$clickPulseDuration: 600ms;
+$doubleClickPulseDuration: 400ms;
 
 .mouse {
   $size: 30px;
@@ -174,44 +175,57 @@ $pulseAnimationDuration: 600ms;
     transform-origin: center center;
   }
 
-  &:global(.click) {
+  @keyframes pulseAnimation {
+    0% {
+      transform: scale(1);
+      opacity: $pulseOpacity;
+    }
+
+    15% {
+      opacity: $pulseOpacity;
+    }
+
+    45% {
+      opacity: 0;
+    }
+
+    50% {
+      transform: scale(1.5);
+    }
+
+    51% {
+      transform: scale(0);
+    }
+
+    100% {
+      transform: scale(1);
+      opacity: $pulseOpacity;
+    }
+  }
+
+  &:global(.click),
+  &:global(.doubleClick) {
     .pulse {
       animation-name: pulseAnimation;
-      animation-duration: $pulseAnimationDuration;
-      animation-fill-mode: forwards;
+      animation-timing-function: linear;
+    }
+  }
 
-      @keyframes pulseAnimation {
-        0% {
-          transform: scale(1);
-          opacity: $pulseOpacity;
-        }
+  &:global(.click) {
+    .pulse {
+      animation-duration: $clickPulseDuration;
+    }
+  }
 
-        15% {
-          opacity: $pulseOpacity;
-        }
-
-        45% {
-          opacity: 0;
-        }
-
-        50% {
-          transform: scale(1.5);
-        }
-
-        51% {
-          transform: scale(0);
-        }
-
-        100% {
-          transform: scale(1);
-          opacity: $pulseOpacity;
-        }
-      }
+  &:global(.doubleClick) {
+    .pulse {
+      animation-iteration-count: 2;
+      animation-duration: $doubleClickPulseDuration;
     }
   }
 }
 
 :export {
-  pulseAnimationDuration: $pulseAnimationDuration;
+  clickPulseDuration: $clickPulseDuration;
   clickColor: map-get($colors, 'accent-dark');
 }

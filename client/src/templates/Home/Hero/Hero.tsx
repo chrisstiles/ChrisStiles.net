@@ -22,6 +22,7 @@ export default function Hero() {
           <Title text={state.titleText} />
           <Headline
             text={state.headlineText}
+            selectSpan={state.selectSpan}
             boldText={state.boldText}
             shrinkText={state.shrinkText}
             skewText={state.skewText}
@@ -30,7 +31,10 @@ export default function Hero() {
             showBoundingBox={state.showBoundingBox}
           />
         </div>
-        <Editor setState={setState} />
+        <Editor
+          setState={setState}
+          showSelectHighlight={state.showSelectHighlight}
+        />
       </div>
 
       <Content className={styles.bottom}>
@@ -43,6 +47,8 @@ export default function Hero() {
 const initialState: HeroState = {
   titleText: '',
   headlineText: '',
+  showSelectHighlight: false,
+  selectSpan: false,
   boldText: false,
   shrinkText: false,
   skewText: false,
@@ -54,6 +60,8 @@ const initialState: HeroState = {
 type HeroState = {
   titleText: string;
   headlineText: string;
+  showSelectHighlight: boolean;
+  selectSpan: boolean;
   boldText: boolean;
   shrinkText: boolean;
   skewText: boolean;

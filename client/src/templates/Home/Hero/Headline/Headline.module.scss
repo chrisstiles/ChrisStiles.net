@@ -17,6 +17,12 @@ $transformTransition: transform $transitionDuration;
   position: relative;
   display: inline-block;
 
+  &.selectSpan {
+    span {
+      background-color: var(--highlight-dark);
+    }
+  }
+
   &.bold {
     font-weight: 800;
   }
@@ -54,7 +60,6 @@ $transformTransition: transform $transitionDuration;
   left: $offset;
   border: 1px solid #2aa5fc;
   pointer-events: none;
-  transition: bottom $transitionDuration;
 
   @at-root .content:empty + & {
     opacity: 0;
