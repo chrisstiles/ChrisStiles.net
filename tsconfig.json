@@ -13,8 +13,23 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "incremental": true
+    "incremental": true,
+    "baseUrl": ".",
+    "paths": {
+      // Shared paths
+      "@colors": ["src/app/styles/abstracts/_colors.scss"],
+      "@elements/*": ["src/app/components/elements/*"],
+      "@images/*": ["src/app/images/*"],
+      "@layouts": ["src/app/components/layouts"],
+      "@layouts/*": ["src/app/components/layouts/*"],
+      "@modules/*": ["src/app/components/modules/*"],
+      "@styles/*": ["src/app/styles/*"],
+      "@templates/*": ["src/app/components/templates/*"],
+
+      // SASS paths
+      "app": ["src/app/styles/abstracts/_app.scss"]
+    }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.scss"],
   "exclude": ["node_modules"]
 }

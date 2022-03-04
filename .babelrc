@@ -1,0 +1,4 @@
+{
+  "presets": ["next/babel"],
+  "plugins": ["@svgr/babel-plugin-svg-dynamic-title"]
+}

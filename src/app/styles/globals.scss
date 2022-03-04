@@ -1,0 +1,84 @@
+/* --------------------------- */
+/* Global */
+/* --------------------------- */
+
+@use 'sass:meta';
+@use 'app';
+@use 'abstracts/colors';
+
+/* --------------------------- */
+/* Fonts */
+
+@import url('https://use.typekit.net/gse1fwz.css');
+
+/* --------------------------- */
+/* CSS Properties */
+
+:root {
+  // --font: #{app.$font};
+  // --font-code: #{app.$font-code};
+
+  // @each $name, $color in meta.module-variables(colors) {
+  //   // --#{$name}: #{$color};
+  //   --#{app.kebab-to-camel-case($name)}: #{$color};
+  // }
+  @include app.css-properties(module-variables(app));
+  // @include app.css-properties('abstracts/colors');
+}
+
+/* --------------------------- */
+/* Shared Styles */
+
+*,
+*:before,
+*:after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  background-repeat: no-repeat;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+html {
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-weight: 400;
+  font-family: var(--font);
+  font-display: swap;
+  background-color: var(--bg);
+  color: #fff;
+  font-size: 18px;
+}
+
+@include app.highlight {
+  background-color: var(--highlight-dark);
+  color: #fff;
+}
+
+:global {
+  #page-wrapper {
+    min-height: calc(100vh - 60px);
+  }
+
+  #footer {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    background-color: var(--bg);
+    color: #fff;
+  }
+}

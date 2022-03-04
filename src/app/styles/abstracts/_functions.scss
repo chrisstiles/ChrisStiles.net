@@ -1,0 +1,92 @@
+/* --------------------------- */
+/* Functions */
+/* --------------------------- */
+
+@use 'sass:string';
+
+@function replace($string, $search, $replace: '') {
+  $index: string.index($string, $search);
+
+  @if $index {
+    @return string.slice($string, 1, $index - 1) + $replace +
+      replace(
+        string.slice($string, $index + string.length($search)),
+        $search,
+        $replace
+      );
+  }
+
+  @return $string;
+}
+
+@function camel-case($str, $replaceAllDashes: true) {
+  $camelCase: '';
+  $prevCharWasDash: false;
+
+  @for $i from 1 to string.length($str) + 1 {
+    $char: string.slice($str, $i, $i);
+
+    @if ($i == 1) {
+      $char: string.to-lower-case($char);
+    }
+
+    @if $char == '-' {
+      @if $prevCharWasDash {
+        $camelCase: $camelCase + '-';
+        $prevCharWasDash: false;
+      } @else {
+        $prevCharWasDash: true;
+      }
+    } @else if $prevCharWasDash {
+      $camelCase: $camelCase + string.to-upper-case($char);
+      $prevCharWasDash: false;
+    } @else {
+      $camelCase: $camelCase + $char;
+      $prevCharWasDash: false;
+    }
+  }
+
+  @if ($replaceAllDashes) {
+    $camelCase: replace($camelCase, '-');
+  }
+
+  @return $camelCase;
+}
+
+@function kebab-case($str) {
+  $kebabCase: '';
+  $prevCharWasDash: false;
+
+  @for $i from 1 to string.length($str) + 1 {
+    $char: string.slice($str, $i, $i);
+    $isFirstChar: $i == 1;
+
+    @if $isFirstChar {
+      $char: string.to-lower-case($char);
+    }
+
+    @if $char == '_' {
+      $char: '-';
+    }
+
+    @if $char == '-' {
+      @if $prevCharWasDash or $isFirstChar {
+        $char: '';
+      }
+
+      @if not $isFirstChar {
+        $prevCharWasDash: true;
+      }
+    } @else if $char != '' and $char == string.to-upper-case($char) {
+      @if $prevCharWasDash == false {
+        $char: '-#{$char}';
+      } @else {
+        $prevCharWasDash: false;
+      }
+    }
+
+    $kebabCase: $kebabCase + $char;
+  }
+
+  @return string.to-lower-case($kebabCase);
+}

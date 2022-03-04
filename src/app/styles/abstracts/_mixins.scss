@@ -1,0 +1,49 @@
+/* --------------------------- */
+/* Mixins */
+/* --------------------------- */
+
+@use 'sass:selector';
+@use 'sass:meta';
+@use 'functions';
+
+@mixin target-ie {
+  @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+    @content;
+  }
+}
+
+@mixin no-select {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+@mixin disable-native-button {
+  appearance: none;
+  -webkit-appearance: none;
+  border: none;
+  outline: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  cursor: pointer;
+  font-family: var(--font);
+}
+
+@mixin highlight {
+  @at-root #{&} ::selection {
+    @content;
+  }
+
+  @at-root #{&} ::-moz-selection {
+    @content;
+  }
+}
+
+@mixin css-properties($vars) {
+  @each $name, $value in $vars {
+    --#{functions.kebab-case($name)}: #{$value};
+  }
+}
