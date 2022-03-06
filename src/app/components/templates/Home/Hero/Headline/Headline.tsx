@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo, type ReactNode } from 'react';
 import styles from './Headline.module.scss';
 import classNames from 'classnames';
 
@@ -25,7 +25,7 @@ export default function Headline({
 
     const top = content[0] + 'need';
     content[1] = content[1].replace(/(good|great)/, '$1***');
-    const bottom: React.ReactNodeArray = content[1].split('***');
+    const bottom: ReactNode[] = content[1].split('***');
 
     if (bottom.length > 1) {
       bottom[0] = <span key="span">{bottom[0]}</span>;
