@@ -1,13 +1,15 @@
-import type { ReactNode } from 'react';
-import Head from 'next/head';
 import Content from '@elements/Content';
+import Head from 'next/head';
+import type { ReactNode } from 'react';
 
-export default function Layout({
-  title = 'Chris Stiles',
-  description = 'Full stack software engineer and UI/UX designer',
-  children,
-  header
-}: LayoutProps) {
+export default function Layout(props: LayoutProps) {
+  const {
+    title = 'Chris Stiles',
+    description = 'Full stack software engineer and UI/UX designer',
+    children,
+    header
+  } = props;
+
   return (
     <>
       <Head>

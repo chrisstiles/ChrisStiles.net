@@ -1,0 +1,228 @@
+/* --------------------------- */
+/* Editor */
+/* --------------------------- */
+
+@use 'sass:map';
+@use 'app';
+
+$borderRadius: 6px;
+
+.wrapper {
+  width: 570px;
+  flex-grow: 0;
+  flex-shrink: 0;
+  margin-top: -90px;
+  position: relative;
+
+  &:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: -1;
+    border-radius: $borderRadius;
+    transform: translate(15px, 15px);
+    background-color: rgba(#121820, 0.65);
+  }
+
+  @include app.highlight {
+    background-color: var(--highlight-light);
+    color: #3d3d3d;
+  }
+}
+
+/* --------------------------- */
+/* Top Bar */
+
+.top {
+  background-color: #e7edf3;
+  border-top-left-radius: $borderRadius;
+  border-top-right-radius: $borderRadius;
+  display: flex;
+  align-items: center;
+  height: 50px;
+  padding: 0 25px;
+}
+
+.dots {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: currentColor;
+  color: #c7cdd3;
+  position: relative;
+  flex-grow: 0;
+  margin-left: 10px;
+
+  &:before,
+  &:after {
+    content: '';
+    background-color: currentColor;
+    position: absolute;
+    border-radius: 50%;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    flex-grow: 0;
+  }
+
+  $offset: 6px;
+
+  &:before {
+    transform: translateX(calc(-100% - #{$offset}));
+  }
+
+  &:after {
+    transform: translateX(calc(100% + #{$offset}));
+  }
+}
+
+.tabs {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  margin-left: 35px;
+}
+
+.tab {
+  @include app.disable-native-button;
+  background-color: transparent;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 800;
+  padding: 0 18px;
+  font-size: 13px;
+  line-height: 1;
+  display: inline-flex;
+  height: 100%;
+  align-items: center;
+  transition: background-color 0.2s;
+  color: #5b6671;
+
+  &:hover,
+  &.hover {
+    background-color: #dee5ec;
+  }
+
+  &.active {
+    background-color: #f9fafc !important;
+  }
+}
+
+/* --------------------------- */
+/* Code */
+
+.code {
+  background-color: #f9fafc;
+  font-family: var(--font-code);
+  height: 250px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* --------------------------- */
+/* Terminal */
+
+.terminal {
+  background-color: #263241;
+  border-bottom-left-radius: $borderRadius;
+  border-bottom-right-radius: $borderRadius;
+  height: 90px;
+}
+
+/* --------------------------- */
+/* Mouse */
+
+$clickPulseDuration: 600ms;
+$doubleClickPulseDuration: 400ms;
+
+.mouse {
+  $size: 30px;
+  $initialX: 20%;
+  $initialY: 60%;
+  $pulseOffset: 9px;
+  $pulseOpacity: 0.25;
+
+  position: absolute;
+  width: $size;
+  height: $size;
+  border-radius: 50%;
+  color: var(--accent);
+  background-color: currentColor;
+  z-index: 300;
+  pointer-events: none;
+  top: $initialY;
+  left: $initialX;
+  transition: opacity 0.25s;
+  opacity: 0;
+
+  .pulse {
+    position: absolute;
+    top: -$pulseOffset;
+    left: -$pulseOffset;
+    right: -$pulseOffset;
+    bottom: -$pulseOffset;
+    color: inherit;
+    background-color: currentColor;
+    border-radius: 50%;
+    opacity: $pulseOpacity;
+    transform-origin: center center;
+  }
+
+  @keyframes pulseAnimation {
+    0% {
+      transform: scale(1);
+      opacity: $pulseOpacity;
+    }
+
+    15% {
+      opacity: $pulseOpacity;
+    }
+
+    45% {
+      opacity: 0;
+    }
+
+    50% {
+      transform: scale(1.5);
+    }
+
+    51% {
+      transform: scale(0);
+    }
+
+    100% {
+      transform: scale(1);
+      opacity: $pulseOpacity;
+    }
+  }
+
+  &:global(.click),
+  &:global(.doubleClick) {
+    .pulse {
+      animation-name: pulseAnimation;
+      animation-timing-function: linear;
+    }
+  }
+
+  &:global(.click) {
+    .pulse {
+      animation-duration: $clickPulseDuration;
+    }
+  }
+
+  &:global(.doubleClick) {
+    .pulse {
+      animation-iteration-count: 2;
+      animation-duration: $doubleClickPulseDuration;
+    }
+  }
+}
+
+:export {
+  clickPulseDuration: $clickPulseDuration;
+  clickColor: app.$accentDark;
+}

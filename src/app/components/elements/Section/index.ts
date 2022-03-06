@@ -1,0 +1,1 @@
+export { default, default as Section, type SectionProps } from './Section';

@@ -12,19 +12,24 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "preserveValueImports": true,
     "jsx": "preserve",
     "incremental": true,
     "baseUrl": ".",
     "paths": {
       // Shared paths
       "@colors": ["src/app/styles/abstracts/_colors.scss"],
+      "@elements": ["src/app/components/elements"],
       "@elements/*": ["src/app/components/elements/*"],
       "@images/*": ["src/app/images/*"],
+      "@helpers": ["src/app/utils/helpers"],
+      "@hooks/*": ["src/app/hooks/*"],
       "@layouts": ["src/app/components/layouts"],
       "@layouts/*": ["src/app/components/layouts/*"],
       "@modules/*": ["src/app/components/modules/*"],
       "@styles/*": ["src/app/styles/*"],
       "@templates/*": ["src/app/components/templates/*"],
+      "@utils/*": ["src/app/utils/*"],
 
       // SASS paths
       "app": ["src/app/styles/abstracts/_app.scss"]

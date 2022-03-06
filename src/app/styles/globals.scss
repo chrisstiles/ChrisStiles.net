@@ -15,15 +15,7 @@
 /* CSS Properties */
 
 :root {
-  // --font: #{app.$font};
-  // --font-code: #{app.$font-code};
-
-  // @each $name, $color in meta.module-variables(colors) {
-  //   // --#{$name}: #{$color};
-  //   --#{app.kebab-to-camel-case($name)}: #{$color};
-  // }
   @include app.css-properties(module-variables(app));
-  // @include app.css-properties('abstracts/colors');
 }
 
 /* --------------------------- */
@@ -54,7 +46,6 @@ body {
   padding: 0;
   font-weight: 400;
   font-family: var(--font);
-  font-display: swap;
   background-color: var(--bg);
   color: #fff;
   font-size: 18px;

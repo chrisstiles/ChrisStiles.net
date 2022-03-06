@@ -1,8 +1,6 @@
-import Content from '@elements/Content';
-import logo from '../../../../images/logo.svg';
-import Logo from '@images/logo.svg';
-import Image from 'next/image';
 import styles from './Header.module.scss';
+import Content from '@elements/Content';
+import Logo from '@images/logo.svg';
 
 export default function Header() {
   return (
@@ -23,7 +21,3 @@ export default function Header() {
     </Content>
   );
 }
-
-type HeadlineProps = {
-  text: string;
-};

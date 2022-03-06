@@ -1,0 +1,106 @@
+/* --------------------------- */
+/* Headline */
+/* --------------------------- */
+
+@use 'app';
+
+$skew: -3.5deg;
+$transitionDuration: 0.3s;
+$transformTransition: transform $transitionDuration;
+
+.headline {
+  font-weight: 700;
+  font-size: 80px;
+  line-height: 1;
+  transform-origin: top right;
+  transition: $transformTransition;
+  position: relative;
+  display: inline-block;
+
+  &.selectSpan {
+    span {
+      background-color: var(--highlight-dark);
+    }
+  }
+
+  &.bold {
+    font-weight: 800;
+  }
+
+  &.shrink {
+    font-size: 59px;
+  }
+
+  &.skew {
+    transform: skewY($skew);
+  }
+
+  &.uppercase {
+    text-transform: uppercase;
+  }
+
+  &.showColor {
+    span {
+      color: var(--accent);
+    }
+  }
+
+  span {
+    position: relative;
+    transition: color 0.3s;
+  }
+}
+
+.box {
+  $offset: -10px;
+  position: absolute;
+  top: $offset;
+  right: $offset;
+  bottom: $offset;
+  left: $offset;
+  border: 1px solid #2aa5fc;
+  pointer-events: none;
+
+  @at-root .content:empty + & {
+    opacity: 0;
+  }
+
+  @at-root .uppercase & {
+    bottom: $offset + 4px;
+  }
+}
+
+.handle {
+  $size: 10px;
+  $offset: -$size / 2;
+  position: absolute;
+  width: $size;
+  height: $size;
+  background-color: var(--bg);
+  border: 1px solid #2aa5fc;
+  transition: $transformTransition;
+
+  &:nth-child(1) {
+    top: $offset;
+    left: $offset;
+  }
+
+  &:nth-child(2) {
+    top: $offset;
+    right: $offset;
+  }
+
+  &:nth-child(3) {
+    bottom: $offset;
+    right: $offset;
+  }
+
+  &:nth-child(4) {
+    bottom: $offset;
+    left: $offset;
+  }
+
+  @at-root .skew & {
+    transform: skewY(-$skew);
+  }
+}

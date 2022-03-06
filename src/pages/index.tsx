@@ -1,6 +1,6 @@
-import type { ReactElement } from 'react';
 import HomeTemplate, { Header } from '@templates/Home';
 import Layout from '@layouts';
+import type { ReactElement } from 'react';
 
 export default function Home() {
   return <HomeTemplate />;

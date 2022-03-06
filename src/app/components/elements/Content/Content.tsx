@@ -1,35 +1,26 @@
-import React from 'react';
-import classNames from 'classnames';
+import { forwardRef, type ComponentPropsWithRef } from 'react';
 import styles from './Content.module.scss';
+import classNames from 'classnames';
 
-export default function Content({
-  className,
-  children,
-  style,
-  tag: Tag = 'div'
-}: ContentProps) {
+export default forwardRef<HTMLElement, ContentProps<any>>(function Content(
+  { tag: Tag = 'div', className, children, ...props },
+  ref
+) {
   return (
     <Tag
+      ref={ref}
       className={classNames(styles.wrapper, className)}
-      style={style}
+      {...props}
     >
       {children}
     </Tag>
   );
-}
+}) as typeof ContentFn;
 
-export function Section(props: ContentProps) {
-  return (
-    <Content
-      tag="section"
-      {...props}
-    />
-  );
-}
+export type ContentProps<T extends keyof JSX.IntrinsicElements> = {
+  tag?: T;
+} & ComponentPropsWithRef<T>;
 
-type ContentProps = {
-  className?: string;
-  children: React.ReactNode;
-  style?: React.CSSProperties;
-  tag?: keyof JSX.IntrinsicElements;
-};
+declare function ContentFn<Tag extends keyof JSX.IntrinsicElements>(
+  props: ContentProps<Tag>
+): JSX.Element;

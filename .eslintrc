@@ -1,3 +1,44 @@
 {
-  "extends": "next/core-web-vitals"
+  "extends": ["next/core-web-vitals", "plugin:import/recommended"],
+  "plugins": ["import"],
+  "rules": {
+    "import/no-named-as-default": 0,
+    "import/order": [
+      1,
+      {
+        "pathGroups": [
+          {
+            "pattern": "react",
+            "group": "index",
+            "position": "before"
+          },
+          {
+            "pattern": "react",
+            "group": "type",
+            "position": "after"
+          },
+          {
+            "pattern": "./*.scss",
+            "group": "sibling",
+            "position": "before"
+          },
+          {
+            "pattern": "./**",
+            "group": "sibling",
+            "position": "before"
+          },
+          { "pattern": "@**", "group": "parent", "position": "after" }
+        ],
+        "groups": [
+          "index",
+          ["sibling", "parent", "internal"],
+          "external",
+          "builtin",
+          "object",
+          "type"
+        ],
+        "pathGroupsExcludedImportTypes": ["type"]
+      }
+    ]
+  }
 }

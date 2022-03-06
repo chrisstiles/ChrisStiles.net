@@ -1,7 +1,7 @@
 // @ts-check
 
 /** @type {import('next').NextConfig} */
-const config = {
+module.exports = {
   reactStrictMode: true,
   swcMinify: true,
   webpack(config) {
@@ -15,5 +15,3 @@ const config = {
     return config;
   }
 };
-
-module.exports = config;
