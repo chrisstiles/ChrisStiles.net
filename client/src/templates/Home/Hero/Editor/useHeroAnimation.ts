@@ -52,7 +52,7 @@ export default function useHeroAnimation({
   // Queue the next step in the animation
   const queue = useCallback(
     async (fn: () => void, delay = 200) => {
-      return new Promise(resolve => {
+      return new Promise<void>(resolve => {
         clearTimeout(queuedAnimation.current);
 
         const callback = async () => {
