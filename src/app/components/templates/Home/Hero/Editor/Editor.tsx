@@ -1,4 +1,6 @@
-import React, {
+import {
+  memo,
+  forwardRef,
   useCallback,
   useRef,
   useState,
@@ -6,11 +8,12 @@ import React, {
   type RefObject
 } from 'react';
 import styles from './Editor.module.scss';
-import useHeroAnimation, { Language } from './useHeroAnimation';
+import useHeroAnimation from './useHeroAnimation';
 import Code from './Code';
 import classNames from 'classnames';
+import { Language } from '@global';
 
-export default React.memo(function Editor({
+export default memo(function Editor({
   setState,
   showSelectHighlight = false
 }: EditorProps) {
@@ -19,21 +22,22 @@ export default React.memo(function Editor({
   const mouse = useRef<HTMLDivElement>(null);
 
   const {
-    currentView,
     html,
     scss,
-    setCurrentView,
     isPlaying,
     isComplete,
-    setIsPlaying
+    visibleView,
+    play,
+    pause,
+    setVisibleView
   } = useHeroAnimation({ setState, htmlTab, scssTab, mouse });
 
   const handleButtonClick = useCallback(
     (view: Language) => {
-      setCurrentView(view);
-      setIsPlaying(false);
+      setVisibleView(view);
+      pause();
     },
-    [setCurrentView, setIsPlaying]
+    [setVisibleView, pause]
   );
 
   const mouseLeaveTimer = useRef<number>();
@@ -61,11 +65,10 @@ export default React.memo(function Editor({
       }, resumeDelay / 3);
 
       mouseLeaveTimer.current = window.setTimeout(() => {
-        setIsPlaying(true);
-        setForceCaretVisible(false);
+        play(() => setForceCaretVisible(false));
       }, resumeDelay);
     }
-  }, [isPlaying, isComplete, setIsPlaying]);
+  }, [isPlaying, isComplete, play]);
 
   return (
     <div
@@ -89,7 +92,7 @@ export default React.memo(function Editor({
           <Tab
             ref={htmlTab}
             language={Language.HTML}
-            currentView={currentView}
+            currentView={visibleView}
             onClick={handleButtonClick}
           >
             index.html
@@ -97,7 +100,7 @@ export default React.memo(function Editor({
           <Tab
             ref={scssTab}
             language={Language.SCSS}
-            currentView={currentView}
+            currentView={visibleView}
             onClick={handleButtonClick}
           >
             styles.scss
@@ -107,12 +110,12 @@ export default React.memo(function Editor({
       <div className={styles.code}>
         <Code
           language={Language.HTML}
-          isVisible={currentView === Language.HTML}
+          isVisible={visibleView === Language.HTML}
           content={html}
         />
         <Code
           language={Language.SCSS}
-          isVisible={currentView === Language.SCSS}
+          isVisible={visibleView === Language.SCSS}
           content={scss}
         />
       </div>
@@ -126,7 +129,7 @@ type EditorProps = {
   showSelectHighlight: boolean;
 };
 
-const Tab = React.forwardRef<TabHandle, TabProps>(function Tab(
+const Tab = forwardRef<TabHandle, TabProps>(function Tab(
   { language, currentView, children, onClick },
   ref
 ) {

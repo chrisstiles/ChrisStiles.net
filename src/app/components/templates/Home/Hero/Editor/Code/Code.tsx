@@ -1,11 +1,11 @@
-import React, { useRef, useMemo } from 'react';
+import { memo, useRef, useMemo } from 'react';
 import styles from './Code.module.scss';
-import { Language } from '../useHeroAnimation';
 import useHasRendered from '@hooks/useHasRendered';
 import Prism from 'prismjs';
 import dedent from 'dedent';
 import 'prismjs/components/prism-scss';
 import classNames from 'classnames';
+import { Language } from '@global';
 
 interface Tokens {
   [key: string]: { pattern: RegExp };
@@ -20,9 +20,8 @@ const tokens: Tokens = {
   }
 };
 
-export default function Code({ language, content, isVisible }: CodeProps) {
+export default memo(function Code({ language, content, isVisible }: CodeProps) {
   const hasRendered = useHasRendered();
-  const ref = useRef<HTMLElement>(null);
 
   // Extend Prism's language grammar for custom functionality
   const grammar = useMemo(() => {
@@ -33,7 +32,7 @@ export default function Code({ language, content, isVisible }: CodeProps) {
     const formattedCode = dedent(content);
     const lines = formattedCode.split('\n');
 
-    if (!hasRendered || !isVisible) {
+    if (!hasRendered) {
       return [formattedCode, lines];
     }
 
@@ -57,7 +56,7 @@ export default function Code({ language, content, isVisible }: CodeProps) {
     });
 
     return [highlightedCode, lines];
-  }, [content, grammar, language, hasRendered, isVisible]);
+  }, [content, grammar, language, hasRendered]);
 
   return (
     <div
@@ -65,27 +64,29 @@ export default function Code({ language, content, isVisible }: CodeProps) {
         [styles.visible]: isVisible
       })}
     >
-      <pre className={styles.code}>
-        {hasRendered && (
-          <>
+      <div className={styles.contentWrapper}>
+        <div className={styles.content}>
+          <pre className={styles.codeWrapper}>
             <code
-              ref={ref}
-              className={`language-${language}`}
+              className={classNames(styles.code, `code-${language}`)}
               dangerouslySetInnerHTML={{ __html: code }}
             />
-            <div className={styles.lineNumbers}>
-              {!lines.length ? (
-                <span />
-              ) : (
-                lines.map((_, index) => <span key={index} />)
-              )}
-            </div>
-          </>
-        )}
-      </pre>
+          </pre>
+        </div>
+        <div
+          role="presentation"
+          className={styles.lineNumbers}
+        >
+          {!lines.length ? (
+            <span />
+          ) : (
+            lines.map((_, index) => <span key={index} />)
+          )}
+        </div>
+      </div>
     </div>
   );
-}
+});
 
 type CodeProps = {
   language: Language;

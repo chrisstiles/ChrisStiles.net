@@ -27,6 +27,16 @@
             "group": "sibling",
             "position": "before"
           },
+          {
+            "pattern": "@global",
+            "group": "object",
+            "position": "after"
+          },
+          {
+            "pattern": "@global/**",
+            "group": "object",
+            "position": "after"
+          },
           { "pattern": "@**", "group": "parent", "position": "after" }
         ],
         "groups": [
@@ -37,7 +47,7 @@
           "object",
           "type"
         ],
-        "pathGroupsExcludedImportTypes": ["type"]
+        "pathGroupsExcludedImportTypes": ["type", "@global**"]
       }
     ]
   }

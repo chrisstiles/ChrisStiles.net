@@ -13,6 +13,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "preserveValueImports": true,
+    "preserveConstEnums": true,
     "jsx": "preserve",
     "incremental": true,
     "baseUrl": ".",
@@ -29,12 +30,14 @@
       "@modules/*": ["src/app/components/modules/*"],
       "@styles/*": ["src/app/styles/*"],
       "@templates/*": ["src/app/components/templates/*"],
+      "@global": ["src/app/global"],
+      "@global/*": ["src/app/global/*"],
       "@utils/*": ["src/app/utils/*"],
 
       // SASS paths
       "app": ["src/app/styles/abstracts/_app.scss"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.scss"],
+  "include": ["next-env.d.ts", "**/*.d.ts", "**/*.ts", "**/*.tsx", "**/*.scss"],
   "exclude": ["node_modules"]
 }

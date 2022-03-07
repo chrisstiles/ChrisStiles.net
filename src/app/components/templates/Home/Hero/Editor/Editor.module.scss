@@ -116,7 +116,7 @@ $borderRadius: 6px;
 /* Code */
 
 .code {
-  background-color: #f9fafc;
+  background-color: var(--editor-background);
   font-family: var(--font-code);
   height: 250px;
   position: relative;

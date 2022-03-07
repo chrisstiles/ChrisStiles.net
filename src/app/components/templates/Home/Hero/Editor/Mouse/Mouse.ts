@@ -1,6 +1,6 @@
 import { clickPulseDuration, clickColor } from '../Editor.module.scss';
-import { Language } from '../useHeroAnimation';
 import gsap from 'gsap';
+import { Language } from '@global';
 import type { RefObject } from 'react';
 import type { TabHandle } from '../Editor';
 
@@ -51,10 +51,7 @@ export default class Mouse {
   private currentX = 0;
   private currentY = 0;
 
-  private async animateTo(
-    el: HTMLElement,
-    opts: AnimationOptions = {}
-  ) {
+  private async animateTo(el: HTMLElement, opts: AnimationOptions = {}) {
     this.show();
 
     let { duration, onUpdate, onComplete } = opts;
@@ -68,7 +65,7 @@ export default class Mouse {
         if (onComplete) {
           onComplete();
         }
-        
+
         resolve();
         return;
       }
@@ -100,9 +97,7 @@ export default class Mouse {
           Math.abs(this.mouse.offsetTop - y)
         );
 
-        duration = Math.round(
-          (baseDuration * distance) / baseDistance
-        );
+        duration = Math.round((baseDuration * distance) / baseDistance);
       }
 
       this.currentX = x;
@@ -205,17 +200,10 @@ export default class Mouse {
   }
 
   async click(hideAfterClick = true, mouseDownCallback?: () => void) {
-    return this.animateClick(
-      hideAfterClick,
-      false,
-      mouseDownCallback
-    );
+    return this.animateClick(hideAfterClick, false, mouseDownCallback);
   }
 
-  async doubleClick(
-    hideAfterClick = true,
-    mouseDownCallback?: () => void
-  ) {
+  async doubleClick(hideAfterClick = true, mouseDownCallback?: () => void) {
     return this.animateClick(hideAfterClick, true, mouseDownCallback);
   }
 
@@ -253,8 +241,7 @@ export default class Mouse {
             mouseRect.left < tabRect.left + tabRect.width &&
             mouseRect.left + mouseRect.width > tabRect.left;
 
-          const yOverlap =
-            mouseRect.top < tabRect.top + tabRect.height;
+          const yOverlap = mouseRect.top < tabRect.top + tabRect.height;
 
           if (xOverlap && yOverlap) {
             tab.setIsHovered(true);
@@ -268,10 +255,7 @@ export default class Mouse {
     });
   }
 
-  async selectElement(
-    el: HTMLElement,
-    mouseDownCallback?: () => void
-  ) {
+  async selectElement(el: HTMLElement, mouseDownCallback?: () => void) {
     return new Promise<void>(async resolve => {
       await this.animateTo(el);
       await this.doubleClick(true, mouseDownCallback);

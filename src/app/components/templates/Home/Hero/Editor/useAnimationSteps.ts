@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Language } from './useHeroAnimation';
+import { Language } from '@global';
 
 export enum StepType {
   Text = 'text',
