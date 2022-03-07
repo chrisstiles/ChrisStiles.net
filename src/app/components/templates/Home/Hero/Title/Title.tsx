@@ -1,18 +1,19 @@
-import React from 'react';
+import { memo, useMemo } from 'react';
 import styles from './Title.module.scss';
+import useSyntaxHighlighting, { Language } from '@hooks/useSyntaxHighlighting';
+import classNames from 'classnames';
 
-export default function Title({ text }: TitleProps) {
+export default memo(function Title({ text }: TitleProps) {
+  const { code } = useSyntaxHighlighting(Language.JavaScript, text);
+
   return (
-    <code className={styles.title}>
-      <span className={styles.red}>this</span>
-      <span className={styles.grey}>.developer</span>
-      <span className={styles.purple}>&nbsp;= new&nbsp;</span>
-      <span className={styles.gold}>Chris Stiles</span>
-      <span className={styles.grey}>()</span>
-      <span className={styles.blue}>;</span>
-    </code>
+    <code
+      className={classNames(styles.title, 'code-javascript')}
+      aria-hidden="true"
+      dangerouslySetInnerHTML={{ __html: code }}
+    />
   );
-}
+});
 
 type TitleProps = {
   text: string;

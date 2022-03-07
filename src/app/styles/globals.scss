@@ -5,6 +5,7 @@
 @use 'sass:meta';
 @use 'app';
 @use 'abstracts/colors';
+@use 'syntax-highlighting';
 
 /* --------------------------- */
 /* Fonts */
@@ -57,10 +58,6 @@ body {
 }
 
 :global {
-  #page-wrapper {
-    min-height: calc(100vh - 60px);
-  }
-
   #footer {
     height: 60px;
     display: flex;

@@ -1,0 +1,64 @@
+/* --------------------------- */
+/* Code Syntax Highlighting */
+/* --------------------------- */
+
+/* --------------------------- */
+/* HTML */
+
+.code-html {
+  // Light Background
+
+  color: #002339;
+
+  .punctuation {
+    color: #3e3e3e;
+  }
+
+  .tag {
+    color: #0444ac;
+  }
+}
+
+/* --------------------------- */
+/* SCSS */
+
+.code-scss {
+  // Light Background
+
+  color: #174781;
+
+  .selector {
+    color: #0444ac;
+  }
+
+  .property {
+    color: #dc3eb7;
+  }
+
+  .punctuation {
+    color: #002339;
+  }
+}
+
+.code-javascript {
+  // Dark Background
+
+  color: #9fb4cf;
+
+  .this {
+    color: #ff5270;
+  }
+
+  .operator,
+  .keyword {
+    color: #c791ea;
+  }
+
+  .class-name {
+    color: #ffcb6b;
+  }
+
+  .semicolon {
+    color: #89ddff;
+  }
+}

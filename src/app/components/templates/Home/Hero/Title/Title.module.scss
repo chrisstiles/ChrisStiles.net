@@ -6,28 +6,7 @@
   font-size: 17px;
   font-family: var(--font-code);
   font-weight: 400;
-  display: flex;
+  display: inline-block;
   width: 100%;
   margin-bottom: 30px;
-}
-
-.red {
-  color: #ff5270;
-}
-
-.grey {
-  color: #9fb4cf;
-}
-
-.purple {
-  color: #c791ea;
-}
-
-.gold {
-  color: #ffcb6b;
-  word-spacing: -0.5em;
-}
-
-.blue {
-  color: #89ddff;
 }

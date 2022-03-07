@@ -42,7 +42,7 @@ export default function Hero() {
 }
 
 const initialState: HeroState = {
-  titleText: '',
+  titleText: 'this.developer = new ChrisStiles();',
   headlineText: '',
   showSelectHighlight: false,
   selectSpan: false,
