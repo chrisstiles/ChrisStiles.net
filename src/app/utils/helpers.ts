@@ -27,3 +27,7 @@ export function getState(state: any, value: any, name?: string) {
 export function isSSR() {
   return typeof window === 'undefined' || typeof document === 'undefined';
 }
+
+export function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}

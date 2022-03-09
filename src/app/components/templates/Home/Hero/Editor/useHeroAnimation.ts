@@ -8,6 +8,7 @@ import {
 } from 'react';
 import useAnimationSteps, { StepType, type Step } from './useAnimationSteps';
 import Mouse from './Mouse';
+import { sleep } from '@helpers';
 import { random } from 'lodash';
 import { Language } from '@global';
 import type { TabHandle } from './Editor';
@@ -314,6 +315,7 @@ export default function useHeroAnimation({
       if (visibleView !== animatingView.current) {
         await mouse.clickTab(animatingView.current);
         setVisibleView(animatingView.current);
+        await sleep(700);
       }
 
       onResume?.();

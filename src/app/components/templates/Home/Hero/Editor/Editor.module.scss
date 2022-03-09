@@ -136,13 +136,13 @@ $borderRadius: 6px;
 /* --------------------------- */
 /* Mouse */
 
-$clickPulseDuration: 600ms;
+$clickPulseDuration: 500ms;
 $doubleClickPulseDuration: 400ms;
 
 .mouse {
   $size: 30px;
-  $initialX: 20%;
-  $initialY: 60%;
+  $initialX: 70%;
+  $initialY: 50%;
   $pulseOffset: 9px;
   $pulseOpacity: 0.25;
 
@@ -156,7 +156,7 @@ $doubleClickPulseDuration: 400ms;
   pointer-events: none;
   top: $initialY;
   left: $initialX;
-  transition: opacity 0.25s;
+  transition: opacity 0.2s;
   opacity: 0;
 
   .pulse {

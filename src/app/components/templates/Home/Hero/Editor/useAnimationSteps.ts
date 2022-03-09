@@ -16,25 +16,32 @@ Select text: (- -)
 
 */
 
+const closeTagDelay = 200;
+const tagNewlineDelay = 250;
+
 export default function useAnimationState(
   setState: (value: any, name?: string) => void
 ): Step[] {
   const steps: Step[] = useMemo(
     () => [
-      { text: '<h1>', view: Language.HTML },
-      { text: '<h1>*|*</h1>', instant: true, delay: 500 },
+      { text: '<h1 class="headline">', view: Language.HTML },
+      {
+        text: '<h1 class="headline">*|*</h1>',
+        instant: true,
+        delay: closeTagDelay
+      },
       {
         instant: true,
-        delay: 500,
+        delay: tagNewlineDelay,
         text: `
-          <h1>
+          <h1 class="headline">
             *|*
           </h1>
         `
       },
       {
         text: `
-          <h1>
+          <h1 class="headline">
             [-Good ideas need good developers-]
           </h1>
         `,
@@ -46,24 +53,24 @@ export default function useAnimationState(
       },
       {
         text: `
-          <h1>
+          <h1 class="headline">
             Good ideas need (-good-) developers
           </h1>
         `,
         onMouseDown() {
-          setState({ selectSpan: true });
+          setState({ selectEmphasis: true });
         }
       },
       {
         text: `
-          <h1>
+          <h1 class="headline">
             Good ideas need *|* developers
           </h1>
         `,
         instant: true,
         delay: 700,
         onStart() {
-          setState({ selectSpan: false });
+          setState({ selectEmphasis: false });
         },
         onComplete() {
           setState({ headlineText: 'Good ideas need developers' });
@@ -71,36 +78,36 @@ export default function useAnimationState(
       },
       {
         text: `
-          <h1>
-            Good ideas need [-<span>-] developers
+          <h1 class="headline">
+            Good ideas need [-<em>-] developers
           </h1>
         `,
-        delay: 1650,
+        delay: 950,
         onType(headlineText: string) {
           setState({
-            headlineText: stripSpan(headlineText)
+            headlineText: strip(headlineText)
           });
         }
       },
       {
         text: `
-          <h1>
-            Good ideas need <span>*|*</span> developers
+          <h1 class="headline">
+            Good ideas need <em>*|*</em> developers
           </h1>
         `,
         instant: true,
-        delay: 500
+        delay: closeTagDelay
       },
       {
         text: `
-          <h1>
-            Good ideas need <span>[-great-]</span> developers
+          <h1 class="headline">
+            Good ideas need <em>[-great-]</em> developers
           </h1>
         `,
-        delay: 500,
+        delay: 400,
         onType(headlineText: string) {
           setState({
-            headlineText: stripSpan(headlineText)
+            headlineText: strip(headlineText)
           });
         }
       },
@@ -109,24 +116,25 @@ export default function useAnimationState(
         delay: 500
       },
       {
-        text: 'h1 {'
+        text: '.headline {'
       },
-      { text: 'h1 {*|*}', instant: true, delay: 500 },
+      { text: '.headline {*|*}', instant: true, delay: closeTagDelay },
       {
         text: `
-          h1 {
+          .headline {
             [-font-weight: 800;-]
           }
         `,
+        delay: tagNewlineDelay,
         onComplete() {
           setState({ boldText: true });
         }
       },
       {
         text: `
-          h1 {
+          .headline {
             font-weight: 800;
-            [-font-size: 3.3em;-]
+            [-font-size: 3.3rem;-]
           }
         `,
         onComplete() {
@@ -135,9 +143,9 @@ export default function useAnimationState(
       },
       {
         text: `
-          h1 {
+          .headline {
             font-weight: 800;
-            font-size: 3.3em;
+            font-size: 3.3rem;
             [-text-transform: uppercase;-]
           }
         `,
@@ -147,10 +155,10 @@ export default function useAnimationState(
       },
       {
         text: `
-          h1 {
+          .headline {
             font-weight: 800;
-            font-size: 3.3em;
-            text-transform: upprcase;
+            font-size: 3.3rem;
+            text-transform: uppercase;
             [-transform: skewY(-3.5deg);-]
           }
         `,
@@ -160,10 +168,10 @@ export default function useAnimationState(
       },
       {
         text: `
-          h1 {
+          .headline {
             font-weight: 800;
-            font-size: 3.3em;
-            text-transform: upprcase;
+            font-size: 3.3rem;
+            text-transform: uppercase;
             transform: skewY(-3.5deg);
             *|*
           }
@@ -173,43 +181,44 @@ export default function useAnimationState(
       },
       {
         text: `
-          h1 {
+          .headline {
             font-weight: 800;
-            font-size: 3.3em;
-            text-transform: upprcase;
+            font-size: 3.3rem;
+            text-transform: uppercase;
             transform: skewY(-3.5deg);
 
-            [-span {-]
+            [-em {-]
           }
         `
       },
       {
         text: `
-          h1 {
+          .headline {
             font-weight: 800;
-            font-size: 3.3em;
-            text-transform: upprcase;
+            font-size: 3.3rem;
+            text-transform: uppercase;
             transform: skewY(-3.5deg);
 
-            span {*|*}
+            em {*|*}
           }
         `,
         instant: true,
-        delay: 500
+        delay: closeTagDelay
       },
       {
         text: `
-          h1 {
+          .headline {
             font-weight: 800;
-            font-size: 3.3em;
-            text-transform: upprcase;
+            font-size: 3.3rem;
+            text-transform: uppercase;
             transform: skewY(-3.5deg);
 
-            span {
-              [-color: var(--green);-]
+            em {
+              [-color: var(--accent-color);-]
             }
           }
         `,
+        delay: tagNewlineDelay,
         onComplete() {
           setState({ showSpanColor: true, showBoundingBox: false });
         }
@@ -234,6 +243,6 @@ export type Step = {
   onMouseDown?(): void;
 };
 
-function stripSpan(text: string) {
-  return text.replace(/<\/?s?p?a?n?>?/g, '');
+function strip(text: string) {
+  return text.replace(/<\/?[^> \s\n]*>?/g, '');
 }

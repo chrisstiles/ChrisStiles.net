@@ -12,12 +12,7 @@
   height: 100%;
   display: flex;
   margin-right: 2px;
-  // opacity: 0;
   pointer-events: none;
-  // transition: opacity 0.3s;
-  // $translate: 80px;
-  // transform: translateX($translate);
-  // transition: all 0.3s cubic-bezier(0.21, 0.94, 0.14, 1);
   position: absolute;
   top: 0;
   left: 0;
@@ -25,16 +20,9 @@
   bottom: 0;
 
   &.visible {
-    // opacity: 1;
-    // transform: translateX(0) !important;
     pointer-events: auto;
-    overflow-y: auto;
-    // z-index: 2;
+    z-index: 10;
   }
-
-  // &:first-child {
-  //   transform: translateX(-$translate);
-  // }
 }
 
 $lineNumbersWidth: 45px;
@@ -42,12 +30,10 @@ $lineNumbersWidth: 45px;
 .contentWrapper {
   padding: 20px 20px 20px 0;
   display: flex;
-  // align-items: flex-start;
   flex-grow: 1;
 }
 
 .content {
-  // background: red;
   flex-grow: 1;
   order: 2;
   overflow: hidden;
@@ -75,26 +61,7 @@ $lineNumbersWidth: 45px;
 }
 
 .code {
-  // $translate: 60px;
-  // order: 2;
-  // margin-left: -$lineNumbersWidth;
-  // padding-left: $lineNumbersWidth;
-  // padding-left: 15px;
   width: 100%;
-  // transform: translateX($translate);
-  // opacity: 0;
-  // transition: transform 0.3s cubic-bezier(0.21, 0.94, 0.14, 1), opacity 0.25s;
-
-  // @at-root {
-  //   .wrapper:first-child & {
-  //     transform: translateX(-$translate);
-  //   }
-
-  //   .wrapper.visible & {
-  //     transform: translateX(0);
-  //     opacity: 1;
-  //   }
-  // }
 
   @keyframes blink {
     0% {
@@ -157,11 +124,35 @@ $lineNumbersWidth: 45px;
   font-weight: 500;
   order: 1;
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: opacity 0.25s linear 0.2s;
+  position: relative;
+  overflow: hidden;
+
+  &:before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    transition: transform 0.2s cubic-bezier(0.37, 0.18, 0, 1), opacity 0.2s;
+
+    background: linear-gradient(
+      180deg,
+      rgba(249, 250, 252, 0) 0%,
+      #f9fafc 16.67%
+    );
+  }
 
   @at-root .visible & {
     opacity: 1;
     transition-duration: 0.1s;
+    transition-delay: 0s;
+
+    &:before {
+      opacity: 0;
+      transform: translateY(100%);
+    }
   }
 
   > span {

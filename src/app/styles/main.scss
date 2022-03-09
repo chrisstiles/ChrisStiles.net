@@ -40,6 +40,7 @@ html {
   -webkit-font-smoothing: antialiased;
   -webkit-text-size-adjust: 100%;
   -moz-osx-font-smoothing: grayscale;
+  font-size: 18px;
 }
 
 body {
@@ -49,7 +50,6 @@ body {
   font-family: var(--font);
   background-color: var(--bg);
   color: #fff;
-  font-size: 18px;
 }
 
 @include app.highlight {

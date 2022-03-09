@@ -17,8 +17,12 @@ $transformTransition: transform $transitionDuration;
   position: relative;
   display: inline-block;
 
-  &.selectSpan {
-    span {
+  em {
+    font-style: normal;
+  }
+
+  &.selectEmphasis {
+    em {
       background-color: var(--highlight-dark);
     }
   }
@@ -40,14 +44,15 @@ $transformTransition: transform $transitionDuration;
   }
 
   &.showColor {
-    span {
+    em {
       color: var(--accent);
     }
   }
 
-  span {
+  strong {
     position: relative;
     transition: color 0.3s;
+    font-weight: inherit;
   }
 }
 

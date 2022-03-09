@@ -19,7 +19,7 @@ export default function Hero() {
           <Title text={state.titleText} />
           <Headline
             text={state.headlineText}
-            selectSpan={state.selectSpan}
+            selectEmphasis={state.selectEmphasis}
             boldText={state.boldText}
             shrinkText={state.shrinkText}
             skewText={state.skewText}
@@ -45,7 +45,7 @@ const initialState: HeroState = {
   titleText: 'this.developer = new ChrisStiles();',
   headlineText: '',
   showSelectHighlight: false,
-  selectSpan: false,
+  selectEmphasis: false,
   boldText: false,
   shrinkText: false,
   skewText: false,
@@ -58,7 +58,7 @@ type HeroState = {
   titleText: string;
   headlineText: string;
   showSelectHighlight: boolean;
-  selectSpan: boolean;
+  selectEmphasis: boolean;
   boldText: boolean;
   shrinkText: boolean;
   skewText: boolean;

@@ -4,7 +4,7 @@ import classNames from 'classnames';
 
 export default function Headline({
   text,
-  selectSpan,
+  selectEmphasis,
   boldText,
   shrinkText,
   skewText,
@@ -28,7 +28,7 @@ export default function Headline({
     const bottom: ReactNode[] = content[1].split('***');
 
     if (bottom.length > 1) {
-      bottom[0] = <span key="span">{bottom[0]}</span>;
+      bottom[0] = <em key="em">{bottom[0]}</em>;
     }
 
     return [top, <br key="br" />, bottom].flat();
@@ -37,7 +37,7 @@ export default function Headline({
   return (
     <h1
       className={classNames(styles.headline, {
-        [styles.selectSpan]: selectSpan,
+        [styles.selectEmphasis]: selectEmphasis,
         [styles.showColor]: showSpanColor,
         [styles.bold]: boldText,
         [styles.shrink]: shrinkText,
@@ -45,7 +45,7 @@ export default function Headline({
         [styles.uppercase]: uppercaseText
       })}
     >
-      <div className={styles.content}>{content}</div>
+      <span className={styles.content}>{content}</span>
       <BoundingBox isVisible={showBoundingBox} />
     </h1>
   );
@@ -64,7 +64,7 @@ function BoundingBox({ isVisible = true }) {
 
 type HeadlineProps = {
   text: string;
-  selectSpan: boolean;
+  selectEmphasis: boolean;
   boldText: boolean;
   shrinkText: boolean;
   skewText: boolean;

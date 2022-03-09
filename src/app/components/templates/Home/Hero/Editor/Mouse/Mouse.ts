@@ -1,5 +1,7 @@
 import { clickPulseDuration, clickColor } from '../Editor.module.scss';
+import { sleep } from '@helpers';
 import gsap from 'gsap';
+import { round } from 'lodash';
 import { Language } from '@global';
 import type { RefObject } from 'react';
 import type { TabHandle } from '../Editor';
@@ -50,18 +52,30 @@ export default class Mouse {
 
   private currentX = 0;
   private currentY = 0;
+  private currentEl?: HTMLElement;
 
   private async animateTo(el: HTMLElement, opts: AnimationOptions = {}) {
     this.show();
 
-    let { duration, onUpdate, onComplete } = opts;
+    if (this.animation) {
+      this.animation?.totalProgress(1).kill();
+      this.animation = null;
+    }
+
+    let { duration, onUpdate, onComplete, delay } = opts;
 
     if (!el) {
       return Promise.reject('Element not found');
     }
 
-    return new Promise<void>(resolve => {
-      if (!this.mouse) {
+    return new Promise<void>(async resolve => {
+      const shouldAnimate = el !== this.currentEl;
+
+      if (!this.mouse || !shouldAnimate) {
+        if (!shouldAnimate) {
+          await sleep(150);
+        }
+
         if (onComplete) {
           onComplete();
         }
@@ -90,24 +104,26 @@ export default class Mouse {
       );
 
       if (duration === undefined) {
-        const baseDuration = 0.4;
-        const baseDistance = 200;
+        const baseDuration = 0.5;
+        const baseDistance = 250;
         const distance = Math.max(
           Math.abs(this.mouse.offsetLeft - x),
           Math.abs(this.mouse.offsetTop - y)
         );
 
-        duration = Math.round((baseDuration * distance) / baseDistance);
+        duration = round((baseDuration * distance) / baseDistance, 2);
       }
 
       this.currentX = x;
       this.currentY = y;
+      this.currentEl = el;
 
       this.animation = gsap.to(this.mouse, {
         x,
         y,
         duration,
-        ease: 'power3.out',
+        delay,
+        ease: 'power4.inOut',
         onUpdate,
         onComplete: () => {
           this.animation = null;
@@ -154,7 +170,7 @@ export default class Mouse {
       gsap.to(this.mouse, {
         scale: 0.8,
         color: clickColor,
-        duration: 0.15,
+        duration: isDoubleClick ? 0.1 : 0.13,
         yoyo: true,
         repeat: isDoubleClick ? 2 : 1,
         onStart: () => {
@@ -266,6 +282,7 @@ export default class Mouse {
 
 type AnimationOptions = {
   duration?: number;
+  delay?: number;
   onUpdate?: gsap.Callback;
   onComplete?: gsap.Callback;
 };
