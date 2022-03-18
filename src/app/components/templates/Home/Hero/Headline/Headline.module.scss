@@ -10,12 +10,13 @@ $transformTransition: transform $transitionDuration;
 
 .headline {
   font-weight: 700;
-  font-size: 80px;
+  font-size: 65px;
   line-height: 1;
   transform-origin: top right;
   transition: $transformTransition;
   position: relative;
   display: inline-block;
+  font-feature-settings: normal;
 
   em {
     font-style: normal;
@@ -29,6 +30,10 @@ $transformTransition: transform $transitionDuration;
 
   &.bold {
     font-weight: 800;
+  }
+
+  &.alternateGlyphs {
+    font-feature-settings: 'salt', 'calt';
   }
 
   &.shrink {

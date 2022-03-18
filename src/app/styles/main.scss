@@ -40,7 +40,8 @@ html {
   -webkit-font-smoothing: antialiased;
   -webkit-text-size-adjust: 100%;
   -moz-osx-font-smoothing: grayscale;
-  font-size: 18px;
+  font-size: 16px;
+  font-feature-settings: 'salt', 'calt';
 }
 
 body {

@@ -146,11 +146,11 @@ export default function useAnimationState(
           .headline {
             font-weight: 800;
             font-size: 3.3rem;
-            [-text-transform: uppercase;-]
+            [-font-feature-settings: 'salt', 'calt';-]
           }
         `,
         onComplete() {
-          setState({ uppercaseText: true });
+          setState({ alternateGlyphs: true });
         }
       },
       {
@@ -158,7 +158,7 @@ export default function useAnimationState(
           .headline {
             font-weight: 800;
             font-size: 3.3rem;
-            text-transform: uppercase;
+            font-feature-settings: 'salt', 'calt';
             [-transform: skewY(-3.5deg);-]
           }
         `,
@@ -171,7 +171,7 @@ export default function useAnimationState(
           .headline {
             font-weight: 800;
             font-size: 3.3rem;
-            text-transform: uppercase;
+            font-feature-settings: 'salt', 'calt';
             transform: skewY(-3.5deg);
             *|*
           }
@@ -184,7 +184,7 @@ export default function useAnimationState(
           .headline {
             font-weight: 800;
             font-size: 3.3rem;
-            text-transform: uppercase;
+            font-feature-settings: 'salt', 'calt';
             transform: skewY(-3.5deg);
 
             [-em {-]
@@ -196,7 +196,7 @@ export default function useAnimationState(
           .headline {
             font-weight: 800;
             font-size: 3.3rem;
-            text-transform: uppercase;
+            font-feature-settings: 'salt', 'calt';
             transform: skewY(-3.5deg);
 
             em {*|*}
@@ -210,7 +210,7 @@ export default function useAnimationState(
           .headline {
             font-weight: 800;
             font-size: 3.3rem;
-            text-transform: uppercase;
+            font-feature-settings: 'salt', 'calt';
             transform: skewY(-3.5deg);
 
             em {

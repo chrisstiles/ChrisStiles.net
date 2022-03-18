@@ -6,6 +6,7 @@ export default function Headline({
   text,
   selectEmphasis,
   boldText,
+  alternateGlyphs,
   shrinkText,
   skewText,
   uppercaseText,
@@ -40,6 +41,7 @@ export default function Headline({
         [styles.selectEmphasis]: selectEmphasis,
         [styles.showColor]: showSpanColor,
         [styles.bold]: boldText,
+        [styles.alternateGlyphs]: alternateGlyphs,
         [styles.shrink]: shrinkText,
         [styles.skew]: skewText,
         [styles.uppercase]: uppercaseText
@@ -66,6 +68,7 @@ type HeadlineProps = {
   text: string;
   selectEmphasis: boolean;
   boldText: boolean;
+  alternateGlyphs: boolean;
   shrinkText: boolean;
   skewText: boolean;
   uppercaseText: boolean;

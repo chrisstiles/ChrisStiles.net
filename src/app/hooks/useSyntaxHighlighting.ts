@@ -59,6 +59,13 @@ const languages: { [key in Language]: Grammar } = {
     this: /this/,
     ...sharedTokens
   }),
-  [Language.HTML]: Prism.languages.extend(Language.HTML, sharedTokens),
+  [Language.HTML]: Prism.languages.extend(Language.HTML, {
+    bracket: {
+      pattern: /[<>]/,
+      greedy: true
+    },
+    // /<\/?(?!\d)[^\s>\/=$<%]+(?:\s(?:\s*[^\s>\/=]+(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s'">=]+(?=[\s>]))|(?=[\s/>])))+)?\s*\/?>/
+    ...sharedTokens
+  }),
   [Language.SCSS]: Prism.languages.extend(Language.SCSS, sharedTokens)
 };
