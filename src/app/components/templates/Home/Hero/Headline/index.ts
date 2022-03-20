@@ -1,2 +1,1 @@
-import Headline from './Headline';
-export default Headline;
+export { default, type HeadlineStyleProps } from './Headline';

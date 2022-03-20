@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { Language } from '@global';
+import type { HeroState, SetHeroStateFunction } from '../Hero';
 
 export enum StepType {
   Text = 'text',
@@ -20,15 +21,19 @@ const closeTagDelay = 200;
 const tagNewlineDelay = 250;
 
 export default function useAnimationState(
-  setState: (value: any, name?: string) => void
+  setState: SetHeroStateFunction
 ): Step[] {
   const steps: Step[] = useMemo(
     () => [
-      { text: '<h1 class="headline">', view: Language.HTML },
+      {
+        text: '<h1 class="headline">',
+        view: Language.HTML
+      },
       {
         text: '<h1 class="headline">*|*</h1>',
         instant: true,
-        delay: closeTagDelay
+        delay: closeTagDelay,
+        startState: { showBoundingBox: true }
       },
       {
         instant: true,
@@ -47,7 +52,7 @@ export default function useAnimationState(
         `,
         delay: 500,
         outputText: true,
-        onType(headlineText: string) {
+        onType(headlineText) {
           setState({ headlineText });
         }
       },
@@ -69,12 +74,8 @@ export default function useAnimationState(
         `,
         instant: true,
         delay: 700,
-        onStart() {
-          setState({ selectEmphasis: false });
-        },
-        onComplete() {
-          setState({ headlineText: 'Good ideas need developers' });
-        }
+        startState: { selectEmphasis: false },
+        completeState: { headlineText: 'Good ideas need developers' }
       },
       {
         text: `
@@ -83,7 +84,7 @@ export default function useAnimationState(
           </h1>
         `,
         delay: 950,
-        onType(headlineText: string) {
+        onType(headlineText) {
           setState({
             headlineText: strip(headlineText)
           });
@@ -105,7 +106,7 @@ export default function useAnimationState(
           </h1>
         `,
         delay: 400,
-        onType(headlineText: string) {
+        onType(headlineText) {
           setState({
             headlineText: strip(headlineText)
           });
@@ -126,9 +127,7 @@ export default function useAnimationState(
           }
         `,
         delay: tagNewlineDelay,
-        onComplete() {
-          setState({ boldText: true });
-        }
+        completeState: { boldText: true }
       },
       {
         text: `
@@ -137,9 +136,7 @@ export default function useAnimationState(
             [-font-size: 3.3rem;-]
           }
         `,
-        onComplete() {
-          setState({ shrinkText: true });
-        }
+        completeState: { shrinkText: true }
       },
       {
         text: `
@@ -149,9 +146,7 @@ export default function useAnimationState(
             [-font-feature-settings: 'salt', 'calt';-]
           }
         `,
-        onComplete() {
-          setState({ alternateGlyphs: true });
-        }
+        completeState: { alternateGlyphs: true }
       },
       {
         text: `
@@ -162,9 +157,7 @@ export default function useAnimationState(
             [-transform: skewY(-3.5deg);-]
           }
         `,
-        onComplete() {
-          setState({ skewText: true });
-        }
+        completeState: { skewText: true }
       },
       {
         text: `
@@ -219,9 +212,7 @@ export default function useAnimationState(
           }
         `,
         delay: tagNewlineDelay,
-        onComplete() {
-          setState({ showSpanColor: true, showBoundingBox: false });
-        }
+        completeState: { showSpanColor: true, showBoundingBox: false }
       }
     ],
     [setState]
@@ -237,6 +228,8 @@ export type Step = {
   delay?: number;
   outputText?: boolean;
   type?: StepType;
+  startState?: Partial<HeroState>;
+  completeState?: Partial<HeroState>;
   onStart?(): void;
   onComplete?(): void;
   onType?(text: string): void;

@@ -1,15 +1,15 @@
 import { useState, useCallback } from 'react';
 import styles from './Hero.module.scss';
 import Title from './Title';
-import Headline from './Headline';
+import Headline, { type HeadlineStyleProps } from './Headline';
 import Editor from './Editor';
 import { Content, Section } from '@elements';
 import { getState } from '@helpers';
 
 export default function Hero() {
   const [state, _setState] = useState(initialState);
-  const setState = useCallback((value: any, name?: keyof HeroState) => {
-    _setState(state => getState(state, value, name));
+  const setState: SetHeroStateFunction = useCallback((value, name) => {
+    !!value && _setState(state => getState(state, value, name));
   }, []);
 
   return (
@@ -53,19 +53,16 @@ const initialState: HeroState = {
   skewText: false,
   uppercaseText: false,
   showSpanColor: false,
-  showBoundingBox: true
+  showBoundingBox: false
 };
 
-type HeroState = {
+export type HeroState = HeadlineStyleProps & {
   titleText: string;
   headlineText: string;
   showSelectHighlight: boolean;
-  selectEmphasis: boolean;
-  boldText: boolean;
-  alternateGlyphs: boolean;
-  shrinkText: boolean;
-  skewText: boolean;
-  uppercaseText: boolean;
-  showSpanColor: boolean;
-  showBoundingBox: boolean;
 };
+
+export type SetHeroStateFunction = (
+  value?: Partial<HeroState>,
+  name?: keyof HeroState
+) => void;

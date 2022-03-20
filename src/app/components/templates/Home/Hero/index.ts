@@ -1,2 +1,1 @@
-import Hero from './Hero';
-export default Hero;
+export { default, type HeroState, type SetHeroStateFunction } from './Hero';

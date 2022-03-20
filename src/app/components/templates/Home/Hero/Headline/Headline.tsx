@@ -38,6 +38,7 @@ export default function Headline({
   return (
     <h1
       className={classNames(styles.headline, {
+        [styles.empty]: !content,
         [styles.selectEmphasis]: selectEmphasis,
         [styles.showColor]: showSpanColor,
         [styles.bold]: boldText,
@@ -53,19 +54,30 @@ export default function Headline({
   );
 }
 
-function BoundingBox({ isVisible = true }) {
-  return !isVisible ? null : (
-    <div className={styles.box}>
+function BoundingBox({ isVisible = false }) {
+  return (
+    <div
+      className={classNames(styles.box, {
+        [styles.hidden]: !isVisible
+      })}
+    >
       <div className={styles.handle} />
       <div className={styles.handle} />
       <div className={styles.handle} />
       <div className={styles.handle} />
     </div>
   );
+  // return !isVisible ? null : (
+  //   <div className={styles.box}>
+  //     <div className={styles.handle} />
+  //     <div className={styles.handle} />
+  //     <div className={styles.handle} />
+  //     <div className={styles.handle} />
+  //   </div>
+  // );
 }
 
-type HeadlineProps = {
-  text: string;
+export type HeadlineStyleProps = {
   selectEmphasis: boolean;
   boldText: boolean;
   alternateGlyphs: boolean;
@@ -74,4 +86,8 @@ type HeadlineProps = {
   uppercaseText: boolean;
   showSpanColor: boolean;
   showBoundingBox: boolean;
+};
+
+type HeadlineProps = HeadlineStyleProps & {
+  text: string;
 };

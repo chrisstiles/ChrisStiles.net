@@ -64,7 +64,6 @@ const languages: { [key in Language]: Grammar } = {
       pattern: /[<>]/,
       greedy: true
     },
-    // /<\/?(?!\d)[^\s>\/=$<%]+(?:\s(?:\s*[^\s>\/=]+(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s'">=]+(?=[\s>]))|(?=[\s/>])))+)?\s*\/?>/
     ...sharedTokens
   }),
   [Language.SCSS]: Prism.languages.extend(Language.SCSS, sharedTokens)

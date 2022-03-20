@@ -6,14 +6,16 @@
 
 $skew: -3.5deg;
 $transitionDuration: 0.3s;
-$transformTransition: transform $transitionDuration;
 
 .headline {
   font-weight: 700;
   font-size: 65px;
   line-height: 1;
   transform-origin: top right;
-  transition: $transformTransition;
+  transition: {
+    duration: $transitionDuration;
+    property: transform, font-size;
+  }
   position: relative;
   display: inline-block;
   font-feature-settings: normal;
@@ -61,18 +63,39 @@ $transformTransition: transform $transitionDuration;
   }
 }
 
+$boxInitialScale: 0;
+$boxEnterTransition: transform 0.35s cubic-bezier(0.47, 0.01, 0.16, 1);
+
 .box {
-  $offset: -10px;
+  $offset: -12px;
   position: absolute;
-  top: $offset;
+  top: $offset + 3px;
   right: $offset;
-  bottom: $offset;
+  bottom: $offset - 3px;
   left: $offset;
   border: 1px solid #2aa5fc;
   pointer-events: none;
 
-  @at-root .content:empty + & {
+  &.hidden {
     opacity: 0;
+    transition: opacity 0.4s;
+    transition-delay: 0.8s;
+  }
+
+  @at-root .headline.empty {
+    width: 0.6em;
+    height: 1em;
+
+    .box {
+      transform-origin: top left;
+      transition: $boxEnterTransition, opacity 0.2s ease;
+      transition-delay: 0s;
+
+      &.hidden {
+        transform: scale($boxInitialScale);
+        opacity: 0;
+      }
+    }
   }
 
   @at-root .uppercase & {
@@ -88,7 +111,7 @@ $transformTransition: transform $transitionDuration;
   height: $size;
   background-color: var(--bg);
   border: 1px solid #2aa5fc;
-  transition: $transformTransition;
+  transition: transform $transitionDuration;
 
   &:nth-child(1) {
     top: $offset;

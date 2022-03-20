@@ -11,6 +11,7 @@ import Mouse from './Mouse';
 import { sleep } from '@helpers';
 import { random } from 'lodash';
 import { Language } from '@global';
+import type { SetHeroStateFunction } from '../Hero';
 import type { TabHandle } from './Editor';
 
 export default function useHeroAnimation({
@@ -93,6 +94,7 @@ export default function useHeroAnimation({
           if (!hasStarted) {
             hasStarted = true;
             step.onStart?.();
+            setState(step.startState);
           }
 
           fn(lines.map(({ text }) => text).join('\n'));
@@ -175,7 +177,7 @@ export default function useHeroAnimation({
         resolve();
       });
     },
-    [minTypingDelay, maxTypingDelay, queue]
+    [queue, setState, minTypingDelay, maxTypingDelay]
   );
 
   // Handle updating specific step
@@ -207,6 +209,7 @@ export default function useHeroAnimation({
               const fn = view === Language.HTML ? setHtml : setScss;
               await queue(() => {
                 step.onStart?.();
+                setState(step.startState);
                 fn(step.text ?? '');
               }, 0);
             } else {
@@ -230,6 +233,7 @@ export default function useHeroAnimation({
               setState({ showSelectHighlight: false });
             }
 
+            setState(step.completeState);
             step.onComplete?.();
 
             if (shoudIncrement) {
@@ -246,9 +250,11 @@ export default function useHeroAnimation({
         return queue(async () => {
           if (step.view && step.view !== visibleView) {
             step.onStart?.();
+            setState(step.startState);
             animatingView.current = step.view;
             await mouse.clickTab(step.view);
             setVisibleView(step.view);
+            setState(step.completeState);
             step.onComplete?.();
 
             if (shoudIncrement) {
@@ -355,5 +361,5 @@ type HeroAnimationConfig = {
   mouse: RefObject<HTMLDivElement>;
   htmlTab: RefObject<TabHandle>;
   scssTab: RefObject<TabHandle>;
-  setState(value: any, name?: string): void;
+  setState: SetHeroStateFunction;
 };

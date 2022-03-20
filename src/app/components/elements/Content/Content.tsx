@@ -15,12 +15,12 @@ export default forwardRef<HTMLElement, ContentProps<any>>(function Content(
       {children}
     </Tag>
   );
-}) as typeof ContentFn;
+}) as typeof ContentFunction;
 
 export type ContentProps<T extends keyof JSX.IntrinsicElements> = {
   tag?: T;
 } & ComponentPropsWithRef<T>;
 
-declare function ContentFn<Tag extends keyof JSX.IntrinsicElements>(
+declare function ContentFunction<Tag extends keyof JSX.IntrinsicElements>(
   props: ContentProps<Tag>
 ): JSX.Element;
