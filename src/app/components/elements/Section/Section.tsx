@@ -1,13 +1,16 @@
 import { forwardRef, type ComponentPropsWithRef } from 'react';
+import styles from './Section.module.scss';
 import { Content } from '@elements';
+import classNames from 'classnames';
 
 export default forwardRef<HTMLElement, SectionProps>(function Section(
-  { wrapContent = true, contentClassName, children, ...props },
+  { wrapContent = true, className, contentClassName, children, ...props },
   ref
 ) {
   return (
     <section
       ref={ref}
+      className={classNames(styles.wrapper, className)}
       {...props}
     >
       {!wrapContent ? (

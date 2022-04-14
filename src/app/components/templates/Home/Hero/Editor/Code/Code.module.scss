@@ -126,19 +126,14 @@ $lineNumbersWidth: 45px;
   pointer-events: none;
   display: block;
 
-  &:last-child {
-    padding-bottom: 10px;
-  }
-
   @at-root :global(.editor:not(.complete)) & {
     &.currentLine {
-      &:after {
+      &:before {
         content: '';
         position: absolute;
         left: 0;
         right: 10px;
         height: 1.4em;
-        margin-top: -1.4em;
         background: #262b3d;
         border-radius: 2px;
         z-index: -1;
@@ -149,7 +144,7 @@ $lineNumbersWidth: 45px;
 
   @at-root :global(.editor:not(.complete):not(.paused)) .visible & {
     &.currentLine {
-      &:after {
+      &:before {
         visibility: visible;
       }
     }
@@ -167,6 +162,10 @@ $lineNumbersWidth: 45px;
 
   @at-root .line:first-child & {
     transition: none !important;
+  }
+
+  @at-root .line:last-child & {
+    padding-bottom: 10px;
   }
 
   @at-root .visible & {

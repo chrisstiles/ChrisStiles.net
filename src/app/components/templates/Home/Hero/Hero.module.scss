@@ -2,6 +2,10 @@
 /* Hero */
 /* --------------------------- */
 
+.wrapper {
+  padding-bottom: 0 !important;
+}
+
 .top {
   display: flex;
   align-items: flex-start;
@@ -10,12 +14,4 @@
 .content {
   padding-right: 80px;
   flex-grow: 1;
-}
-
-.bottom {
-  margin-top: 110px;
-  text-align: center;
-  color: var(--light-grey-color);
-  font-weight: 500;
-  font-size: 17px;
 }

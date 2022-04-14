@@ -1,0 +1,16 @@
+/* --------------------------- */
+/* Experience */
+/* --------------------------- */
+
+.wrapper {
+  background-color: #161929;
+  overflow: hidden;
+  z-index: 10;
+  $offset: 100px;
+  clip-path: polygon(0 $offset, 100% 0, 100% calc(100% - #{$offset}), 0 100%);
+}
+
+.content {
+  padding-top: 120px;
+  padding-bottom: 120px;
+}

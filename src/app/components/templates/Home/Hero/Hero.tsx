@@ -13,7 +13,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <Section>
+    <Section className={styles.wrapper}>
       <div className={styles.top}>
         <div className={styles.content}>
           <Title text={state.titleText} />
@@ -34,10 +34,6 @@ export default function Hero() {
           showSelectHighlight={state.showSelectHighlight}
         />
       </div>
-
-      <Content className={styles.bottom}>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-      </Content>
     </Section>
   );
 }
