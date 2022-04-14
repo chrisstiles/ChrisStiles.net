@@ -68,6 +68,12 @@ $transitionDuration: 0.3s;
   }
 }
 
+.content {
+  &:empty {
+    font-weight: 800;
+  }
+}
+
 $boxInitialScale: 0;
 $boxEnterTransition: transform 0.35s cubic-bezier(0.47, 0.01, 0.16, 1);
 

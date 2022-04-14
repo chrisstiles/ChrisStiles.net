@@ -18,15 +18,6 @@ export default function Layout(props: LayoutProps) {
           name="description"
           content={description}
         />
-        <link
-          rel="icon"
-          href="/favicon.ico"
-        />
-        <meta charSet="utf-8" />
-        <meta
-          name="viewport"
-          content="initial-scale=1.0, width=device-width"
-        />
       </Head>
       {header}
       <main id="main">{children}</main>
