@@ -134,7 +134,7 @@ $borderRadius: 6px;
 /* --------------------------- */
 /* Mouse */
 
-$clickPulseDuration: 480ms;
+$clickPulseDuration: 420ms;
 $doubleClickPulseDuration: 400ms;
 
 .mouse {
@@ -209,7 +209,7 @@ $doubleClickPulseDuration: 400ms;
   &:global(.click) {
     .pulse {
       animation-duration: $clickPulseDuration;
-      animation-delay: 0.05s;
+      animation-delay: 0.1s;
     }
   }
 

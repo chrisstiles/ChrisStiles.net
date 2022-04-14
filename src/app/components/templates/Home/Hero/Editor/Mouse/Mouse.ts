@@ -174,7 +174,7 @@ export default class Mouse {
           { scale: 1 }
         ],
         color: clickColor,
-        duration: isDoubleClick ? 0.22 : 0.28,
+        duration: isDoubleClick ? 0.22 : 0.26,
         repeat: isDoubleClick ? 1 : 0,
 
         onStart: () => {
