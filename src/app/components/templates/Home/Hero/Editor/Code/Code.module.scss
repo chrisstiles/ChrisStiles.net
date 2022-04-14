@@ -125,6 +125,7 @@ $lineNumbersWidth: 45px;
 .line {
   pointer-events: none;
   display: block;
+  counter-increment: lineNumber;
 
   @at-root :global(.editor:not(.complete)) & {
     &.currentLine {
@@ -159,6 +160,10 @@ $lineNumbersWidth: 45px;
   transition: opacity 0.2s;
   border-right: 1px solid #3c415c;
   opacity: 0;
+
+  &:before {
+    content: counter(lineNumber);
+  }
 
   @at-root .line:first-child & {
     transition: none !important;

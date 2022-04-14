@@ -3,7 +3,7 @@ import NextDocument, { Html, Head, Main, NextScript } from 'next/document';
 export default class Document extends NextDocument {
   render() {
     return (
-      <Html>
+      <Html lang="en">
         <Head>
           <link
             rel="stylesheet"
@@ -48,11 +48,6 @@ export default class Document extends NextDocument {
           <meta
             name="theme-color"
             content="#1e2236"
-          />
-          <meta charSet="utf-8" />
-          <meta
-            name="viewport"
-            content="initial-scale=1.0, width=device-width"
           />
         </Head>
         <body>

@@ -21,7 +21,7 @@
   user-select: none;
 }
 
-@mixin disable-native-button {
+@mixin disable-native-button($transparentBg: false) {
   appearance: none;
   -webkit-appearance: none;
   border: none;
@@ -30,6 +30,10 @@
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   cursor: pointer;
   font-family: var(--font);
+
+  @if $transparentBg {
+    background-color: transparent;
+  }
 }
 
 @mixin highlight {

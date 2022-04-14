@@ -75,6 +75,8 @@ export default memo(function Editor({
 
   return (
     <div
+      role="presentation"
+      aria-hidden="true"
       className={classNames('editor', styles.wrapper, {
         playing: isPlaying && !isComplete,
         paused: hasStarted && !isPlaying && !isComplete,
@@ -149,16 +151,21 @@ const Tab = forwardRef<TabHandle, TabProps>(function Tab(
   useImperativeHandle(ref, () => ({ setIsHovered, el }));
 
   return (
-    <button
-      ref={el}
-      className={classNames(styles.tab, {
+    <div
+      className={classNames(styles.tabWrapper, {
         [styles.hover]: isHovered,
         [styles.active]: currentView === language
       })}
       onClick={() => onClick(language)}
     >
-      {children}
-    </button>
+      <button
+        ref={el}
+        tabIndex={-1}
+        disabled
+      >
+        {children}
+      </button>
+    </div>
   );
 });
 

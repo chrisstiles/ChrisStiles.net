@@ -66,9 +66,7 @@ export default memo(function Code({
           <span
             className={styles.num}
             style={style}
-          >
-            {index + 1}
-          </span>
+          />
         </span>
       );
     });
