@@ -237,13 +237,13 @@ export default class Mouse {
 
     return new Promise<void>(async resolve => {
       await this.animateTo(el, opts);
-      await this.click();
+      await this.click(opts.hideOnComplete);
       resolve();
     });
   }
 
   // Animates mouse to a tab and clicks it
-  async clickTab(language: Language) {
+  async clickTab(language: Language, hideOnComplete = true) {
     const tab = this.getTab(language);
 
     if (!tab?.el.current) {
@@ -254,6 +254,7 @@ export default class Mouse {
     let hasHovered = false;
 
     return this.clickElement(tab.el.current, {
+      hideOnComplete,
       onUpdate: () => {
         if (!hasHovered && this.mouse) {
           const mouseRect = this.mouse.getBoundingClientRect();
@@ -287,6 +288,7 @@ export default class Mouse {
 type AnimationOptions = {
   duration?: number;
   delay?: number;
+  hideOnComplete?: boolean;
   onUpdate?: gsap.Callback;
   onComplete?: gsap.Callback;
 };

@@ -57,12 +57,16 @@ export default function useHeroAnimation({
   }, [visibleView]);
 
   const ensureAnimatingViewIsVisible = useCallback(
-    async (view = animatingView.current, delay = 700) => {
+    async (
+      view = animatingView.current,
+      hideOnComplete = true,
+      delay = 700
+    ) => {
       if (
         (isPlayingRef.current && visibleViewRef.current !== view) ||
         animatingView.current !== view
       ) {
-        await mouse.clickTab(view);
+        await mouse.clickTab(view, hideOnComplete);
         visibleViewRef.current = animatingView.current;
         animatingView.current = view;
         setVisibleView(view);
@@ -219,7 +223,7 @@ export default function useHeroAnimation({
       if (step.text?.trim()) {
         // Get the current view and update it if needed
         const view = step.view ?? animatingView.current;
-        await ensureAnimatingViewIsVisible(view);
+        await ensureAnimatingViewIsVisible(view, !step.forceMouseVisible);
 
         // Update editor text
         if (step.text) {

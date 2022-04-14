@@ -65,12 +65,60 @@ export default function useAnimationState(
           setState({ headlineText });
         }
       },
+
+      {
+        text: '.headline {',
+        view: Language.SCSS,
+        delay: 500
+      },
+      { text: '.headline {*|*}', instant: true, delay: closeTagDelay },
+      {
+        text: `
+          .headline {
+            [-font-weight: 800;-]
+          }
+        `,
+        delay: tagNewlineDelay,
+        completeState: { boldText: true }
+      },
+      {
+        text: `
+          .headline {
+            font-weight: 800;
+            [-font-size: 3.8rem;-]
+          }
+        `,
+        completeState: { growText: true }
+      },
+      {
+        text: `
+          .headline {
+            font-weight: 800;
+            font-size: 3.8rem;
+            [-font-feature-settings: 'salt', 'calt';-]
+          }
+        `,
+        completeState: { alternateGlyphs: true }
+      },
+      {
+        text: `
+          .headline {
+            font-weight: 800;
+            font-size: 3.8rem;
+            font-feature-settings: 'salt', 'calt';
+            [-transform: skewY(-3.5deg);-]
+          }
+        `,
+        completeState: { skewText: true }
+      },
       {
         text: `
           <h1 class="headline">
             Good ideas need (-good-) developers
           </h1>
         `,
+        view: Language.HTML,
+        forceMouseVisible: true,
         onMouseDown() {
           setState({ selectEmphasis: true });
         }
@@ -122,64 +170,6 @@ export default function useAnimationState(
         }
       },
       {
-        text: '.headline {',
-        view: Language.SCSS,
-        delay: 500
-      },
-      { text: '.headline {*|*}', instant: true, delay: closeTagDelay },
-      {
-        text: `
-          .headline {
-            [-font-weight: 800;-]
-          }
-        `,
-        delay: tagNewlineDelay,
-        completeState: { boldText: true }
-      },
-      {
-        text: `
-          .headline {
-            font-weight: 800;
-            [-font-size: 3.8rem;-]
-          }
-        `,
-        completeState: { growText: true }
-      },
-      {
-        text: `
-          .headline {
-            font-weight: 800;
-            font-size: 3.8rem;
-            [-font-feature-settings: 'salt', 'calt';-]
-          }
-        `,
-        completeState: { alternateGlyphs: true }
-      },
-      {
-        text: `
-          .headline {
-            font-weight: 800;
-            font-size: 3.8rem;
-            font-feature-settings: 'salt', 'calt';
-            [-transform: skewY(-3.5deg);-]
-          }
-        `,
-        completeState: { skewText: true }
-      },
-      {
-        text: `
-          .headline {
-            font-weight: 800;
-            font-size: 3.8rem;
-            font-feature-settings: 'salt', 'calt';
-            transform: skewY(-3.5deg);
-            *|*
-          }
-        `,
-        instant: true,
-        delay: 200
-      },
-      {
         text: `
           .headline {
             font-weight: 800;
@@ -189,7 +179,8 @@ export default function useAnimationState(
 
             [-em {-]
           }
-        `
+        `,
+        view: Language.SCSS
       },
       {
         text: `
@@ -235,6 +226,7 @@ export type Step = {
   delay?: number;
   outputText?: boolean;
   type?: StepType;
+  forceMouseVisible?: boolean;
   startState?: Partial<HeroState>;
   completeState?: Partial<HeroState>;
   onStart?(): void;
