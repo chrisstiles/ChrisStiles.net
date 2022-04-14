@@ -1,15 +1,28 @@
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import Prism, { type Grammar } from 'prismjs';
 import dedent from 'dedent';
 import 'prismjs/components/prism-scss';
 import { Language } from '@global';
+
+Prism.languages.insertBefore(Language.JavaScript, 'keyword', {
+  this: {
+    pattern: /this/,
+    lookbehind: true
+  }
+});
 
 export default function useSyntaxHighlighting(
   language: Language,
   text: string,
   stripIndentation: boolean = true
 ) {
-  const [code, lines] = useMemo((): [string, string[]] => {
+  const prevLineIndex = useRef(0);
+
+  const [code, lines, currentLineIndex] = useMemo((): [
+    string,
+    string[],
+    number
+  ] => {
     const code = stripIndentation ? dedent(text) : text;
     const lines = code.split('\n');
 
@@ -33,10 +46,22 @@ export default function useSyntaxHighlighting(
       }
     });
 
-    return [highlightedCode, lines];
+    let currentLineIndex = lines.findIndex(l => l.includes('*|*'));
+
+    if (currentLineIndex < 0) {
+      currentLineIndex = prevLineIndex.current;
+    }
+
+    prevLineIndex.current = currentLineIndex;
+
+    return [
+      highlightedCode.replace('*|*', '<span class="token caret"></span>'),
+      lines,
+      currentLineIndex
+    ];
   }, [language, text, stripIndentation]);
 
-  return { code, lines };
+  return { code, lines, currentLineIndex };
 }
 
 export { Language };
@@ -46,25 +71,69 @@ type Tokens = Grammar & {
 };
 
 const sharedTokens: Tokens = {
-  caret: /\*\|\*/g,
   select: /\(-(.*)-\)/
 };
 
 const languages: { [key in Language]: Grammar } = {
   [Language.JavaScript]: Prism.languages.extend(Language.JavaScript, {
-    punctuation: /[{}[\](),.:]/,
-    keyword:
-      /(^|[^.]|\.\.\.\s*)\b(?:as|assert(?=\s*\{)|async(?=\s*(?:function\b|\(|[$\w\xA0-\uFFFF]|$))|await|break|case|class|const|continue|debugger|default|delete|do|else|enum|export|extends|finally(?=\s*(?:\{|$))|for|from(?=\s*(?:['"]|$))|function|(?:get|set)(?=\s*(?:[#\[$\w\xA0-\uFFFF]|$))|if|implements|import|in|instanceof|interface|let|new|null|of|package|private|protected|public|return|static|super|switch|throw|try|typeof|undefined|var|void|while|with|yield)\b/,
-    semicolon: /;/g,
-    this: /this/,
-    ...sharedTokens
-  }),
-  [Language.HTML]: Prism.languages.extend(Language.HTML, {
-    bracket: {
-      pattern: /[<>]/,
-      greedy: true
+    punctuation: {
+      pattern: Prism.languages.javascript.punctuation as RegExp,
+      inside: {
+        semicolon: /;/
+      }
     },
     ...sharedTokens
   }),
-  [Language.SCSS]: Prism.languages.extend(Language.SCSS, sharedTokens)
+  [Language.HTML]: Prism.languages.extend(Language.HTML, {
+    tag: {
+      pattern: /<[^>]+>?/,
+      greedy: true,
+      inside: {
+        tag: {
+          pattern: /^<\/?[^\s\/]+>?/,
+          inside: {
+            punctuation: /^<\/?|>/,
+            namespace: /^[^\s>\/:]+:/
+          }
+        },
+        'attr-value': {
+          pattern: /(?:"|')[^"']+(?:"|')?/,
+          inside: {
+            punctuation: [
+              {
+                pattern: /^=/,
+                alias: 'attr-equals'
+              },
+              /"|'/
+            ]
+          }
+        },
+        punctuation: /\/?>|=|'|"/,
+        'attr-name': {
+          pattern: /[^\s>\/]+[^"']/
+        }
+      }
+    },
+    ...sharedTokens
+  }),
+  [Language.SCSS]: Prism.languages.extend(Language.SCSS, {
+    bracket: {
+      pattern: /[{}]/,
+      inside: {
+        open: /{/,
+        close: /}/
+      }
+    },
+    parentheses: /[()]/,
+    punctuation: /[;:,]/,
+    selector: {
+      pattern:
+        /(?=\S)[^@;{}()]?(?:[^@;{}()\s]|\s+(?!\s)|#\{\$[-\w]+\})+(?=\s*\{(?:\}|\s|[^}][^:{}]*[:{][^}]))|^(?=\S)[.#][^\s]*/,
+      inside: {
+        prefix: /^[.#:]/,
+        'selector-name': /[^.#]([-\w]+)/
+      }
+    },
+    ...sharedTokens
+  })
 };

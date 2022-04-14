@@ -13,6 +13,8 @@ $borderRadius: 6px;
   flex-shrink: 0;
   margin-top: -90px;
   position: relative;
+  background-color: var(--editor-background-color);
+  border-radius: $borderRadius;
 
   &:before {
     content: '';
@@ -26,20 +28,12 @@ $borderRadius: 6px;
     transform: translate(15px, 15px);
     background-color: rgba(#121820, 0.65);
   }
-
-  @include app.highlight {
-    background-color: var(--highlight-light);
-    color: #3d3d3d;
-  }
 }
 
 /* --------------------------- */
 /* Top Bar */
 
 .top {
-  background-color: #e7edf3;
-  border-top-left-radius: $borderRadius;
-  border-top-right-radius: $borderRadius;
   display: flex;
   align-items: center;
   height: 50px;
@@ -47,11 +41,11 @@ $borderRadius: 6px;
 }
 
 .dots {
-  width: 10px;
-  height: 10px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
   background-color: currentColor;
-  color: #c7cdd3;
+  color: #525976;
   position: relative;
   flex-grow: 0;
   margin-left: 10px;
@@ -89,26 +83,30 @@ $borderRadius: 6px;
 
 .tab {
   @include app.disable-native-button;
+  font-family: var(--font-code);
   background-color: transparent;
-  text-transform: uppercase;
+  color: #616885;
   letter-spacing: 0.05em;
-  font-weight: 800;
   padding: 0 18px;
   font-size: 13px;
   line-height: 1;
   display: inline-flex;
   height: 100%;
   align-items: center;
-  transition: background-color 0.2s;
-  color: #5b6671;
+  transition: {
+    property: color, background-color;
+    duration: 0.2s;
+  }
 
   &:hover,
   &.hover {
-    background-color: #dee5ec;
+    background-color: #282d40;
+    color: #7e86a0;
   }
 
   &.active {
-    background-color: #f9fafc !important;
+    background-color: #25293b !important;
+    color: #fff !important;
   }
 }
 
@@ -116,7 +114,6 @@ $borderRadius: 6px;
 /* Code */
 
 .code {
-  background-color: var(--editor-background);
   font-family: var(--font-code);
   height: 250px;
   position: relative;
@@ -127,7 +124,7 @@ $borderRadius: 6px;
 /* Terminal */
 
 .terminal {
-  background-color: #263241;
+  background-color: #1b1e2b;
   border-bottom-left-radius: $borderRadius;
   border-bottom-right-radius: $borderRadius;
   height: 90px;
@@ -136,7 +133,7 @@ $borderRadius: 6px;
 /* --------------------------- */
 /* Mouse */
 
-$clickPulseDuration: 500ms;
+$clickPulseDuration: 480ms;
 $doubleClickPulseDuration: 400ms;
 
 .mouse {
@@ -150,7 +147,7 @@ $doubleClickPulseDuration: 400ms;
   width: $size;
   height: $size;
   border-radius: 50%;
-  color: var(--accent);
+  color: var(--green-accent-color);
   background-color: currentColor;
   z-index: 300;
   pointer-events: none;
@@ -211,6 +208,7 @@ $doubleClickPulseDuration: 400ms;
   &:global(.click) {
     .pulse {
       animation-duration: $clickPulseDuration;
+      animation-delay: 0.05s;
     }
   }
 
@@ -224,5 +222,5 @@ $doubleClickPulseDuration: 400ms;
 
 :export {
   clickPulseDuration: $clickPulseDuration;
-  clickColor: app.$accentDark;
+  clickColor: app.$greenAccentDark;
 }

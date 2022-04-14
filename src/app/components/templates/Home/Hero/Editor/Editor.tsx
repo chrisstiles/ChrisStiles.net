@@ -24,6 +24,7 @@ export default memo(function Editor({
   const {
     html,
     scss,
+    hasStarted,
     isPlaying,
     isComplete,
     visibleView,
@@ -45,7 +46,7 @@ export default memo(function Editor({
 
   // Show the caret before delay in resuming animation
   // after the user's mouse leaves the editor box
-  const [forceCaretVisible, setForceCaretVisible] = useState(false);
+  const [forceCaretVisible, setForceCaretVisible] = useState(true);
 
   const handleMouseEnter = useCallback(() => {
     clearTimeout(mouseLeaveTimer.current);
@@ -70,11 +71,16 @@ export default memo(function Editor({
     }
   }, [isPlaying, isComplete, play]);
 
+  const [numLines, setNumLines] = useState(1);
+
   return (
     <div
-      className={classNames(styles.wrapper, {
-        stopped: !isPlaying || isComplete,
-        showCaret: !isComplete && forceCaretVisible,
+      className={classNames('editor', styles.wrapper, {
+        playing: isPlaying && !isComplete,
+        paused: hasStarted && !isPlaying && !isComplete,
+        complete: !isPlaying && isComplete,
+        // stopped: !isPlaying || isComplete,
+        showCaret: isPlaying || (!isComplete && forceCaretVisible),
         selectText: showSelectHighlight
       })}
       onMouseEnter={handleMouseEnter}
@@ -112,11 +118,15 @@ export default memo(function Editor({
           language={Language.HTML}
           isVisible={visibleView === Language.HTML}
           content={html}
+          numLines={numLines}
+          setNumLines={setNumLines}
         />
         <Code
           language={Language.SCSS}
           isVisible={visibleView === Language.SCSS}
           content={scss}
+          numLines={numLines}
+          setNumLines={setNumLines}
         />
       </div>
       <div className={styles.terminal} />

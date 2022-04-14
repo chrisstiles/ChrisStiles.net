@@ -6,16 +6,23 @@
 /* HTML */
 
 .code-html {
-  // Light Background
-
-  color: #002339;
-
-  .punctuation {
-    color: #3e3e3e;
-  }
+  color: #a6accd;
 
   .tag {
-    color: #0444ac;
+    color: #f07178;
+  }
+
+  .bracket,
+  .tag .punctuation {
+    color: #89ddff;
+  }
+
+  .attr-name {
+    color: #c792ea;
+  }
+
+  .attr-value {
+    color: #c3e88d;
   }
 }
 
@@ -23,35 +30,54 @@
 /* SCSS */
 
 .code-scss {
-  // Light Background
-
-  color: #174781;
+  color: #f78c6c;
 
   .selector {
-    color: #0444ac;
+    color: #f07178;
+
+    .prefix {
+      color: #89ddff;
+
+      + .selector-name {
+        color: #ffcb6b;
+      }
+    }
   }
 
   .property {
-    color: #dc3eb7;
+    color: #b2ccd6;
+  }
+
+  .bracket {
+    color: #ffd700;
   }
 
   .punctuation {
-    color: #002339;
+    color: #89ddff;
+  }
+
+  .function {
+    color: #82aaff;
+  }
+
+  .parentheses {
+    color: #da70d6;
   }
 }
 
+/* --------------------------- */
+/* JavaScript */
+
 .code-javascript {
-  // Dark Background
-
   color: #9fb4cf;
-
-  .this {
-    color: #ff5270;
-  }
 
   .operator,
   .keyword {
     color: #c791ea;
+  }
+
+  .this {
+    color: #ff5270;
   }
 
   .class-name {

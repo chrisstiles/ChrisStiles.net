@@ -4,29 +4,33 @@
 
 @use 'app';
 
+$initialFontSize: 54px;
+$largeFontSize: 70px;
 $skew: -3.5deg;
 $transitionDuration: 0.3s;
 
 .headline {
   font-weight: 700;
-  font-size: 65px;
+  font-size: $initialFontSize;
   line-height: 1;
-  transform-origin: top right;
   transition: {
     duration: $transitionDuration;
     property: transform, font-size;
+    timing-function: ease;
   }
   position: relative;
   display: inline-block;
   font-feature-settings: normal;
+  will-change: transform, font-size;
 
   em {
     font-style: normal;
+    will-change: color;
   }
 
   &.selectEmphasis {
     em {
-      background-color: var(--highlight-dark);
+      background-color: var(--highlight-dark-color);
     }
   }
 
@@ -38,11 +42,12 @@ $transitionDuration: 0.3s;
     font-feature-settings: 'salt', 'calt';
   }
 
-  &.shrink {
-    font-size: 59px;
+  &.grow {
+    font-size: $largeFontSize;
   }
 
   &.skew {
+    transform-origin: top right;
     transform: skewY($skew);
   }
 
@@ -52,7 +57,7 @@ $transitionDuration: 0.3s;
 
   &.showColor {
     em {
-      color: var(--accent);
+      color: var(--yellow-accent-color);
     }
   }
 
@@ -109,7 +114,7 @@ $boxEnterTransition: transform 0.35s cubic-bezier(0.47, 0.01, 0.16, 1);
   position: absolute;
   width: $size;
   height: $size;
-  background-color: var(--bg);
+  background-color: var(--page-background-color);
   border: 1px solid #2aa5fc;
   transition: transform $transitionDuration;
 

@@ -42,8 +42,8 @@
   }
 }
 
-@mixin css-properties($vars) {
+@mixin css-properties($vars, $suffix: '') {
   @each $name, $value in $vars {
-    --#{functions.kebab-case($name)}: #{$value};
+    --#{functions.kebab-case($name)}#{$suffix}: #{$value};
   }
 }

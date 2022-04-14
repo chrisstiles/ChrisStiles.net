@@ -5,6 +5,7 @@
 @use 'sass:meta';
 @use 'app';
 @use 'abstracts/colors';
+@use 'abstracts/variables';
 @use 'syntax-highlighting';
 
 /* --------------------------- */
@@ -16,7 +17,8 @@
 /* CSS Properties */
 
 :root {
-  @include app.css-properties(module-variables(app));
+  @include app.css-properties(module-variables(variables));
+  @include app.css-properties(module-variables(colors), '-color');
 }
 
 /* --------------------------- */
@@ -49,12 +51,12 @@ body {
   padding: 0;
   font-weight: 400;
   font-family: var(--font);
-  background-color: var(--bg);
+  background-color: var(--page-background-color);
   color: #fff;
 }
 
 @include app.highlight {
-  background-color: var(--highlight-dark);
+  background-color: var(--highlight-dark-color);
   color: #fff;
 }
 
@@ -67,7 +69,7 @@ body {
     text-transform: uppercase;
     font-weight: 600;
     letter-spacing: 0.03em;
-    background-color: var(--bg);
+    background-color: var(--page-background-color);
     color: #fff;
   }
 }

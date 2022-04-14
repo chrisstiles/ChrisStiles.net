@@ -6,8 +6,8 @@
 
 .wrapper {
   overflow: hidden;
-  font-size: 15px;
-  line-height: 1.3;
+  font-size: 14px;
+  line-height: 1.4;
   color: #000;
   height: 100%;
   display: flex;
@@ -88,12 +88,8 @@ $lineNumbersWidth: 45px;
     margin-top: -3px;
     animation: blink 0.75s step-end infinite;
 
-    @at-root .visible & {
+    @at-root :global(.showCaret) & {
       display: inline-block;
-    }
-
-    @at-root :global(.stopped:not(.showCaret)) & {
-      visibility: hidden;
     }
 
     &:first-child {
@@ -107,7 +103,8 @@ $lineNumbersWidth: 45px;
 
 :global(.selectText) {
   .wrapper :global(.select) {
-    background-color: var(--highlight-light);
+    background-color: var(--highlight-dark-color);
+    color: #fff;
   }
 }
 
@@ -123,54 +120,64 @@ $lineNumbersWidth: 45px;
   width: $lineNumbersWidth;
   font-weight: 500;
   order: 1;
+}
+
+.line {
+  pointer-events: none;
+  display: block;
+
+  &:last-child {
+    padding-bottom: 10px;
+  }
+
+  @at-root :global(.editor:not(.complete)) & {
+    &.currentLine {
+      &:after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 10px;
+        height: 1.4em;
+        margin-top: -1.4em;
+        background: #262b3d;
+        border-radius: 2px;
+        z-index: -1;
+        visibility: hidden;
+      }
+    }
+  }
+
+  @at-root :global(.editor:not(.complete):not(.paused)) .visible & {
+    &.currentLine {
+      &:after {
+        visibility: visible;
+      }
+    }
+  }
+}
+
+.num {
+  color: #3c415c;
+  display: block;
+  padding-right: 0.7em;
+  text-align: right;
+  transition: opacity 0.2s;
+  border-right: 1px solid #3c415c;
   opacity: 0;
-  transition: opacity 0.25s linear 0.2s;
-  position: relative;
-  overflow: hidden;
 
-  &:before {
-    content: '';
-    position: absolute;
-    top: 10px;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    transition: transform 0.2s cubic-bezier(0.37, 0.18, 0, 1), opacity 0.2s;
-
-    background: linear-gradient(
-      180deg,
-      rgba(249, 250, 252, 0) 0%,
-      #f9fafc 16.67%
-    );
+  @at-root .line:first-child & {
+    transition: none !important;
   }
 
   @at-root .visible & {
     opacity: 1;
-    transition-duration: 0.1s;
-    transition-delay: 0s;
-
-    &:before {
-      opacity: 0;
-      transform: translateY(100%);
-    }
   }
 
-  > span {
-    pointer-events: none;
-    display: block;
-    counter-increment: lineNumber;
-    border-right: 1px solid #d9dee4;
-
-    &:last-child {
-      padding-bottom: 10px;
-    }
-
-    &:before {
-      content: counter(lineNumber);
-      color: #8792a0;
-      display: block;
-      padding-right: 0.7em;
-      text-align: right;
-    }
+  @at-root :global(.editor:not(.complete):not(.paused))
+      .visible
+      .currentLine
+      & {
+    border-color: #5e637f;
+    color: #676e95;
   }
 }

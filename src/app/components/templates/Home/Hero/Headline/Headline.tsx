@@ -7,7 +7,7 @@ export default function Headline({
   selectEmphasis,
   boldText,
   alternateGlyphs,
-  shrinkText,
+  growText,
   skewText,
   uppercaseText,
   showSpanColor,
@@ -43,7 +43,7 @@ export default function Headline({
         [styles.showColor]: showSpanColor,
         [styles.bold]: boldText,
         [styles.alternateGlyphs]: alternateGlyphs,
-        [styles.shrink]: shrinkText,
+        [styles.grow]: growText,
         [styles.skew]: skewText,
         [styles.uppercase]: uppercaseText
       })}
@@ -57,6 +57,7 @@ export default function Headline({
 function BoundingBox({ isVisible = false }) {
   return (
     <div
+      aria-hidden="true"
       className={classNames(styles.box, {
         [styles.hidden]: !isVisible
       })}
@@ -67,21 +68,13 @@ function BoundingBox({ isVisible = false }) {
       <div className={styles.handle} />
     </div>
   );
-  // return !isVisible ? null : (
-  //   <div className={styles.box}>
-  //     <div className={styles.handle} />
-  //     <div className={styles.handle} />
-  //     <div className={styles.handle} />
-  //     <div className={styles.handle} />
-  //   </div>
-  // );
 }
 
 export type HeadlineStyleProps = {
   selectEmphasis: boolean;
   boldText: boolean;
   alternateGlyphs: boolean;
-  shrinkText: boolean;
+  growText: boolean;
   skewText: boolean;
   uppercaseText: boolean;
   showSpanColor: boolean;

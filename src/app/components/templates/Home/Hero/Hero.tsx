@@ -22,7 +22,7 @@ export default function Hero() {
             selectEmphasis={state.selectEmphasis}
             boldText={state.boldText}
             alternateGlyphs={state.alternateGlyphs}
-            shrinkText={state.shrinkText}
+            growText={state.growText}
             skewText={state.skewText}
             uppercaseText={state.uppercaseText}
             showSpanColor={state.showSpanColor}
@@ -49,7 +49,7 @@ const initialState: HeroState = {
   selectEmphasis: false,
   boldText: false,
   alternateGlyphs: false,
-  shrinkText: false,
+  growText: false,
   skewText: false,
   uppercaseText: false,
   showSpanColor: false,

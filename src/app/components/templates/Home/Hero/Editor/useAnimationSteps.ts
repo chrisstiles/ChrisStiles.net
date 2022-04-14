@@ -26,8 +26,17 @@ export default function useAnimationState(
   const steps: Step[] = useMemo(
     () => [
       {
-        text: '<h1 class="headline">',
+        text: '<h1 class="',
         view: Language.HTML
+      },
+      {
+        text: '<h1 class="*|*"',
+        instant: true,
+        delay: 10
+      },
+      {
+        text: '<h1 class="[-headline-]"',
+        delay: 300
       },
       {
         text: '<h1 class="headline">*|*</h1>',
@@ -113,11 +122,9 @@ export default function useAnimationState(
         }
       },
       {
+        text: '.headline {',
         view: Language.SCSS,
         delay: 500
-      },
-      {
-        text: '.headline {'
       },
       { text: '.headline {*|*}', instant: true, delay: closeTagDelay },
       {
@@ -133,16 +140,16 @@ export default function useAnimationState(
         text: `
           .headline {
             font-weight: 800;
-            [-font-size: 3.3rem;-]
+            [-font-size: 3.8rem;-]
           }
         `,
-        completeState: { shrinkText: true }
+        completeState: { growText: true }
       },
       {
         text: `
           .headline {
             font-weight: 800;
-            font-size: 3.3rem;
+            font-size: 3.8rem;
             [-font-feature-settings: 'salt', 'calt';-]
           }
         `,
@@ -152,7 +159,7 @@ export default function useAnimationState(
         text: `
           .headline {
             font-weight: 800;
-            font-size: 3.3rem;
+            font-size: 3.8rem;
             font-feature-settings: 'salt', 'calt';
             [-transform: skewY(-3.5deg);-]
           }
@@ -163,7 +170,7 @@ export default function useAnimationState(
         text: `
           .headline {
             font-weight: 800;
-            font-size: 3.3rem;
+            font-size: 3.8rem;
             font-feature-settings: 'salt', 'calt';
             transform: skewY(-3.5deg);
             *|*
@@ -176,7 +183,7 @@ export default function useAnimationState(
         text: `
           .headline {
             font-weight: 800;
-            font-size: 3.3rem;
+            font-size: 3.8rem;
             font-feature-settings: 'salt', 'calt';
             transform: skewY(-3.5deg);
 
@@ -188,7 +195,7 @@ export default function useAnimationState(
         text: `
           .headline {
             font-weight: 800;
-            font-size: 3.3rem;
+            font-size: 3.8rem;
             font-feature-settings: 'salt', 'calt';
             transform: skewY(-3.5deg);
 
@@ -202,7 +209,7 @@ export default function useAnimationState(
         text: `
           .headline {
             font-weight: 800;
-            font-size: 3.3rem;
+            font-size: 3.8rem;
             font-feature-settings: 'salt', 'calt';
             transform: skewY(-3.5deg);
 

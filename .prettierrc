@@ -4,7 +4,7 @@
   "singleQuote": true,
   "tabWidth": 2,
   "trailingComma": "none",
-  "jsxBracketSameLine": false,
+  "bracketSameLine": false,
   "bracketSpacing": true,
   "arrowParens": "avoid",
   "singleAttributePerLine": true

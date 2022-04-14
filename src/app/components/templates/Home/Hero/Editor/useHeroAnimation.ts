@@ -15,7 +15,7 @@ import type { SetHeroStateFunction } from '../Hero';
 import type { TabHandle } from './Editor';
 
 export default function useHeroAnimation({
-  startDelay = 0,
+  startDelay = 1000,
   minTypingDelay = 40,
   maxTypingDelay = 150,
   htmlTab,
@@ -41,6 +41,7 @@ export default function useHeroAnimation({
   const timer = useRef<number>();
   const queuedAnimation = useRef<(() => void) | null>(null);
   const isPlayingRef = useRef(isPlaying);
+  const isPausedRef = useRef(false);
 
   // The user can change the current editor by clicking
   // one of the tabs, which pauses the animation. We keep
@@ -48,38 +49,64 @@ export default function useHeroAnimation({
   // belongs to, and if necessary will switch back to
   // the correct tab when the animation resumes
   const [visibleView, setVisibleView] = useState(Language.HTML);
+  const visibleViewRef = useRef(Language.HTML);
   const animatingView = useRef(Language.HTML);
 
-  // Queue the next step in the animation
-  const queue = useCallback(async (fn: () => void, delay = 200) => {
-    return new Promise<void>(resolve => {
-      clearTimeout(timer.current);
+  useEffect(() => {
+    visibleViewRef.current = visibleView;
+  }, [visibleView]);
 
-      const callback = async () => {
-        queuedAnimation.current = null;
+  const ensureAnimatingViewIsVisible = useCallback(
+    async (view = animatingView.current, delay = 700) => {
+      if (
+        (isPlayingRef.current && visibleViewRef.current !== view) ||
+        animatingView.current !== view
+      ) {
+        await mouse.clickTab(view);
+        visibleViewRef.current = animatingView.current;
+        animatingView.current = view;
+        setVisibleView(view);
+        await sleep(delay);
+      }
+    },
+    [mouse]
+  );
+
+  // Queue the next step in the animation
+  const queue = useCallback(
+    async (fn: () => void, delay = 200) => {
+      return new Promise<void>(resolve => {
         clearTimeout(timer.current);
 
-        const run = () => {
-          requestAnimationFrame(() => {
-            fn();
-            resolve();
-          });
+        const callback = () => {
+          queuedAnimation.current = null;
+          clearTimeout(timer.current);
+
+          const run = async () => {
+            await ensureAnimatingViewIsVisible();
+
+            requestAnimationFrame(() => {
+              fn();
+              resolve();
+            });
+          };
+
+          if (delay === 0) {
+            run();
+          } else {
+            timer.current = window.setTimeout(run, delay);
+          }
         };
 
-        if (delay === 0) {
-          run();
+        if (!isPlayingRef.current) {
+          queuedAnimation.current = callback;
         } else {
-          timer.current = window.setTimeout(run, delay);
+          callback();
         }
-      };
-
-      if (!isPlayingRef.current) {
-        queuedAnimation.current = callback;
-      } else {
-        callback();
-      }
-    });
-  }, []);
+      });
+    },
+    [ensureAnimatingViewIsVisible]
+  );
 
   const type = useCallback(
     async (step: Step, view: Language) => {
@@ -101,8 +128,8 @@ export default function useHeroAnimation({
         }, delay);
       };
 
-      if (splitLines.length === 1 && !text.match(/\[-/)) {
-        lines.push({ text: '', match: text, shouldType: true });
+      if (splitLines.length === 1 && !text.includes('[-')) {
+        lines.push({ text: '*|*', match: text, shouldType: true });
       } else {
         splitLines.forEach(line => {
           const match = line.match(/\[-(.*)-\]/);
@@ -129,7 +156,7 @@ export default function useHeroAnimation({
       return new Promise<void>(async resolve => {
         const typeLine = async (line: TypedLine) => {
           return new Promise<string>(resolve => {
-            const text = line.match ?? line.text;
+            let text = line.match ?? line.text;
 
             text
               .split('')
@@ -182,7 +209,7 @@ export default function useHeroAnimation({
 
   // Handle updating specific step
   const handleStep = useCallback(
-    (step?: Step, shoudIncrement = true) => {
+    async (step?: Step, shoudIncrement = true) => {
       if (!step) {
         setIsPlaying(false);
         return Promise.resolve();
@@ -191,13 +218,8 @@ export default function useHeroAnimation({
       // Type text into an editor view
       if (step.text?.trim()) {
         // Get the current view and update it if needed
-        let view: Language;
-
-        setVisibleView(current => {
-          view = step.view ?? current;
-          animatingView.current = view;
-          return view;
-        });
+        const view = step.view ?? animatingView.current;
+        await ensureAnimatingViewIsVisible(view);
 
         // Update editor text
         if (step.text) {
@@ -207,7 +229,7 @@ export default function useHeroAnimation({
           return queue(async () => {
             if (step.instant || shouldSelectText) {
               const fn = view === Language.HTML ? setHtml : setScss;
-              await queue(() => {
+              await queue(async () => {
                 step.onStart?.();
                 setState(step.startState);
                 fn(step.text ?? '');
@@ -221,7 +243,7 @@ export default function useHeroAnimation({
                 document.querySelector('.token.select');
 
               if (el) {
-                await mouse.selectElement(el, () => {
+                await mouse.selectElement(el, async () => {
                   setState({ showSelectHighlight: true });
                   step?.onMouseDown?.();
                 });
@@ -244,45 +266,20 @@ export default function useHeroAnimation({
 
         return Promise.resolve();
       }
-
-      // Switch to a different tab with mouse animation
-      if (step.view && step.view !== visibleView) {
-        return queue(async () => {
-          if (step.view && step.view !== visibleView) {
-            step.onStart?.();
-            setState(step.startState);
-            animatingView.current = step.view;
-            await mouse.clickTab(step.view);
-            setVisibleView(step.view);
-            setState(step.completeState);
-            step.onComplete?.();
-
-            if (shoudIncrement) {
-              setStepIndex(i => i + 1);
-            }
-          }
-        }, step.delay);
-      }
     },
-    [
-      mouse,
-      visibleView,
-      setIsPlaying,
-      setVisibleView,
-      queue,
-      setHtml,
-      setScss,
-      setStepIndex,
-      setState,
-      type
-    ]
+    [ensureAnimatingViewIsVisible, queue, setState, type, mouse]
   );
 
   // Start running animation initially after a delay
   useEffect(() => {
     window.setTimeout(() => {
-      setHasStarted(true);
-      setIsPlaying(true);
+      if (
+        !isPausedRef.current &&
+        visibleViewRef.current === animatingView.current
+      ) {
+        setHasStarted(true);
+        setIsPlaying(true);
+      }
     }, startDelay);
   }, [startDelay]);
 
@@ -314,24 +311,24 @@ export default function useHeroAnimation({
 
   const play = useCallback(
     async (onResume?: () => void) => {
-      if (!hasStarted || isComplete) {
+      if (isComplete) {
         return;
       }
 
-      if (visibleView !== animatingView.current) {
-        await mouse.clickTab(animatingView.current);
-        setVisibleView(animatingView.current);
-        await sleep(700);
-      }
+      isPlayingRef.current = true;
+      isPausedRef.current = false;
 
+      await ensureAnimatingViewIsVisible();
       onResume?.();
+      setHasStarted(true);
       setIsPlaying(true);
     },
-    [hasStarted, isComplete, visibleView, mouse]
+    [ensureAnimatingViewIsVisible, isComplete]
   );
 
   const pause = useCallback(() => {
     isPlayingRef.current = false;
+    isPausedRef.current = true;
     setIsPlaying(false);
   }, []);
 
@@ -339,6 +336,7 @@ export default function useHeroAnimation({
     visibleView,
     html,
     scss,
+    hasStarted,
     isPlaying,
     isComplete,
     play,

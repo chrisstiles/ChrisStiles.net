@@ -168,11 +168,15 @@ export default class Mouse {
 
     return new Promise<void>(resolve => {
       gsap.to(this.mouse, {
-        scale: 0.8,
+        keyframes: [
+          { scale: 1 },
+          { scale: isDoubleClick ? 0.88 : 0.78 },
+          { scale: 1 }
+        ],
         color: clickColor,
-        duration: isDoubleClick ? 0.1 : 0.13,
-        yoyo: true,
-        repeat: isDoubleClick ? 2 : 1,
+        duration: isDoubleClick ? 0.22 : 0.28,
+        repeat: isDoubleClick ? 1 : 0,
+
         onStart: () => {
           if (!this.mouse) {
             resolve();
@@ -191,7 +195,7 @@ export default class Mouse {
           if (hideAfterClick) {
             this.hideTimer = window.setTimeout(
               () => this.hide(),
-              isDoubleClick ? 400 : 250
+              isDoubleClick ? 400 : 380
             );
           }
         },
