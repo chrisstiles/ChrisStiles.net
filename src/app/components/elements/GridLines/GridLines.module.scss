@@ -1,0 +1,46 @@
+/* --------------------------- */
+/* Grid Lines */
+/* --------------------------- */
+
+.wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  overflow: hidden;
+  z-index: -1;
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+}
+
+.linesWrapper {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.grid {
+  $offset: 20px;
+  display: flex;
+  width: calc(100% + #{$offset * 2});
+  margin-left: -$offset;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+.line {
+  flex-grow: 1;
+  display: flex;
+  justify-content: flex-end;
+
+  &:first-child {
+    border-left: 1px solid #2d334a;
+  }
+
+  svg {
+    width: 1px;
+    height: 100%;
+  }
+}
