@@ -1,5 +1,6 @@
 import styles from './Experience.module.scss';
-import { Section, Content, GridLines } from '@elements';
+import LogoAnimation from './LogoAnimation';
+import { Section, Content, H2, GridLines } from '@elements';
 
 export default function Experience() {
   return (
@@ -8,12 +9,18 @@ export default function Experience() {
       wrapContent={false}
     >
       <Content className={styles.content}>
-        <h2>If your only tool is a hammer, every project looks like a nail</h2>
-        <p>
-          Vestibulum nec nulla rutrum nine years semper. Donec quis orci
-          maximus, efficitur guam in, ultrices massa. Lorem ipsum dolor sit
-          amet, consectetur adipiscing elit.{' '}
-        </p>
+        <div className={styles.text}>
+          <H2 eyebrow="Experience matters">
+            If your only tool is a hammer, every project looks like a nail
+          </H2>
+
+          <p>
+            Vestibulum nec nulla rutrum nine years semper. Donec quis orci
+            maximus, efficitur guam in, ultrices massa. Lorem ipsum dolor sit
+            amet, consectetur adipiscing elit.
+          </p>
+        </div>
+        <LogoAnimation />
       </Content>
       <GridLines
         solidColor="#262B3F"

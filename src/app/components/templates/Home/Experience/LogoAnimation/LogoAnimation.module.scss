@@ -1,0 +1,70 @@
+/* --------------------------- */
+/* Logo Animation */
+/* --------------------------- */
+
+.wrapper {
+  width: calc(50% + 20px);
+  margin-right: -20px;
+  flex-grow: 0;
+  flex-shrink: 0;
+  text-align: center;
+  overflow: hidden;
+  position: relative;
+  pointer-events: none;
+}
+
+.content {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+}
+
+$logoSize: 150px;
+$logoOffset: 30px;
+
+.column,
+.logo {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.column {
+  margin-right: $logoOffset;
+  height: 100%;
+  position: relative;
+  width: $logoSize;
+  visibility: hidden;
+
+  &:last-child {
+    margin-right: 0;
+  }
+
+  &.visible {
+    visibility: visible;
+  }
+}
+
+.logo {
+  width: $logoSize;
+  height: $logoSize;
+  background: blue;
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin-top: -$logoSize - $logoOffset;
+
+  &:nth-child(even) {
+    background: green;
+  }
+}
+
+:export {
+  logoSize: $logoSize;
+  logoOffset: $logoOffset;
+}

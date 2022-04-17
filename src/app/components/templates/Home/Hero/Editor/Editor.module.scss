@@ -9,10 +9,11 @@ $borderRadius: 6px;
 
 .wrapper {
   width: calc(50% + 6px);
-  margin-right: -13px;
+  $offsetY: 250px;
+  padding-bottom: $offsetY;
+  margin: -90px -13px #{-$offsetY / 2} 0;
   flex-grow: 0;
   flex-shrink: 0;
-  margin-top: -90px;
   position: relative;
   background-color: var(--editor-background-color);
   border-radius: $borderRadius;
@@ -82,16 +83,11 @@ $borderRadius: 6px;
   margin-left: 35px;
 }
 
-// .tabWrapper {
-//   display: inline-flex;
-//   height: 100%;
-// }
-
 .tabWrapper {
   font-family: var(--font-code);
   color: #616885;
   letter-spacing: 0.05em;
-  padding: 0 18px;
+  padding: 0 18px 1px 18px;
   font-size: 13px;
   line-height: 1;
   display: inline-flex;

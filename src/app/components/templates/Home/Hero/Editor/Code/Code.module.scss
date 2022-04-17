@@ -7,7 +7,7 @@
 .wrapper {
   overflow: hidden;
   font-size: 14px;
-  line-height: 1.4;
+  line-height: 1.5;
   color: #000;
   height: 100%;
   display: flex;
@@ -43,6 +43,7 @@ $lineNumbersWidth: 45px;
   $translate: 80px;
   width: 100%;
   padding-left: 15px;
+  font-family: inherit;
   transform: translateX($translate);
   opacity: 0;
   transition: transform 0.4s cubic-bezier(0.21, 0.94, 0.14, 1), opacity 0.3s;
@@ -62,6 +63,7 @@ $lineNumbersWidth: 45px;
 
 .code {
   width: 100%;
+  font-family: inherit;
 
   @keyframes blink {
     0% {

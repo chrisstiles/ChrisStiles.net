@@ -3,7 +3,7 @@ import styles from './Hero.module.scss';
 import Title from './Title';
 import Headline, { type HeadlineStyleProps } from './Headline';
 import Editor from './Editor';
-import { Content, Section } from '@elements';
+import { Section } from '@elements';
 import { getState } from '@helpers';
 
 export default function Hero() {

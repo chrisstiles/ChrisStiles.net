@@ -131,7 +131,6 @@ export default memo(function Editor({
           setNumLines={setNumLines}
         />
       </div>
-      <div className={styles.terminal} />
     </div>
   );
 });
