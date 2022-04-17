@@ -8,7 +8,6 @@
   flex-grow: 0;
   flex-shrink: 0;
   text-align: center;
-  overflow: hidden;
   position: relative;
   pointer-events: none;
 }
@@ -31,22 +30,27 @@ $logoOffset: 30px;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   transform-style: preserve-3d;
-  will-change: transform;
 }
 
-.column {
+.columnWrapper {
   margin-right: $logoOffset;
-  height: 100%;
   position: relative;
-  width: $logoSize;
-  visibility: hidden;
+  height: 100%;
 
   &:last-child {
     margin-right: 0;
   }
+}
+
+.column {
+  height: 100%;
+  position: relative;
+  width: $logoSize;
+  opacity: 0;
+  will-change: transform;
 
   &.visible {
-    visibility: visible;
+    opacity: 1;
   }
 }
 
@@ -58,10 +62,19 @@ $logoOffset: 30px;
   top: 0;
   left: 0;
   margin-top: -$logoSize - $logoOffset;
+  will-change: transform, filter;
 
   &:nth-child(even) {
     background: green;
   }
+}
+
+.blur {
+  width: $logoSize;
+  height: $logoSize;
+  position: absolute;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 :export {

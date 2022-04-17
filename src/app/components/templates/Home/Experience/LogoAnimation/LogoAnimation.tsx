@@ -30,6 +30,7 @@ export default memo(function LogoAnimation() {
             isVisible={isVisible}
             isPlaying={true}
             direction={index % 2 === 0 ? 'down' : 'up'}
+            index={index}
           />
         ))}
       </div>
@@ -41,10 +42,15 @@ function LogoColumn({
   logos,
   isVisible,
   isPlaying,
-  direction = 'down'
+  direction = 'down',
+  index
 }: LogoColumnProps) {
   const wrapper = useRef<HTMLDivElement>(null);
   const logoCount = logos?.length ?? 0;
+
+  // TODO replace this with new useId hook in React 18
+  const filterId = useMemo(() => `blur-filter-${index + 1}`, [index]);
+  const blurFilter = useRef<SVGFEGaussianBlurElement>(null);
 
   const components = useMemo(() => {
     return !logoCount
@@ -53,11 +59,12 @@ function LogoColumn({
           <div
             key={index}
             className={styles.logo}
+            style={{ filter: `url('#${filterId}')` }}
           >
             {logo}
           </div>
         ));
-  }, [logos, logoCount]);
+  }, [logos, logoCount, filterId]);
 
   // The distance each logo must animate before wrapping
   const [wrapperSize, setWrapperSize] = useState(0);
@@ -76,13 +83,19 @@ function LogoColumn({
     return () => observer.disconnect();
   }, [logos, logoCount]);
 
-  const isPlayingRef = useRef(isPlaying);
+  const hasInitialAnimation = useRef(false);
+  const hasStartedLogoAnimation = useRef(false);
+  const isPlayingRef = useRef(false);
+
   const logoTween = useRef<gsap.core.Tween | null>(null);
 
   useEffect(() => {
-    isPlayingRef.current = isPlaying && isVisible;
+    const shouldPlay =
+      isPlaying && isVisible && hasStartedLogoAnimation.current;
 
-    if (isPlaying) {
+    isPlayingRef.current = shouldPlay;
+
+    if (shouldPlay) {
       logoTween.current?.play();
     } else {
       logoTween.current?.pause();
@@ -92,7 +105,7 @@ function LogoColumn({
   useEffect(() => {
     const wrapperEl = wrapper.current;
 
-    if (wrapperEl && logoCount && wrapperSize) {
+    if (wrapperEl && logoCount) {
       const offset = parseInt(logoOffset);
       const size = parseInt(logoSize) + offset;
 
@@ -111,7 +124,7 @@ function LogoColumn({
         duration: round(duration, 3),
         ease: 'none',
         repeat: -1,
-        paused: !isPlayingRef.current || !isVisible,
+        paused: !isPlayingRef.current,
         runBackwards: direction === 'up',
         modifiers: {
           y: gsap.utils.unitize(y => parseFloat(y) % distance)
@@ -122,47 +135,109 @@ function LogoColumn({
     return () => {
       logoTween.current?.kill();
     };
-  }, [wrapperSize, logoCount, direction, isVisible, components]);
+  }, [logoCount, direction, components]);
 
-  const hasInitialAnimation = useRef(false);
+  // Animate column in before starting individual logo animations
   const columnTween = useRef<gsap.core.Tween | null>(null);
+  const [hasInitialPosition, setHasInitialPosition] = useState(false);
 
   useEffect(() => {
-    if (isVisible && wrapper.current && !hasInitialAnimation.current) {
+    if (
+      isVisible &&
+      wrapper.current &&
+      !hasInitialAnimation.current &&
+      wrapperSize
+    ) {
       hasInitialAnimation.current = true;
 
       const index = Math.max(0, getElementIndex(wrapper.current));
       const height = logoCount * (parseInt(logoSize) + parseInt(logoOffset));
-      const translate = direction === 'up' ? height : -height - wrapperSize;
+      const translate = direction === 'up' ? height : -height;
 
-      columnTween.current = gsap.fromTo(
-        wrapper.current,
-        { y: Math.round(translate) },
-        {
-          y: 0,
-          duration: 3.2,
-          ease: 'expo.inOut',
-          paused: !isVisible,
-          delay: index * 0.2
+      gsap.set(wrapper.current, { y: Math.round(translate) });
+      setHasInitialPosition(true);
+
+      const blur = 0.7;
+      const getValue = gsap.getProperty(wrapper.current);
+      const getPosition = () => {
+        return {
+          x: Number(getValue('x')),
+          y: Number(getValue('y'))
+        };
+      };
+
+      const prevPosition = getPosition();
+
+      let blurX = blurFilter.current?.stdDeviationX ?? {
+        baseVal: 0,
+        animVal: 0
+      };
+
+      let blurY = blurFilter.current?.stdDeviationY ?? {
+        baseVal: 0,
+        animVal: 0
+      };
+
+      columnTween.current = gsap.to(wrapper.current, {
+        y: 0,
+        duration: 3.8,
+        ease: 'expo.inOut',
+        paused: !isVisible,
+        delay: index * 0.2,
+        onUpdate() {
+          if (!blurFilter.current) {
+            return;
+          }
+
+          if (!hasStartedLogoAnimation.current && this.progress() >= 0.65) {
+            hasStartedLogoAnimation.current = true;
+            logoTween.current?.play();
+          }
+
+          const { x, y } = getPosition();
+
+          blurX.baseVal = round(Math.abs(x - prevPosition.x) * blur, 4);
+          blurY.baseVal = round(Math.abs(y - prevPosition.y) * blur, 4);
+
+          prevPosition.x = x;
+          prevPosition.y = y;
+        },
+        onComplete() {
+          blurX.baseVal = 0;
+          blurY.baseVal = 0;
         }
-      );
+      });
     }
   }, [direction, isVisible, logoCount, wrapperSize]);
 
-  useEffect(() => {
-    if (isVisible) {
-      columnTween.current?.play();
-    }
-  }, [isVisible]);
-
   return !logoCount ? null : (
-    <div
-      ref={wrapper}
-      className={classNames(styles.column, direction, {
-        [styles.visible]: isVisible
-      })}
-    >
-      {components}
+    <div className={styles.columnWrapper}>
+      <div
+        ref={wrapper}
+        className={classNames(styles.column, direction, {
+          [styles.visible]: isVisible && hasInitialPosition
+        })}
+      >
+        {components}
+      </div>
+      <svg className={styles.blur}>
+        <defs>
+          <filter
+            id={filterId}
+            x="-50%"
+            y="-50%"
+            width="200%"
+            height="200%"
+            colorInterpolationFilters="sRGB"
+          >
+            <feGaussianBlur
+              ref={blurFilter}
+              in="SourceGraphic"
+              stdDeviation="0"
+            />
+          </filter>
+        </defs>
+      </svg>
     </div>
   );
 }
@@ -172,6 +247,7 @@ type LogoColumnProps = {
   isVisible: boolean;
   isPlaying: boolean;
   direction?: 'up' | 'down';
+  index: number;
 };
 
 const icons = [
