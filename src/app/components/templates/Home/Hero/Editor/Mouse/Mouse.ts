@@ -58,7 +58,8 @@ export default class Mouse {
     this.show();
 
     if (this.animation) {
-      this.animation?.totalProgress(1).kill();
+      // this.animation?.totalProgress(1).kill();
+      this.animation.invalidate();
       this.animation = null;
     }
 

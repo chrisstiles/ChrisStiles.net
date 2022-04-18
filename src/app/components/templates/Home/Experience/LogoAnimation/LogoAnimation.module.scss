@@ -10,6 +10,46 @@
   text-align: center;
   position: relative;
   pointer-events: none;
+
+  &:before,
+  &:after {
+    content: '';
+    position: absolute;
+    left: 3px;
+    right: 3px;
+    z-index: 3;
+    opacity: 0.77;
+    background: linear-gradient(
+      173deg,
+      #161929 0%,
+      rgba(22, 25, 41, 0.991353) 4.39%,
+      rgba(22, 25, 41, 0.96449) 8.79%,
+      rgba(22, 25, 41, 0.91834) 13.18%,
+      rgba(22, 25, 41, 0.852589) 17.58%,
+      rgba(22, 25, 41, 0.768225) 21.97%,
+      rgba(22, 25, 41, 0.668116) 26.36%,
+      rgba(22, 25, 41, 0.557309) 30.76%,
+      rgba(22, 25, 41, 0.442691) 35.15%,
+      rgba(22, 25, 41, 0.331884) 39.55%,
+      rgba(22, 25, 41, 0.231775) 43.94%,
+      rgba(22, 25, 41, 0.147411) 48.33%,
+      rgba(22, 25, 41, 0.0816599) 52.73%,
+      rgba(22, 25, 41, 0.03551) 57.12%,
+      rgba(22, 25, 41, 0.0086472) 61.52%,
+      rgba(22, 25, 41, 0) 65.91%
+    );
+  }
+
+  &:before {
+    top: 0;
+    height: 200px;
+  }
+
+  &:after {
+    bottom: 0;
+    transform: rotate(180deg);
+    height: 300px;
+  }
 }
 
 .content {
@@ -23,7 +63,7 @@
 }
 
 $logoSize: 150px;
-$logoOffset: 30px;
+$logoOffset: 20px;
 
 .column,
 .logo {
@@ -33,13 +73,20 @@ $logoOffset: 30px;
 }
 
 .columnWrapper {
-  margin-right: $logoOffset;
+  margin-right: 25px;
   position: relative;
   height: 100%;
 
   &:last-child {
     margin-right: 0;
   }
+}
+
+.column,
+.logo {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform-style: preserve-3d;
 }
 
 .column {
@@ -57,15 +104,24 @@ $logoOffset: 30px;
 .logo {
   width: $logoSize;
   height: $logoSize;
-  background: blue;
   position: absolute;
   top: 0;
   left: 0;
   margin-top: -$logoSize - $logoOffset;
+  margin-bottom: $logoOffset;
   will-change: transform, filter;
 
-  &:nth-child(even) {
-    background: green;
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 1146px) {
+    margin-bottom: 100px;
+  }
+
+  svg {
+    width: 100%;
+    height: 100%;
   }
 }
 

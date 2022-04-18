@@ -1,10 +1,13 @@
 import { memo, useMemo, useRef, useEffect, useState } from 'react';
-import styles, { logoSize, logoOffset } from './LogoAnimation.module.scss';
+import styles from './LogoAnimation.module.scss';
 import { getElementIndex } from '@helpers';
 import gsap from 'gsap';
 import classNames from 'classnames';
 import ResizeObserver from 'resize-observer-polyfill';
 import { round } from 'lodash';
+
+const baseLogoSize = parseInt(styles.logoSize);
+const baseLogoOffset = parseInt(styles.logoOffset);
 
 export default memo(function LogoAnimation() {
   const [isVisible, setIsVisible] = useState(false);
@@ -61,18 +64,33 @@ function LogoColumn({
             className={styles.logo}
             style={{ filter: `url('#${filterId}')` }}
           >
-            {logo}
+            <svg>
+              <use xlinkHref={`/images/logo-icons.svg#icon-${logo}`}></use>
+            </svg>
           </div>
         ));
   }, [logos, logoCount, filterId]);
 
   // The distance each logo must animate before wrapping
   const [wrapperSize, setWrapperSize] = useState(0);
+  const [logoSize, setLogoSize] = useState(baseLogoSize);
+  const [logoOffset, setLogoOffset] = useState(baseLogoOffset);
 
   useEffect(() => {
     const wrapperEl = wrapper.current;
     const observer = new ResizeObserver(([entry]) => {
       setWrapperSize(entry.contentRect.height);
+
+      const logo = wrapperEl?.firstElementChild as HTMLDivElement;
+
+      if (logo) {
+        const style = getComputedStyle(logo);
+        const offset =
+          parseInt(style.marginBottom) || parseInt(style.marginRight);
+
+        setLogoSize(logo.offsetHeight);
+        setLogoOffset(!isNaN(offset) ? offset : 20);
+      }
     });
 
     if (wrapperEl) {
@@ -90,12 +108,10 @@ function LogoColumn({
   const logoTween = useRef<gsap.core.Tween | null>(null);
 
   useEffect(() => {
-    const shouldPlay =
+    isPlayingRef.current =
       isPlaying && isVisible && hasStartedLogoAnimation.current;
 
-    isPlayingRef.current = shouldPlay;
-
-    if (shouldPlay) {
+    if (isPlayingRef.current) {
       logoTween.current?.play();
     } else {
       logoTween.current?.pause();
@@ -106,8 +122,7 @@ function LogoColumn({
     const wrapperEl = wrapper.current;
 
     if (wrapperEl && logoCount) {
-      const offset = parseInt(logoOffset);
-      const size = parseInt(logoSize) + offset;
+      const size = logoSize + logoOffset;
 
       gsap.set(wrapperEl.children, { y: i => i * size });
 
@@ -120,7 +135,7 @@ function LogoColumn({
       const distance = logoCount * size;
 
       logoTween.current = gsap.to(wrapperEl.children, {
-        y: `+=${distance}`,
+        y: () => `+=${distance}`,
         duration: round(duration, 3),
         ease: 'none',
         repeat: -1,
@@ -135,7 +150,7 @@ function LogoColumn({
     return () => {
       logoTween.current?.kill();
     };
-  }, [logoCount, direction, components]);
+  }, [logoCount, direction, components, logoSize, logoOffset]);
 
   // Animate column in before starting individual logo animations
   const columnTween = useRef<gsap.core.Tween | null>(null);
@@ -151,13 +166,13 @@ function LogoColumn({
       hasInitialAnimation.current = true;
 
       const index = Math.max(0, getElementIndex(wrapper.current));
-      const height = logoCount * (parseInt(logoSize) + parseInt(logoOffset));
+      const height = logoCount * (logoSize + logoOffset);
       const translate = direction === 'up' ? height : -height;
 
       gsap.set(wrapper.current, { y: Math.round(translate) });
       setHasInitialPosition(true);
 
-      const blur = 0.7;
+      const multiplier = 0.6;
       const getValue = gsap.getProperty(wrapper.current);
       const getPosition = () => {
         return {
@@ -189,18 +204,19 @@ function LogoColumn({
             return;
           }
 
-          if (!hasStartedLogoAnimation.current && this.progress() >= 0.65) {
-            hasStartedLogoAnimation.current = true;
-            logoTween.current?.play();
-          }
-
           const { x, y } = getPosition();
 
-          blurX.baseVal = round(Math.abs(x - prevPosition.x) * blur, 4);
-          blurY.baseVal = round(Math.abs(y - prevPosition.y) * blur, 4);
+          blurX.baseVal = round(Math.abs(x - prevPosition.x) * multiplier, 4);
+          blurY.baseVal = round(Math.abs(y - prevPosition.y) * multiplier, 4);
 
           prevPosition.x = x;
           prevPosition.y = y;
+
+          if (!hasStartedLogoAnimation.current && this.progress() >= 0.64) {
+            hasStartedLogoAnimation.current = true;
+            isPlayingRef.current = true;
+            logoTween.current?.play();
+          }
         },
         onComplete() {
           blurX.baseVal = 0;
@@ -208,7 +224,7 @@ function LogoColumn({
         }
       });
     }
-  }, [direction, isVisible, logoCount, wrapperSize]);
+  }, [direction, isVisible, logoCount, logoOffset, logoSize, wrapperSize]);
 
   return !logoCount ? null : (
     <div className={styles.columnWrapper}>
@@ -251,7 +267,7 @@ type LogoColumnProps = {
 };
 
 const icons = [
-  ['1', '2', '3', '4', '5', '6', '7'],
-  ['8', '9', '10', '11', '12', '13', '14'],
-  ['15', '16', '17', '18', '19', '20', '21']
+  ['sass', 'html', 'sass', 'html', 'sass', 'html'],
+  ['sass', 'html', 'sass', 'html', 'sass', 'html'],
+  ['sass', 'html', 'sass', 'html', 'sass', 'html']
 ];
