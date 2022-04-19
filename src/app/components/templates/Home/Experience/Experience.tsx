@@ -2,7 +2,7 @@ import styles from './Experience.module.scss';
 import LogoAnimation from './LogoAnimation';
 import { Section, Content, H2, GridLines } from '@elements';
 
-export default function Experience() {
+export default function Experience({ iconFileNames }: ExperienceProps) {
   return (
     <Section
       className={styles.wrapper}
@@ -20,7 +20,9 @@ export default function Experience() {
             amet, consectetur adipiscing elit.
           </p>
         </div>
-        <LogoAnimation />
+        {iconFileNames?.length && (
+          <LogoAnimation iconFileNames={iconFileNames} />
+        )}
       </Content>
       <GridLines
         solidColor="#262B3F"
@@ -29,3 +31,7 @@ export default function Experience() {
     </Section>
   );
 }
+
+type ExperienceProps = {
+  iconFileNames: string[];
+};

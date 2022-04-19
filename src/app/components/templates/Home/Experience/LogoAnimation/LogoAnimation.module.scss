@@ -18,7 +18,8 @@
     left: 3px;
     right: 3px;
     z-index: 3;
-    opacity: 0.77;
+    height: 320px;
+    opacity: 0.8;
     background: linear-gradient(
       173deg,
       #161929 0%,
@@ -42,13 +43,11 @@
 
   &:before {
     top: 0;
-    height: 200px;
   }
 
   &:after {
-    bottom: 0;
+    bottom: 40px;
     transform: rotate(180deg);
-    height: 300px;
   }
 }
 
@@ -61,9 +60,6 @@
   display: flex;
   justify-content: center;
 }
-
-$logoSize: 150px;
-$logoOffset: 20px;
 
 .column,
 .logo {
@@ -89,10 +85,34 @@ $logoOffset: 20px;
   transform-style: preserve-3d;
 }
 
+$baseLogoSize: 140px;
+$baseLogoOffset: 20px;
+
+@mixin position-logos($size, $offset) {
+  @at-root {
+    .column {
+      width: $size;
+    }
+
+    .logo {
+      width: $size;
+      height: $size;
+      margin-top: -$size - $offset;
+      margin-bottom: $offset;
+    }
+
+    .blur {
+      width: $size;
+      height: $size;
+    }
+  }
+}
+
+@include position-logos($baseLogoSize, $baseLogoOffset);
+
 .column {
   height: 100%;
   position: relative;
-  width: $logoSize;
   opacity: 0;
   will-change: transform;
 
@@ -102,21 +122,13 @@ $logoOffset: 20px;
 }
 
 .logo {
-  width: $logoSize;
-  height: $logoSize;
   position: absolute;
   top: 0;
   left: 0;
-  margin-top: -$logoSize - $logoOffset;
-  margin-bottom: $logoOffset;
   will-change: transform, filter;
 
   &:last-child {
     margin-bottom: 0;
-  }
-
-  @media (max-width: 1146px) {
-    margin-bottom: 100px;
   }
 
   svg {
@@ -126,14 +138,16 @@ $logoOffset: 20px;
 }
 
 .blur {
-  width: $logoSize;
-  height: $logoSize;
   position: absolute;
   visibility: hidden;
   pointer-events: none;
 }
 
+@media (width < 1146px) {
+  @include position-logos(100px, 15px);
+}
+
 :export {
-  logoSize: $logoSize;
-  logoOffset: $logoOffset;
+  logoSize: $baseLogoSize;
+  logoOffset: $baseLogoOffset;
 }

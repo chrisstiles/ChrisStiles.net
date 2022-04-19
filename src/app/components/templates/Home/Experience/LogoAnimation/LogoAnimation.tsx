@@ -4,13 +4,21 @@ import { getElementIndex } from '@helpers';
 import gsap from 'gsap';
 import classNames from 'classnames';
 import ResizeObserver from 'resize-observer-polyfill';
-import { round } from 'lodash';
+import { round, shuffle, chunk } from 'lodash';
 
 const baseLogoSize = parseInt(styles.logoSize);
 const baseLogoOffset = parseInt(styles.logoOffset);
 
-export default memo(function LogoAnimation() {
+export default memo(function LogoAnimation({
+  iconFileNames = []
+}: LogoAnimationProps) {
   const [isVisible, setIsVisible] = useState(false);
+  const [icons, setIcons] = useState<string[][]>([]);
+
+  useEffect(() => {
+    const columnLength = Math.ceil(iconFileNames.length / 3);
+    setIcons(chunk(shuffle(iconFileNames), columnLength));
+  }, [iconFileNames]);
 
   useEffect(() => {
     const delay = 1000;
@@ -65,7 +73,8 @@ function LogoColumn({
             style={{ filter: `url('#${filterId}')` }}
           >
             <svg>
-              <use xlinkHref={`/images/logo-icons.svg#icon-${logo}`}></use>
+              {/* <use href={`/images/logo-icons.svg#icon-${logo}`}></use> */}
+              <use href={`#icon-${logo}`}></use>
             </svg>
           </div>
         ));
@@ -79,7 +88,7 @@ function LogoColumn({
   useEffect(() => {
     const wrapperEl = wrapper.current;
     const observer = new ResizeObserver(([entry]) => {
-      setWrapperSize(entry.contentRect.height);
+      setWrapperSize(Math.ceil(entry.contentRect.height));
 
       const logo = wrapperEl?.firstElementChild as HTMLDivElement;
 
@@ -104,7 +113,6 @@ function LogoColumn({
   const hasInitialAnimation = useRef(false);
   const hasStartedLogoAnimation = useRef(false);
   const isPlayingRef = useRef(false);
-
   const logoTween = useRef<gsap.core.Tween | null>(null);
 
   useEffect(() => {
@@ -258,6 +266,10 @@ function LogoColumn({
   );
 }
 
+type LogoAnimationProps = {
+  iconFileNames: string[];
+};
+
 type LogoColumnProps = {
   logos: string[];
   isVisible: boolean;
@@ -265,9 +277,3 @@ type LogoColumnProps = {
   direction?: 'up' | 'down';
   index: number;
 };
-
-const icons = [
-  ['sass', 'html', 'sass', 'html', 'sass', 'html'],
-  ['sass', 'html', 'sass', 'html', 'sass', 'html'],
-  ['sass', 'html', 'sass', 'html', 'sass', 'html']
-];
