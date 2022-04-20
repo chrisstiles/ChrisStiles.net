@@ -69,7 +69,7 @@
 }
 
 .columnWrapper {
-  margin-right: 25px;
+  margin-right: 35px;
   position: relative;
   height: 100%;
 
@@ -85,7 +85,7 @@
   transform-style: preserve-3d;
 }
 
-$baseLogoSize: 140px;
+$baseLogoSize: 130px;
 $baseLogoOffset: 20px;
 
 @mixin position-logos($size, $offset) {

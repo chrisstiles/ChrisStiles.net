@@ -1,6 +1,5 @@
 import { memo, useMemo, useRef, useEffect, useState } from 'react';
 import styles from './LogoAnimation.module.scss';
-import { getElementIndex } from '@helpers';
 import gsap from 'gsap';
 import classNames from 'classnames';
 import ResizeObserver from 'resize-observer-polyfill';
@@ -73,7 +72,6 @@ function LogoColumn({
             style={{ filter: `url('#${filterId}')` }}
           >
             <svg>
-              {/* <use href={`/images/logo-icons.svg#icon-${logo}`}></use> */}
               <use href={`#icon-${logo}`}></use>
             </svg>
           </div>
@@ -114,6 +112,7 @@ function LogoColumn({
   const hasStartedLogoAnimation = useRef(false);
   const isPlayingRef = useRef(false);
   const logoTween = useRef<gsap.core.Tween | null>(null);
+  const logoVelocity = useRef(5);
 
   useEffect(() => {
     isPlayingRef.current =
@@ -173,14 +172,16 @@ function LogoColumn({
     ) {
       hasInitialAnimation.current = true;
 
-      const index = Math.max(0, getElementIndex(wrapper.current));
       const height = logoCount * (logoSize + logoOffset);
-      const translate = direction === 'up' ? height : -height;
+      const translate =
+        direction === 'up'
+          ? wrapperSize + (logoSize + logoOffset) * 2
+          : -height;
 
       gsap.set(wrapper.current, { y: Math.round(translate) });
       setHasInitialPosition(true);
 
-      const multiplier = 0.6;
+      const multiplier = 0.7;
       const getValue = gsap.getProperty(wrapper.current);
       const getPosition = () => {
         return {
@@ -202,29 +203,53 @@ function LogoColumn({
       };
 
       columnTween.current = gsap.to(wrapper.current, {
-        y: 0,
-        duration: 3.8,
-        ease: 'expo.inOut',
+        y:
+          direction === 'down'
+            ? 0
+            : -height + wrapperSize + (logoSize + logoOffset) * 2,
+        duration: 3.8 - index * 0.51,
+        ease: 'expo.out',
         paused: !isVisible,
-        delay: index * 0.2,
+        delay: index * 0.25,
         onUpdate() {
-          if (!blurFilter.current) {
+          const { x, y } = getPosition();
+
+          if (x === prevPosition.x && y === prevPosition.y) {
             return;
           }
 
-          const { x, y } = getPosition();
+          const deltaRatio = gsap.ticker.deltaRatio(60);
 
-          blurX.baseVal = round(Math.abs(x - prevPosition.x) * multiplier, 4);
-          blurY.baseVal = round(Math.abs(y - prevPosition.y) * multiplier, 4);
+          const dx = Math.abs(x - prevPosition.x);
+          const dy = Math.abs(y - prevPosition.y);
 
-          prevPosition.x = x;
-          prevPosition.y = y;
+          const vx = dx / deltaRatio;
+          const vy = dy / deltaRatio;
 
-          if (!hasStartedLogoAnimation.current && this.progress() >= 0.64) {
+          const startLogoAnimationVelocity = logoVelocity.current + 0.2;
+          const canStartLogoAnimation =
+            (vx > 0 && vx <= startLogoAnimationVelocity) ||
+            (vy > 0 && vy <= startLogoAnimationVelocity);
+
+          if (
+            !hasStartedLogoAnimation.current &&
+            canStartLogoAnimation &&
+            this.progress() >= 0.4
+          ) {
             hasStartedLogoAnimation.current = true;
             isPlayingRef.current = true;
             logoTween.current?.play();
           }
+
+          if (!blurFilter.current) {
+            return;
+          }
+
+          blurX.baseVal = vx * multiplier;
+          blurY.baseVal = vy * multiplier;
+
+          prevPosition.x = x;
+          prevPosition.y = y;
         },
         onComplete() {
           blurX.baseVal = 0;
@@ -232,7 +257,15 @@ function LogoColumn({
         }
       });
     }
-  }, [direction, isVisible, logoCount, logoOffset, logoSize, wrapperSize]);
+  }, [
+    direction,
+    index,
+    isVisible,
+    logoCount,
+    logoOffset,
+    logoSize,
+    wrapperSize
+  ]);
 
   return !logoCount ? null : (
     <div className={styles.columnWrapper}>
