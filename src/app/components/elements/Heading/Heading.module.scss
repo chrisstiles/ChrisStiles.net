@@ -4,7 +4,13 @@
 
 .eyebrow {
   color: var(--green-accent-color);
+  display: block;
   font-size: 22px;
   font-weight: 400;
-  margin-bottom: 0.85em;
+  margin-bottom: 1.1em;
+
+  :global(.sr) {
+    position: relative;
+    display: inline-block;
+  }
 }

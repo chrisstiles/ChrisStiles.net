@@ -3,9 +3,15 @@
 /* --------------------------- */
 
 .wrapper {
-  background-color: #161929;
-  overflow: hidden;
+  position: relative;
   z-index: 10;
+  overflow: hidden;
+  width: 100%;
+  margin-top: -40px;
+}
+
+.contentWrapper {
+  background-color: #161929;
   padding: 0;
   $offset: 100px;
   clip-path: polygon(0 $offset, 100% 0, 100% calc(100% - #{$offset}), 0 100%);

@@ -1,0 +1,25 @@
+/* --------------------------- */
+/* Background Accents */
+/* --------------------------- */
+
+.accent {
+  position: absolute;
+  width: 825px;
+  height: 235px;
+  z-index: -1;
+  top: 50px;
+  left: -110px;
+
+  &.right {
+    top: auto;
+    left: auto;
+    transform: rotate(180deg);
+    right: -310px;
+    bottom: 100px;
+  }
+}
+
+.back,
+.front {
+  transform-origin: bottom left;
+}
