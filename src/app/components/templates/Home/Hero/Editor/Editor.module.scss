@@ -9,7 +9,7 @@ $borderRadius: 6px;
 
 .wrapper {
   width: calc(50% + 6px);
-  $offsetY: 250px;
+  $offsetY: 200px;
   padding-bottom: $offsetY;
   margin: -90px -13px #{-$offsetY / 2} 0;
   flex-grow: 0;
@@ -125,7 +125,7 @@ $borderRadius: 6px;
 
 .code {
   font-family: var(--font-code);
-  height: 250px;
+  min-height: 312px;
   position: relative;
   overflow: hidden;
 }
@@ -149,7 +149,7 @@ $doubleClickPulseDuration: 400ms;
 .mouse {
   $size: 30px;
   $initialX: 70%;
-  $initialY: 50%;
+  $initialY: 30%;
   $pulseOffset: 9px;
   $pulseOpacity: 0.25;
 

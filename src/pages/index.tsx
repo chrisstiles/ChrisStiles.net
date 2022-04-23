@@ -1,5 +1,5 @@
 import { memo, type ReactElement } from 'react';
-import HomeTemplate, { Header } from '@templates/Home';
+import HomeTemplate from '@templates/Home';
 import Layout from '@layouts';
 import path from 'path';
 import fs from 'fs';
@@ -28,7 +28,7 @@ const SpriteSheet = memo(function SpriteSheet({ sprites }: SpriteSheetProps) {
 });
 
 Home.getLayout = function (page: ReactElement) {
-  return <Layout header={<Header />}>{page}</Layout>;
+  return <Layout wrapMainContent={false}>{page}</Layout>;
 };
 
 export async function getStaticProps(): Promise<

@@ -58,7 +58,6 @@ export default class Mouse {
     this.show();
 
     if (this.animation) {
-      // this.animation?.totalProgress(1).kill();
       this.animation.invalidate();
       this.animation = null;
     }
@@ -105,7 +104,7 @@ export default class Mouse {
       );
 
       if (duration === undefined) {
-        const baseDuration = 0.5;
+        const baseDuration = 0.3;
         const baseDistance = 250;
         const distance = Math.max(
           Math.abs(this.mouse.offsetLeft - x),

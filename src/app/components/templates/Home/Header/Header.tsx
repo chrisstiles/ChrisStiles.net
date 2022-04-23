@@ -1,8 +1,9 @@
+import { memo } from 'react';
 import styles from './Header.module.scss';
 import Content from '@elements/Content';
 import Logo from '@images/logo.svg';
 
-export default function Header() {
+export default function Header({ bullets }: HeaderProps) {
   return (
     <Content
       tag="header"
@@ -12,12 +13,24 @@ export default function Header() {
         className={styles.logo}
         aria-label="Chris Stiles"
       />
-
-      <ul className={styles.items}>
-        <li>Software engineer</li>
-        <li>UI/UX designer</li>
-        <li>Creator</li>
-      </ul>
+      {!!bullets.length && (
+        <ul className={styles.items}>
+          {bullets.map((text, index) => (
+            <Bullet
+              key={index}
+              text={text}
+            />
+          ))}
+        </ul>
+      )}
     </Content>
   );
 }
+
+const Bullet = memo(function Bullet({ text }: { text: string }) {
+  return <li>{text}</li>;
+});
+
+type HeaderProps = {
+  bullets: string[];
+};

@@ -23,7 +23,8 @@ export default function useSyntaxHighlighting(
     string[],
     number
   ] => {
-    const code = stripIndentation ? dedent(text) : text;
+    const trailingLines = text.match(/\n+$/) ?? [''];
+    const code = (stripIndentation ? dedent(text) : text) + trailingLines[0];
     const lines = code.split('\n');
 
     let highlightedCode = Prism.highlight(code, languages[language], language);

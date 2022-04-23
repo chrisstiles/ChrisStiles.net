@@ -1,9 +1,10 @@
+import { memo } from 'react';
 import styles from './Experience.module.scss';
 import LogoAnimation from './LogoAnimation';
 import BackgroundAccent from './BackgroundAccent';
 import { Section, Content, H2, GridLines } from '@elements';
 
-export default function Experience({ iconFileNames }: ExperienceProps) {
+export default memo(function Experience({ iconFileNames }: ExperienceProps) {
   return (
     <Section
       className={styles.wrapper}
@@ -34,7 +35,7 @@ export default function Experience({ iconFileNames }: ExperienceProps) {
       <BackgroundAccent />
     </Section>
   );
-}
+});
 
 type ExperienceProps = {
   iconFileNames: string[];

@@ -5,7 +5,10 @@ import {
   useRef,
   useState,
   useImperativeHandle,
-  type RefObject
+  type ReactNode,
+  type RefObject,
+  type Dispatch,
+  type SetStateAction
 } from 'react';
 import styles from './Editor.module.scss';
 import useHeroAnimation from './useHeroAnimation';
@@ -14,8 +17,9 @@ import classNames from 'classnames';
 import { Language } from '@global';
 
 export default memo(function Editor({
+  showSelectHighlight = false,
   setState,
-  showSelectHighlight = false
+  setHeaderBullets
 }: EditorProps) {
   const htmlTab = useRef<TabHandle>(null);
   const scssTab = useRef<TabHandle>(null);
@@ -31,7 +35,7 @@ export default memo(function Editor({
     play,
     pause,
     setVisibleView
-  } = useHeroAnimation({ setState, htmlTab, scssTab, mouse });
+  } = useHeroAnimation({ setState, setHeaderBullets, htmlTab, scssTab, mouse });
 
   const handleButtonClick = useCallback(
     (view: Language) => {
@@ -81,7 +85,6 @@ export default memo(function Editor({
         playing: isPlaying && !isComplete,
         paused: hasStarted && !isPlaying && !isComplete,
         complete: !isPlaying && isComplete,
-        // stopped: !isPlaying || isComplete,
         showCaret: isPlaying || (!isComplete && forceCaretVisible),
         selectText: showSelectHighlight
       })}
@@ -136,8 +139,9 @@ export default memo(function Editor({
 });
 
 type EditorProps = {
-  setState: (value: any, name?: any) => void;
   showSelectHighlight: boolean;
+  setState: (value: any, name?: any) => void;
+  setHeaderBullets: Dispatch<SetStateAction<string[]>>;
 };
 
 const Tab = forwardRef<TabHandle, TabProps>(function Tab(
@@ -176,6 +180,6 @@ export type TabHandle = {
 type TabProps = {
   language: Language;
   currentView: Language;
-  children?: React.ReactNode;
+  children?: ReactNode;
   onClick(x: Language): void;
 };

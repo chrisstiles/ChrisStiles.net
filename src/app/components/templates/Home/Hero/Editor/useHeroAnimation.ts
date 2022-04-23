@@ -4,7 +4,9 @@ import {
   useEffect,
   useCallback,
   useMemo,
-  type RefObject
+  type RefObject,
+  type Dispatch,
+  type SetStateAction
 } from 'react';
 import useAnimationSteps, { StepType, type Step } from './useAnimationSteps';
 import Mouse from './Mouse';
@@ -17,15 +19,16 @@ import type { TabHandle } from './Editor';
 export default function useHeroAnimation({
   startDelay = 1000,
   minTypingDelay = 40,
-  maxTypingDelay = 150,
+  maxTypingDelay = 90,
   htmlTab,
   scssTab,
   mouse: _mouse,
-  setState
+  setState,
+  setHeaderBullets
 }: HeroAnimationConfig) {
   // The list of steps that runs one at a time
   // to build the entire hero animation
-  const steps = useAnimationSteps(setState);
+  const steps = useAnimationSteps(setState, setHeaderBullets);
 
   // This object manages the simulated mouse element
   const mouse = useMemo(() => {
@@ -136,11 +139,17 @@ export default function useHeroAnimation({
         lines.push({ text: '*|*', match: text, shouldType: true });
       } else {
         splitLines.forEach(line => {
-          const match = line.match(/\[-(.*)-\]/);
+          const match = line.match(/\[!?-(.*)-\]/);
 
           if (match) {
+            const shouldReverse = line.includes('[!-');
+            const text = shouldReverse
+              ? line.replace(match[0], `${match[1]}*|*`)
+              : line.replace(match[0], '*|*');
+
             lines.push({
-              text: line.replace(match[0], '*|*'),
+              shouldReverse,
+              text,
               match: match[1],
               start: match.index,
               shouldType: true
@@ -160,11 +169,17 @@ export default function useHeroAnimation({
       return new Promise<void>(async resolve => {
         const typeLine = async (line: TypedLine) => {
           return new Promise<string>(resolve => {
-            let text = line.match ?? line.text;
+            let hasStarted = false;
+
+            const text = line.match ?? line.text;
+            const fn = line.shouldReverse ? 'reduceRight' : 'reduce';
+            const endText = line.text.substring(
+              (line.start ?? 0) + text.length
+            );
 
             text
               .split('')
-              .reduce(
+              [fn](
                 async (
                   prevPromise: Promise<string>,
                   nextText: string,
@@ -173,17 +188,21 @@ export default function useHeroAnimation({
                   await prevPromise;
 
                   return await new Promise<string>(async resolve => {
-                    const delay =
-                      charIndex === 0
-                        ? 0
-                        : random(minTypingDelay, maxTypingDelay);
-
                     const start = (line.start ?? 0) + charIndex;
+                    const delay = !hasStarted
+                      ? 0
+                      : random(minTypingDelay, maxTypingDelay);
 
-                    line.text =
-                      line.text.substring(0, start) +
-                      nextText +
-                      line.text.substring(start);
+                    hasStarted = true;
+
+                    if (line.shouldReverse) {
+                      line.text = line.text.substring(0, start) + endText;
+                    } else {
+                      line.text =
+                        line.text.substring(0, start) +
+                        nextText +
+                        line.text.substring(start);
+                    }
 
                     await updateText(delay);
                     step.onType?.(line.text.replace('*|*', ''));
@@ -352,6 +371,7 @@ export default function useHeroAnimation({
 type TypedLine = {
   text: string;
   shouldType: boolean;
+  shouldReverse?: boolean;
   start?: number;
   match?: string;
 };
@@ -364,4 +384,5 @@ type HeroAnimationConfig = {
   htmlTab: RefObject<TabHandle>;
   scssTab: RefObject<TabHandle>;
   setState: SetHeroStateFunction;
+  setHeaderBullets: Dispatch<SetStateAction<string[]>>;
 };

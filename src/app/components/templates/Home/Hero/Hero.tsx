@@ -1,4 +1,9 @@
-import { useState, useCallback } from 'react';
+import {
+  useState,
+  useCallback,
+  type SetStateAction,
+  type Dispatch
+} from 'react';
 import styles from './Hero.module.scss';
 import Title from './Title';
 import Headline, { type HeadlineStyleProps } from './Headline';
@@ -6,7 +11,7 @@ import Editor from './Editor';
 import { Section } from '@elements';
 import { getState } from '@helpers';
 
-export default function Hero() {
+export default function Hero({ setHeaderBullets }: HeroProps) {
   const [state, _setState] = useState(initialState);
   const setState: SetHeroStateFunction = useCallback((value, name) => {
     !!value && _setState(state => getState(state, value, name));
@@ -30,8 +35,9 @@ export default function Hero() {
           />
         </div>
         <Editor
-          setState={setState}
           showSelectHighlight={state.showSelectHighlight}
+          setState={setState}
+          setHeaderBullets={setHeaderBullets}
         />
       </div>
     </Section>
@@ -50,6 +56,10 @@ const initialState: HeroState = {
   uppercaseText: false,
   showSpanColor: false,
   showBoundingBox: false
+};
+
+type HeroProps = {
+  setHeaderBullets: Dispatch<SetStateAction<string[]>>;
 };
 
 export type HeroState = HeadlineStyleProps & {
