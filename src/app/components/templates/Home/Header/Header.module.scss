@@ -33,6 +33,17 @@
       margin-left: 25px;
       opacity: 0.3;
       font-weight: 800;
+      display: inline-block;
+      transform: translate(-20px, 40px);
+      opacity: 0;
+      animation: separatorIn 0.5s cubic-bezier(0.12, 0.84, 0.19, 1) forwards;
+
+      @keyframes separatorIn {
+        to {
+          transform: translate(0, 0);
+          opacity: 0.3;
+        }
+      }
     }
 
     &:last-child {

@@ -205,7 +205,7 @@ export default function useHeroAnimation({
                     }
 
                     await updateText(delay);
-                    step.onType?.(line.text.replace('*|*', ''));
+                    step.onType?.(line.text.replace('*|*', '').trim());
 
                     if (isPlayingRef.current) {
                       resolve(nextText);
