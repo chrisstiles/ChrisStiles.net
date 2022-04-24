@@ -103,11 +103,20 @@ $borderRadius: 6px;
   &.hover {
     background-color: #282d40;
     color: #7e86a0;
+
+    svg {
+      opacity: 1;
+    }
   }
 
   &.active {
     background-color: #25293b !important;
     color: #fff !important;
+
+    svg {
+      mix-blend-mode: normal;
+      opacity: 1;
+    }
   }
 
   button {
@@ -117,6 +126,19 @@ $borderRadius: 6px;
     line-height: inherit;
     color: inherit;
     pointer-events: none;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  svg {
+    width: 1.15em;
+    height: 1.15em;
+    flex-grow: 0;
+    flex-shrink: 0;
+    margin-right: 5px;
+    mix-blend-mode: luminosity;
+    opacity: 0.6;
+    transition: all 0.2s;
   }
 }
 

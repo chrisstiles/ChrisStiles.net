@@ -175,6 +175,9 @@ const Tab = forwardRef<TabHandle, TabProps>(function Tab(
         tabIndex={-1}
         disabled
       >
+        <svg>
+          <use href={`#icon-${language}`} />
+        </svg>
         {children}
       </button>
     </div>
