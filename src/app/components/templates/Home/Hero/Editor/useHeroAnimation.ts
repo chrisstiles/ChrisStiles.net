@@ -8,6 +8,7 @@ import {
   type Dispatch,
   type SetStateAction
 } from 'react';
+import { flushSync } from 'react-dom';
 import useAnimationSteps, { StepType, type Step } from './useAnimationSteps';
 import Mouse from './Mouse';
 import { sleep } from '@helpers';
@@ -255,7 +256,12 @@ export default function useHeroAnimation({
               await queue(async () => {
                 step.onStart?.();
                 setState(step.startState);
-                fn(step.text ?? '');
+
+                if (shouldSelectText) {
+                  flushSync(() => fn(step.text ?? ''));
+                } else {
+                  fn(step.text ?? '');
+                }
               }, 0);
             } else {
               await type(step, view);

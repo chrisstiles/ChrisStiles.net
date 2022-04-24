@@ -8,12 +8,12 @@
       {
         "pathGroups": [
           {
-            "pattern": "react",
+            "pattern": "react*",
             "group": "index",
             "position": "before"
           },
           {
-            "pattern": "react",
+            "pattern": "react*",
             "group": "type",
             "position": "after"
           },

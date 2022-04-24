@@ -1,4 +1,4 @@
-import { memo, useMemo, useRef, useEffect, useState } from 'react';
+import { memo, useMemo, useRef, useEffect, useState, useId } from 'react';
 import styles from './LogoAnimation.module.scss';
 import gsap from 'gsap';
 import classNames from 'classnames';
@@ -58,8 +58,8 @@ function LogoColumn({
   const wrapper = useRef<HTMLDivElement>(null);
   const logoCount = logos?.length ?? 0;
 
-  // TODO replace this with new useId hook in React 18
-  const filterId = useMemo(() => `blur-filter-${index + 1}`, [index]);
+  const id = useId();
+  const filterId = useMemo(() => `blur-filter-${id}`, [id]);
   const blurFilter = useRef<SVGFEGaussianBlurElement>(null);
 
   const components = useMemo(() => {
