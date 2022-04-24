@@ -5,6 +5,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "analyze": "ANALYZE=true next build",
+    "analyze-source-map": "SOURCE_MAP=true next build && npx source-map-explorer \\.next/static/chunks/*.js --only-mapped",
+    "analyze-css": "SOURCE_MAP=true next build && npx source-map-explorer \\.next/static/css/*.css",
     "lint": "next lint",
     "audit": "npm audit --production",
     "audit-dev": "npm audit --development"
@@ -21,6 +24,7 @@
     "resize-observer-polyfill": "^1.5.1"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^12.1.5",
     "@svgr/webpack": "^6.2.1",
     "@types/dedent": "^0.7.0",
     "@types/lodash": "^4.14.179",

@@ -1,9 +1,10 @@
 const loaderUtils = require('loader-utils');
 const path = require('path');
 
-module.exports = {
+module.exports = withBundleAnalyzer({
   reactStrictMode: true,
   swcMinify: true,
+  productionBrowserSourceMaps: process.env.SOURCE_MAP === 'true',
   webpack(config) {
     config.module.rules.push({
       test: /\.svg$/,
@@ -13,8 +14,25 @@ module.exports = {
     });
 
     return config;
+  },
+  experimental: {
+    modularizeImports: {
+      lodash: {
+        transform: 'lodash/{{member}}'
+      }
+    }
   }
-};
+});
+
+function withBundleAnalyzer(config) {
+  if (process.env.ANALYZE === 'true') {
+    return require('@next/bundle-analyzer')({
+      enabled: true
+    })(config);
+  }
+
+  return config;
+}
 
 function findLoaderRules(config, loader) {
   const rules = config.module.rules.find(({ oneOf }) => !!oneOf);
