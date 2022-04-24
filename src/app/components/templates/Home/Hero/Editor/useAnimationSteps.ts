@@ -227,7 +227,8 @@ export default function useAnimationState(
       {
         text: '<main>*|*</main>',
         instant: true,
-        delay: closeTagDelay
+        delay: closeTagDelay,
+        completeState: { headlineBoundsVisible: true }
       },
       {
         text: `
@@ -269,8 +270,7 @@ export default function useAnimationState(
           </main>
         `,
         instant: true,
-        delay: closeTagDelay,
-        startState: { headlineBoundsVisible: true }
+        delay: closeTagDelay
       },
       {
         text: `

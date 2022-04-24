@@ -61,17 +61,18 @@ export default function BackgroundAccent() {
             <path
               id="accent-path-back"
               d="M819.587.909.683 141.855 4.91 234h825.37L819.587.909Z"
+              className={styles.back}
             />
             <path
               id="accent-path-front"
               d="M150.779 148.02 971.348 30.983l7.66 203.021-824.63-.039-3.599-85.945Z"
+              className={styles.front}
             />
             <clipPath id="accent-back-clip">
               <use href="#accent-path-back" />
             </clipPath>
             <rect
               id="accent-shape-back"
-              className={styles.back}
               clipPath="url(#accent-back-clip)"
               width="100%"
               height="100%"
@@ -79,7 +80,6 @@ export default function BackgroundAccent() {
             <use
               id="accent-shape-front-right"
               href="#accent-path-front"
-              className={styles.front}
             />
             <use
               id="accent-shape-front-left"
