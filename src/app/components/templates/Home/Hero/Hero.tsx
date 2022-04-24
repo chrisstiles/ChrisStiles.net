@@ -11,7 +11,10 @@ import Editor from './Editor';
 import { Section } from '@elements';
 import { getState } from '@helpers';
 
-export default function Hero({ setHeaderBullets }: HeroProps) {
+export default function Hero({
+  setHeaderBoundsVisible,
+  setHeaderBullets
+}: HeroProps) {
   const [state, _setState] = useState(initialState);
   const setState: SetHeroStateFunction = useCallback((value, name) => {
     !!value && _setState(state => getState(state, value, name));
@@ -31,12 +34,13 @@ export default function Hero({ setHeaderBullets }: HeroProps) {
             skewText={state.skewText}
             uppercaseText={state.uppercaseText}
             showSpanColor={state.showSpanColor}
-            showBoundingBox={state.showBoundingBox}
+            showBoundingBox={state.headlineBoundsVisible}
           />
         </div>
         <Editor
           showSelectHighlight={state.showSelectHighlight}
           setState={setState}
+          setHeaderBoundsVisible={setHeaderBoundsVisible}
           setHeaderBullets={setHeaderBullets}
         />
       </div>
@@ -55,10 +59,11 @@ const initialState: HeroState = {
   skewText: false,
   uppercaseText: false,
   showSpanColor: false,
-  showBoundingBox: false
+  headlineBoundsVisible: false
 };
 
 type HeroProps = {
+  setHeaderBoundsVisible: Dispatch<SetStateAction<boolean>>;
   setHeaderBullets: Dispatch<SetStateAction<string[]>>;
 };
 
@@ -66,6 +71,7 @@ export type HeroState = HeadlineStyleProps & {
   titleText: string;
   headlineText: string;
   showSelectHighlight: boolean;
+  headlineBoundsVisible: boolean;
 };
 
 export type SetHeroStateFunction = (

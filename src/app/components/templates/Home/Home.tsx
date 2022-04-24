@@ -6,12 +6,19 @@ import { GridLines } from '@elements';
 
 export default function HomeTemplate({ iconFileNames }: HomeTemplateProps) {
   const [headerBullets, setHeaderBullets] = useState<string[]>([]);
+  const [headerBoundsVisible, setHeaderBoundsVisible] = useState(false);
 
   return (
     <>
-      <Header bullets={headerBullets} />
+      <Header
+        showBoundingBox={headerBoundsVisible}
+        bullets={headerBullets}
+      />
       <main id="main">
-        <Hero setHeaderBullets={setHeaderBullets} />
+        <Hero
+          setHeaderBoundsVisible={setHeaderBoundsVisible}
+          setHeaderBullets={setHeaderBullets}
+        />
         <Experience iconFileNames={iconFileNames} />
         <GridLines />
       </main>

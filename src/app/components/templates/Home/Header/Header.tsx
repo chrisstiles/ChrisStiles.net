@@ -1,9 +1,10 @@
-import { memo } from 'react';
+import { memo, type ReactNode } from 'react';
 import styles from './Header.module.scss';
+import BoundingBox from '../BoundingBox';
 import Content from '@elements/Content';
 import Logo from '@images/logo.svg';
 
-export default function Header({ bullets }: HeaderProps) {
+export default function Header({ bullets, showBoundingBox }: HeaderProps) {
   return (
     <Content
       tag="header"
@@ -13,24 +14,41 @@ export default function Header({ bullets }: HeaderProps) {
         className={styles.logo}
         aria-label="Chris Stiles"
       />
-      {!!bullets.length && (
-        <ul className={styles.items}>
-          {bullets.map((text, index) => (
-            <Bullet
-              key={index}
-              text={text}
-            />
-          ))}
-        </ul>
-      )}
+      <div className={styles.itemsWrapper}>
+        {!!bullets.length && (
+          <ul className={styles.items}>
+            {bullets.map((text, index) => (
+              <Bullet key={index}>
+                {text}
+                <BoundingBox
+                  className={styles.box}
+                  isVisible={showBoundingBox && index === bullets.length - 1}
+                  animateIn={index > 0}
+                />
+              </Bullet>
+            ))}
+          </ul>
+        )}
+        {!bullets.length && (
+          <BoundingBox
+            className={styles.box}
+            isVisible={showBoundingBox}
+          />
+        )}
+      </div>
     </Content>
   );
 }
 
-const Bullet = memo(function Bullet({ text }: { text: string }) {
-  return <li>{text}</li>;
+const Bullet = memo(function Bullet({ children }: BulletProps) {
+  return <li>{children}</li>;
 });
 
 type HeaderProps = {
   bullets: string[];
+  showBoundingBox: boolean;
+};
+
+type BulletProps = {
+  children: ReactNode;
 };

@@ -1,0 +1,61 @@
+/* --------------------------- */
+/* Bounding Box */
+/* --------------------------- */
+
+$boxInitialScale: 0;
+$boxEnterTransition: transform 0.35s cubic-bezier(0.47, 0.01, 0.16, 1);
+$handleSize: 10px;
+$handleOffset: -$handleSize / 2;
+
+.box {
+  $offset: -12px;
+  position: absolute;
+  top: $offset + 3px;
+  right: $offset;
+  bottom: $offset - 3px;
+  left: $offset;
+  border: 1px solid #2aa5fc;
+  pointer-events: none;
+  transform-origin: 2px 2px;
+  transition: $boxEnterTransition, opacity 0.2s ease;
+  transition-delay: 0s;
+
+  &.small {
+    transform: scale($boxInitialScale);
+    opacity: 0;
+  }
+
+  &.hidden {
+    opacity: 0;
+    transition: opacity 0.3s;
+    transition-delay: 0.8s;
+  }
+}
+
+.handle {
+  position: absolute;
+  width: $handleSize;
+  height: $handleSize;
+  background-color: var(--page-background-color);
+  border: 1px solid #2aa5fc;
+
+  &:nth-child(1) {
+    top: $handleOffset;
+    left: $handleOffset;
+  }
+
+  &:nth-child(2) {
+    top: $handleOffset;
+    right: $handleOffset;
+  }
+
+  &:nth-child(3) {
+    bottom: $handleOffset;
+    right: $handleOffset;
+  }
+
+  &:nth-child(4) {
+    bottom: $handleOffset;
+    left: $handleOffset;
+  }
+}

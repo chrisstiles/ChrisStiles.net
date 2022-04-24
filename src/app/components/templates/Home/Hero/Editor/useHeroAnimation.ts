@@ -25,11 +25,16 @@ export default function useHeroAnimation({
   scssTab,
   mouse: _mouse,
   setState,
+  setHeaderBoundsVisible,
   setHeaderBullets
 }: HeroAnimationConfig) {
   // The list of steps that runs one at a time
   // to build the entire hero animation
-  const steps = useAnimationSteps(setState, setHeaderBullets);
+  const steps = useAnimationSteps(
+    setState,
+    setHeaderBoundsVisible,
+    setHeaderBullets
+  );
 
   // This object manages the simulated mouse element
   const mouse = useMemo(() => {
@@ -178,6 +183,9 @@ export default function useHeroAnimation({
               (line.start ?? 0) + text.length
             );
 
+            const minDelay = step.minTypingDelay ?? minTypingDelay;
+            const maxDelay = step.maxTypingDelay ?? maxTypingDelay;
+
             text
               .split('')
               [fn](
@@ -190,9 +198,7 @@ export default function useHeroAnimation({
 
                   return await new Promise<string>(async resolve => {
                     const start = (line.start ?? 0) + charIndex;
-                    const delay = !hasStarted
-                      ? 0
-                      : random(minTypingDelay, maxTypingDelay);
+                    const delay = !hasStarted ? 0 : random(minDelay, maxDelay);
 
                     hasStarted = true;
 
@@ -390,5 +396,6 @@ type HeroAnimationConfig = {
   htmlTab: RefObject<TabHandle>;
   scssTab: RefObject<TabHandle>;
   setState: SetHeroStateFunction;
+  setHeaderBoundsVisible: Dispatch<boolean>;
   setHeaderBullets: Dispatch<SetStateAction<string[]>>;
 };

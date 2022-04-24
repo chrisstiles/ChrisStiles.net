@@ -19,6 +19,7 @@ import { Language } from '@global';
 export default memo(function Editor({
   showSelectHighlight = false,
   setState,
+  setHeaderBoundsVisible,
   setHeaderBullets
 }: EditorProps) {
   const htmlTab = useRef<TabHandle>(null);
@@ -35,7 +36,14 @@ export default memo(function Editor({
     play,
     pause,
     setVisibleView
-  } = useHeroAnimation({ setState, setHeaderBullets, htmlTab, scssTab, mouse });
+  } = useHeroAnimation({
+    setState,
+    setHeaderBoundsVisible,
+    setHeaderBullets,
+    htmlTab,
+    scssTab,
+    mouse
+  });
 
   const handleButtonClick = useCallback(
     (view: Language) => {
@@ -141,6 +149,7 @@ export default memo(function Editor({
 type EditorProps = {
   showSelectHighlight: boolean;
   setState: (value: any, name?: any) => void;
+  setHeaderBoundsVisible: Dispatch<SetStateAction<boolean>>;
   setHeaderBullets: Dispatch<SetStateAction<string[]>>;
 };
 

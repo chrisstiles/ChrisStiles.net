@@ -23,6 +23,7 @@ const tagNewlineDelay = 250;
 
 export default function useAnimationState(
   setState: SetHeroStateFunction,
+  setHeaderBoundsVisible: Dispatch<boolean>,
   setHeaderBullets: Dispatch<SetStateAction<string[]>>
 ): Step[] {
   const steps: Step[] = useMemo(() => {
@@ -34,7 +35,10 @@ export default function useAnimationState(
       {
         text: '<header>*|*</header>',
         instant: true,
-        delay: closeTagDelay
+        delay: closeTagDelay,
+        onComplete() {
+          setHeaderBoundsVisible(true);
+        }
       },
       {
         text: `
@@ -192,6 +196,8 @@ export default function useAnimationState(
           </header>
         `,
         delay: 800,
+        minTypingDelay: 30,
+        maxTypingDelay: 50,
         onType(text) {
           setHeaderBullets(t => [t[0], t[1], strip(text)]);
         }
@@ -210,6 +216,9 @@ export default function useAnimationState(
         delay: 300,
         onType(text) {
           setHeaderBullets(t => [t[0], t[1], strip(text)]);
+        },
+        onComplete() {
+          setHeaderBoundsVisible(false);
         }
       },
       {
@@ -261,7 +270,7 @@ export default function useAnimationState(
         `,
         instant: true,
         delay: closeTagDelay,
-        startState: { showBoundingBox: true }
+        startState: { headlineBoundsVisible: true }
       },
       {
         text: `
@@ -456,7 +465,7 @@ export default function useAnimationState(
           }
         `,
         delay: tagNewlineDelay,
-        completeState: { showSpanColor: true, showBoundingBox: false }
+        completeState: { showSpanColor: true, headlineBoundsVisible: false }
       }
     ];
 
@@ -520,7 +529,7 @@ export default function useAnimationState(
     });
 
     return newSteps;
-  }, [setState, setHeaderBullets]);
+  }, [setState, setHeaderBoundsVisible, setHeaderBullets]);
 
   return steps;
 }
@@ -532,6 +541,8 @@ export type Step = {
   delay?: number;
   outputText?: boolean;
   type?: StepType;
+  minTypingDelay?: number;
+  maxTypingDelay?: number;
   moveCaretToLineEnd?: boolean;
   forceMouseVisible?: boolean;
   startState?: Partial<HeroState>;

@@ -29,6 +29,11 @@ $transitionDuration: 0.3s;
     will-change: color;
   }
 
+  &.empty {
+    width: 0.6em;
+    height: 1em;
+  }
+
   &.selectEmphasis {
     em {
       background-color: var(--highlight-dark-color);
@@ -75,77 +80,12 @@ $transitionDuration: 0.3s;
   }
 }
 
-$boxInitialScale: 0;
-$boxEnterTransition: transform 0.35s cubic-bezier(0.47, 0.01, 0.16, 1);
-
 .box {
-  $offset: -12px;
-  position: absolute;
-  top: $offset + 3px;
-  right: $offset;
-  bottom: $offset - 3px;
-  left: $offset;
-  border: 1px solid #2aa5fc;
-  pointer-events: none;
+  :global(.handle) {
+    transition: transform $transitionDuration;
 
-  &.hidden {
-    opacity: 0;
-    transition: opacity 0.4s;
-    transition-delay: 0.8s;
-  }
-
-  @at-root .headline.empty {
-    width: 0.6em;
-    height: 1em;
-
-    .box {
-      transform-origin: top left;
-      transition: $boxEnterTransition, opacity 0.2s ease;
-      transition-delay: 0s;
-
-      &.hidden {
-        transform: scale($boxInitialScale);
-        opacity: 0;
-      }
+    @at-root .skew & {
+      transform: skewY(-$skew);
     }
-  }
-
-  @at-root .uppercase & {
-    bottom: $offset + 4px;
-  }
-}
-
-.handle {
-  $size: 10px;
-  $offset: -$size / 2;
-  position: absolute;
-  width: $size;
-  height: $size;
-  background-color: var(--page-background-color);
-  border: 1px solid #2aa5fc;
-  transition: transform $transitionDuration;
-
-  &:nth-child(1) {
-    top: $offset;
-    left: $offset;
-  }
-
-  &:nth-child(2) {
-    top: $offset;
-    right: $offset;
-  }
-
-  &:nth-child(3) {
-    bottom: $offset;
-    right: $offset;
-  }
-
-  &:nth-child(4) {
-    bottom: $offset;
-    left: $offset;
-  }
-
-  @at-root .skew & {
-    transform: skewY(-$skew);
   }
 }

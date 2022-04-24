@@ -1,5 +1,6 @@
 import { useMemo, type ReactNode } from 'react';
 import styles from './Headline.module.scss';
+import BoundingBox from '../../BoundingBox';
 import classNames from 'classnames';
 
 export default function Headline({
@@ -49,24 +50,11 @@ export default function Headline({
       })}
     >
       <span className={styles.content}>{content}</span>
-      <BoundingBox isVisible={showBoundingBox} />
+      <BoundingBox
+        className={styles.box}
+        isVisible={showBoundingBox}
+      />
     </h1>
-  );
-}
-
-function BoundingBox({ isVisible = false }) {
-  return (
-    <div
-      aria-hidden="true"
-      className={classNames(styles.box, {
-        [styles.hidden]: !isVisible
-      })}
-    >
-      <div className={styles.handle} />
-      <div className={styles.handle} />
-      <div className={styles.handle} />
-      <div className={styles.handle} />
-    </div>
   );
 }
 
@@ -78,9 +66,9 @@ export type HeadlineStyleProps = {
   skewText: boolean;
   uppercaseText: boolean;
   showSpanColor: boolean;
-  showBoundingBox: boolean;
 };
 
 type HeadlineProps = HeadlineStyleProps & {
   text: string;
+  showBoundingBox: boolean;
 };
