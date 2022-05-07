@@ -28,6 +28,7 @@ export default memo(function Experience({ iconFileNames }: ExperienceProps) {
           )}
         </Content>
         <GridLines
+          className={styles.grid}
           solidColor="#262B3F"
           dashColor="#262B3F"
         />

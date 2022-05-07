@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Header from './Header';
 import Hero from './Hero';
 import Experience from './Experience';
+import Highlights from './Highlights';
 import { GridLines } from '@elements';
 
 export default function HomeTemplate({ iconFileNames }: HomeTemplateProps) {
@@ -20,8 +21,9 @@ export default function HomeTemplate({ iconFileNames }: HomeTemplateProps) {
           setHeaderBullets={setHeaderBullets}
         />
         <Experience iconFileNames={iconFileNames} />
-        <GridLines />
+        <Highlights />
       </main>
+      <GridLines />
     </>
   );
 }

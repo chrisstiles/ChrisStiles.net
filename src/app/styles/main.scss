@@ -48,6 +48,7 @@ body {
   font-family: var(--font);
   background-color: var(--page-background-color);
   color: #cacadb;
+  position: relative;
 }
 
 h1,
@@ -87,18 +88,14 @@ p {
   color: #fff;
 }
 
-:global {
-  #footer {
-    height: 60px;
-    display: flex;
-    align-items: center;
-    font-size: 14px;
-    text-transform: uppercase;
-    font-weight: 600;
-    letter-spacing: 0.03em;
-    background-color: var(--page-background-color);
-    color: #fff;
-  }
+#footer {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: #fff;
 }
 
 #icon-sprites {

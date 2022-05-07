@@ -2,6 +2,7 @@ import { useMemo, useRef } from 'react';
 import Prism, { type Grammar } from 'prismjs';
 import dedent from 'dedent';
 import 'prismjs/components/prism-scss';
+import 'prismjs/components/prism-typescript';
 import { Language } from '@global';
 
 Prism.languages.insertBefore(Language.JavaScript, 'keyword', {
@@ -79,6 +80,15 @@ const languages: { [key in Language]: Grammar } = {
   [Language.JavaScript]: Prism.languages.extend(Language.JavaScript, {
     punctuation: {
       pattern: Prism.languages.javascript.punctuation as RegExp,
+      inside: {
+        semicolon: /;/
+      }
+    },
+    ...sharedTokens
+  }),
+  [Language.TypeScript]: Prism.languages.extend(Language.TypeScript, {
+    punctuation: {
+      pattern: Prism.languages.typescript.punctuation as RegExp,
       inside: {
         semicolon: /;/
       }

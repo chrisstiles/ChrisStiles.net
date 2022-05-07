@@ -124,6 +124,14 @@ export default memo(function Editor({
           >
             styles.scss
           </Tab>
+          <Tab
+            // ref={scssTab}
+            language={Language.TypeScript}
+            currentView={visibleView}
+            onClick={handleButtonClick}
+          >
+            scripts.ts
+          </Tab>
         </div>
       </div>
       <div className={styles.code}>
@@ -138,6 +146,13 @@ export default memo(function Editor({
           language={Language.SCSS}
           isVisible={visibleView === Language.SCSS}
           content={scss}
+          numLines={numLines}
+          setNumLines={setNumLines}
+        />
+        <Code
+          language={Language.TypeScript}
+          isVisible={visibleView === Language.TypeScript}
+          content={'const test = "hello";'}
           numLines={numLines}
           setNumLines={setNumLines}
         />
@@ -175,7 +190,7 @@ const Tab = forwardRef<TabHandle, TabProps>(function Tab(
         tabIndex={-1}
         disabled
       >
-        <svg>
+        <svg aria-hidden="true">
           <use href={`#icon-${language}`} />
         </svg>
         {children}

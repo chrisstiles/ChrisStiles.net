@@ -8,6 +8,8 @@
   overflow: hidden;
   width: 100%;
   margin-top: -80px;
+  padding-bottom: 100px !important;
+  margin-bottom: -100px;
 }
 
 .contentWrapper {
@@ -29,4 +31,8 @@
   p {
     max-width: 580px;
   }
+}
+
+.grid {
+  top: -6px;
 }
