@@ -56,7 +56,7 @@ export default function useSyntaxHighlighting(
       }
     });
 
-    let currentLineIndex = lines.findIndex(l => l.includes('*|*'));
+    let currentLineIndex = lines.findIndex(l => l.includes('#|#'));
 
     if (currentLineIndex < 0) {
       currentLineIndex = prevLineIndex.current;
@@ -65,7 +65,7 @@ export default function useSyntaxHighlighting(
     prevLineIndex.current = currentLineIndex;
 
     return [
-      highlightedCode.replace('*|*', '<span class="token caret"></span>'),
+      highlightedCode.replace('#|#', '<span class="token caret"></span>'),
       lines,
       currentLineIndex
     ];
@@ -92,16 +92,11 @@ const javascriptGrammar = {
     }
   },
   import: {
-    pattern: /\b(import|as|from)\b/,
-    // pattern: /\bimport \*\b|\b(import|as|from)\b/,
+    pattern: /\bimport \*|\b(import|as|from)\b/,
     inside: {
-      star: {
-        pattern: /\*/
-        // greedy: true
-      }
+      star: /\*/
     }
   },
-  // operator: /--|\+\+|\*\*=?|=>|&&=?|\|\|=?|[!=]==|<<=?|>>>?=?|(?!\|)[-+*/%&|^!=<>](?!\|)=?|\.{3}|\?\?=?|\?\.?|[~:]/,
   operator:
     /--|\+\+|\*\*=?|=>|&&=?|\|\|=?|[!=]==|<<=?|>>>?=?|[-+/%&^!=<>]=?|\.{3}|\?\?=?|\?\.?|[~:]/,
   keyword: [

@@ -13,7 +13,7 @@ Special character keys:
 
 Typewriter text: [-  -]
 Typewriter delete text: [!-  -]
-Caret position: *|*
+Caret position: #|#
 Select text: (- -)
 
 */
@@ -26,33 +26,40 @@ export default function useAnimationState(
   setHeaderBoundsVisible: Dispatch<boolean>,
   setHeaderBullets: Dispatch<SetStateAction<string[]>>
 ): AnimationSteps {
-  const { steps, initialView }: AnimationSteps = useMemo(() => {
+  const { steps, initialView, baseText }: AnimationSteps = useMemo(() => {
     const steps: Step[] = [
       {
         view: Language.TypeScript,
-        text: `
-          import './styles.scss';
-          [-import * a-]
-        `
-        // blockIsComplete: true
+        text: `import './styles.scss';`,
+        isBaseText: true
       },
-      // {
-      //   view: Language.TypeScript,
-      //   text: `
-      //     import './styles.scss';
-      //     [-import * as effects from './fancy-effects';-]
-      //   `,
-      //   blockIsComplete: true
-      // },
       {
-        text: 'effects.addFlair();'
+        text: `import * as effects from '`
+      },
+      {
+        text: `import * as effects from '#|#'`,
+        instant: true,
+        delay: 10
+      },
+      {
+        text: `import * as effects from '[-./fancy-effects-]'`,
+        delay: 200
+      },
+      {
+        text: `import * as effects from './fancy-effects';\n`,
+        instant: true,
+        blockIsComplete: true
+      },
+      {
+        text: 'effects.addFlair();',
+        delay: 300
       },
       {
         view: Language.HTML,
         text: '<header>'
       },
       {
-        text: '<header>*|*</header>',
+        text: '<header>#|#</header>',
         instant: true,
         delay: closeTagDelay,
         onComplete() {
@@ -62,7 +69,7 @@ export default function useAnimationState(
       {
         text: `
           <header>
-            *|*
+            #|#
           </header>
         `,
         instant: true,
@@ -78,7 +85,7 @@ export default function useAnimationState(
       {
         text: `
           <header>
-            <ul>*|*</ul>
+            <ul>#|#</ul>
           </header>
         `,
         instant: true,
@@ -88,7 +95,7 @@ export default function useAnimationState(
         text: `
           <header>
             <ul>
-              *|*
+              #|#
             </ul>
           </header>
         `,
@@ -108,7 +115,7 @@ export default function useAnimationState(
         text: `
           <header>
             <ul>
-              <li>*|*</li>
+              <li>#|#</li>
             </ul>
           </header>
         `,
@@ -144,7 +151,7 @@ export default function useAnimationState(
           <header>
             <ul>
               <li>Software engineer</li>
-              <li>*|*</li>
+              <li>#|#</li>
             </ul>
           </header>
         `,
@@ -183,7 +190,7 @@ export default function useAnimationState(
             <ul>
               <li>Software engineer</li>
               <li>Interaction designer</li>
-              <li>*|*</li>
+              <li>#|#</li>
             </ul>
           </header>
         `,
@@ -244,7 +251,7 @@ export default function useAnimationState(
         text: '<main>'
       },
       {
-        text: '<main>*|*</main>',
+        text: '<main>#|#</main>',
         instant: true,
         delay: closeTagDelay,
         completeState: { headlineBoundsVisible: true }
@@ -252,7 +259,7 @@ export default function useAnimationState(
       {
         text: `
           <main>
-            *|*
+            #|#
           </main>
         `,
         instant: true,
@@ -268,7 +275,7 @@ export default function useAnimationState(
       {
         text: `
           <main>
-            <h1 class="*|*"
+            <h1 class="#|#"
           </main>
         `,
         instant: true,
@@ -285,7 +292,7 @@ export default function useAnimationState(
       {
         text: `
           <main>
-            <h1 class="headline">*|*</h1>
+            <h1 class="headline">#|#</h1>
           </main>
         `,
         instant: true,
@@ -295,7 +302,7 @@ export default function useAnimationState(
         text: `
           <main>
             <h1 class="headline">
-              *|*
+              #|#
             </h1>
           </main>
         `,
@@ -321,7 +328,7 @@ export default function useAnimationState(
         text: '.headline {',
         delay: 500
       },
-      { text: '.headline {*|*}', instant: true, delay: closeTagDelay },
+      { text: '.headline {#|#}', instant: true, delay: closeTagDelay },
       {
         text: `
           .headline {
@@ -370,7 +377,7 @@ export default function useAnimationState(
         text: `
           <main>
             <h1 class="headline">
-              Good ideas need *|* developers
+              Good ideas need #|# developers
             </h1>
           </main>
         `,
@@ -398,7 +405,7 @@ export default function useAnimationState(
         text: `
           <main>
             <h1 class="headline">
-              Good ideas need <em>*|*</em> developers
+              Good ideas need <em>#|#</em> developers
             </h1>
           </main>
         `,
@@ -439,7 +446,7 @@ export default function useAnimationState(
             font-size: 3.8rem;
             font-feature-settings: 'salt', 'calt';
             transform: skewY(-3.5deg);
-            *|*
+            #|#
           }
         `,
         instant: true
@@ -464,7 +471,7 @@ export default function useAnimationState(
             font-feature-settings: 'salt', 'calt';
             transform: skewY(-3.5deg);
 
-            em {*|*}
+            em {#|#}
           }
         `,
         instant: true,
@@ -495,7 +502,14 @@ export default function useAnimationState(
     let currentView = initialView;
     let shouldAddDelay = false;
 
+    const baseText: { [key in Language]?: string } = {
+      [Language.TypeScript]: '',
+      [Language.HTML]: '',
+      [Language.SCSS]: ''
+    };
+
     const blocks: { [key in Language]?: string } = {
+      [Language.TypeScript]: '',
       [Language.HTML]: '',
       [Language.SCSS]: ''
     };
@@ -512,28 +526,37 @@ export default function useAnimationState(
       }
 
       if (step.text) {
+        if (step.isBaseText) {
+          const text = step.text + '\n';
+
+          baseText[currentView] += text;
+          blocks[currentView] += text;
+        }
+
         step.text = (blocks[currentView] ?? '') + step.text.trimStart();
 
         if (step.blockIsComplete) {
           blocks[currentView] =
-            step.text.replace(/[([]!?-|-[)\]]|\*\|\*/g, '') + '\n';
+            step.text.replace(/[([]!?-|-[)\]]|#\|#/g, '') + '\n';
         }
       }
 
-      newSteps.push(step);
+      if (!step.isBaseText) {
+        newSteps.push(step);
 
-      if (step.moveCaretToLineEnd && step.text?.includes('-]')) {
-        newSteps.push({
-          text: step.text.replace(/\[!?-/, '').replace(/-\](.*)/, '$1*|*'),
-          delay: 100
-        });
+        if (step.moveCaretToLineEnd && step.text?.includes('-]')) {
+          newSteps.push({
+            text: step.text.replace(/\[!?-/, '').replace(/-\](.*)/, '$1#|#'),
+            delay: 100
+          });
+        }
       }
 
-      if (step.blockIsComplete) {
+      if (step.blockIsComplete || step.isBaseText) {
         shouldAddDelay = true;
 
         newSteps.push({
-          text: blocks[currentView] + '*|*',
+          text: blocks[currentView] + '#|#',
           instant: true,
           delay: 300
         });
@@ -548,19 +571,21 @@ export default function useAnimationState(
       }
     });
 
-    return { steps: newSteps, initialView };
+    return { steps: newSteps, initialView, baseText };
   }, [setState, setHeaderBoundsVisible, setHeaderBullets]);
 
-  return { steps, initialView };
+  return { steps, initialView, baseText };
 }
 
 type AnimationSteps = {
   steps: Step[];
   initialView: Language;
+  baseText: { [key in Language]?: string };
 };
 
 export type Step = {
   text?: string;
+  isBaseText?: boolean;
   view?: Language;
   instant?: boolean;
   delay?: number;

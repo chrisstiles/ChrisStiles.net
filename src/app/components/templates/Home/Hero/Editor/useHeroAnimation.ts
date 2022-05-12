@@ -31,7 +31,7 @@ export default function useHeroAnimation({
 }: HeroAnimationConfig) {
   // The list of steps that runs one at a time
   // to build the entire hero animation
-  const { steps, initialView } = useAnimationSteps(
+  const { steps, initialView, baseText } = useAnimationSteps(
     setState,
     setHeaderBoundsVisible,
     setHeaderBullets
@@ -46,9 +46,9 @@ export default function useHeroAnimation({
   const [isPlaying, setIsPlaying] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
-  const [typescript, setTypescript] = useState('');
-  const [html, setHtml] = useState('');
-  const [scss, setScss] = useState('');
+  const [typescript, setTypescript] = useState(baseText.typescript);
+  const [html, setHtml] = useState(baseText.html);
+  const [scss, setScss] = useState(baseText.scss);
   const timer = useRef<number>();
   const queuedAnimation = useRef<(() => void) | null>(null);
   const isPlayingRef = useRef(isPlaying);
@@ -156,7 +156,7 @@ export default function useHeroAnimation({
       };
 
       if (splitLines.length === 1 && !text.includes('[-')) {
-        lines.push({ text: '*|*', match: text, shouldType: true });
+        lines.push({ text: '#|#', match: text, shouldType: true });
       } else {
         splitLines.forEach(line => {
           const match = line.match(/\[!?-(.*)-\]/);
@@ -164,8 +164,8 @@ export default function useHeroAnimation({
           if (match) {
             const shouldReverse = line.includes('[!-');
             const text = shouldReverse
-              ? line.replace(match[0], `${match[1]}*|*`)
-              : line.replace(match[0], '*|*');
+              ? line.replace(match[0], `${match[1]}#|#`)
+              : line.replace(match[0], '#|#');
 
             lines.push({
               shouldReverse,
@@ -226,7 +226,7 @@ export default function useHeroAnimation({
                     }
 
                     await updateText(delay);
-                    step.onType?.(line.text.replace('*|*', '').trim());
+                    step.onType?.(line.text.replace('#|#', '').trim());
 
                     if (isPlayingRef.current) {
                       resolve(nextText);
@@ -307,7 +307,7 @@ export default function useHeroAnimation({
             step.onComplete?.();
 
             if (shoudIncrement) {
-              // setStepIndex(i => i + 1);
+              setStepIndex(i => i + 1);
             }
           }, step.delay);
         }
