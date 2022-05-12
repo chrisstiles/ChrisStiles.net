@@ -12,6 +12,14 @@ Prism.languages.insertBefore(Language.JavaScript, 'keyword', {
   }
 });
 
+Prism.languages.insertBefore(Language.JavaScript, 'punctuation', {
+  parentheses: /[()]/
+});
+
+Prism.languages.insertBefore(Language.TypeScript, 'punctuation', {
+  parentheses: /[()]/
+});
+
 export default function useSyntaxHighlighting(
   language: Language,
   text: string,
@@ -76,6 +84,40 @@ const sharedTokens: Tokens = {
   select: /\(-(.*)-\)/
 };
 
+const javascriptGrammar = {
+  punctuation: {
+    pattern: Prism.languages.javascript.punctuation as RegExp,
+    inside: {
+      semicolon: /;/
+    }
+  },
+  import: {
+    pattern: /\b(import|as|from)\b/,
+    // pattern: /\bimport \*\b|\b(import|as|from)\b/,
+    inside: {
+      star: {
+        pattern: /\*/
+        // greedy: true
+      }
+    }
+  },
+  // operator: /--|\+\+|\*\*=?|=>|&&=?|\|\|=?|[!=]==|<<=?|>>>?=?|(?!\|)[-+*/%&|^!=<>](?!\|)=?|\.{3}|\?\?=?|\?\.?|[~:]/,
+  operator:
+    /--|\+\+|\*\*=?|=>|&&=?|\|\|=?|[!=]==|<<=?|>>>?=?|[-+/%&^!=<>]=?|\.{3}|\?\?=?|\?\.?|[~:]/,
+  keyword: [
+    {
+      lookbehind: true,
+      pattern: /((?:^|\})\s*)catch\b/
+    },
+    {
+      lookbehind: true,
+      pattern:
+        /(^|[^.]|\.\.\.\s*)\b(?:assert(?=\s*\{)|async(?=\s*(?:function\b|\(|[$\w\xA0-\uFFFF]|$))|await|break|case|class|const|continue|debugger|default|delete|do|else|enum|export|extends|finally(?=\s*(?:\{|$))|for|function|(?:get|set)(?=\s*(?:[#\[$\w\xA0-\uFFFF]|$))|if|implements|in|instanceof|interface|let|new|null|of|package|private|protected|public|return|static|super|switch|this|throw|try|typeof|undefined|var|void|while|with|yield)\b/
+    }
+  ],
+  ...sharedTokens
+};
+
 const languages: { [key in Language]: Grammar } = {
   [Language.JavaScript]: Prism.languages.extend(Language.JavaScript, {
     punctuation: {
@@ -86,15 +128,10 @@ const languages: { [key in Language]: Grammar } = {
     },
     ...sharedTokens
   }),
-  [Language.TypeScript]: Prism.languages.extend(Language.TypeScript, {
-    punctuation: {
-      pattern: Prism.languages.typescript.punctuation as RegExp,
-      inside: {
-        semicolon: /;/
-      }
-    },
-    ...sharedTokens
-  }),
+  [Language.TypeScript]: Prism.languages.extend(
+    Language.TypeScript,
+    javascriptGrammar
+  ),
   [Language.HTML]: Prism.languages.extend(Language.HTML, {
     tag: {
       pattern: /<[^>]+>?/,

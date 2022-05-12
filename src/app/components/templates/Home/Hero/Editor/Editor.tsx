@@ -4,8 +4,8 @@ import {
   useCallback,
   useRef,
   useState,
+  useMemo,
   useImperativeHandle,
-  type ReactNode,
   type RefObject,
   type Dispatch,
   type SetStateAction
@@ -22,11 +22,13 @@ export default memo(function Editor({
   setHeaderBoundsVisible,
   setHeaderBullets
 }: EditorProps) {
+  const typescriptTab = useRef<TabHandle>(null);
   const htmlTab = useRef<TabHandle>(null);
   const scssTab = useRef<TabHandle>(null);
   const mouse = useRef<HTMLDivElement>(null);
 
   const {
+    typescript,
     html,
     scss,
     hasStarted,
@@ -40,6 +42,7 @@ export default memo(function Editor({
     setState,
     setHeaderBoundsVisible,
     setHeaderBullets,
+    typescriptTab,
     htmlTab,
     scssTab,
     mouse
@@ -52,6 +55,26 @@ export default memo(function Editor({
     },
     [setVisibleView, pause]
   );
+
+  const views = useMemo<EditorView[]>(() => {
+    return [
+      {
+        language: Language.TypeScript,
+        ref: typescriptTab,
+        label: 'scripts.ts'
+      },
+      {
+        language: Language.HTML,
+        ref: htmlTab,
+        label: 'home.html'
+      },
+      {
+        language: Language.SCSS,
+        ref: scssTab,
+        label: 'styles.scss'
+      }
+    ];
+  }, []);
 
   const mouseLeaveTimer = useRef<number>();
   const showCaretTimer = useRef<number>();
@@ -85,6 +108,49 @@ export default memo(function Editor({
 
   const [numLines, setNumLines] = useState(1);
 
+  const [tabComponents, codeComponents] = useMemo(() => {
+    const tabComponents: JSX.Element[] = [];
+    const codeComponents: JSX.Element[] = [];
+
+    const visibleViewIndex = views.findIndex(
+      ({ language }) => language === visibleView
+    );
+
+    const content: { [key in Language]?: string } = {
+      html,
+      scss,
+      typescript
+    };
+
+    views.forEach(({ language, ref, label }, index) => {
+      tabComponents.push(
+        <Tab
+          key={index}
+          ref={ref}
+          language={language}
+          label={label}
+          index={index}
+          currentIndex={visibleViewIndex}
+          onClick={handleButtonClick}
+        />
+      );
+
+      codeComponents.push(
+        <Code
+          key={index}
+          language={language}
+          index={index}
+          currentIndex={visibleViewIndex}
+          content={content[language]!}
+          numLines={numLines}
+          setNumLines={setNumLines}
+        />
+      );
+    });
+
+    return [tabComponents, codeComponents];
+  }, [views, visibleView, typescript, html, scss, numLines, handleButtonClick]);
+
   return (
     <div
       role="presentation"
@@ -107,56 +173,9 @@ export default memo(function Editor({
       </div>
       <div className={styles.top}>
         <span className={styles.dots} />
-        <div className={styles.tabs}>
-          <Tab
-            ref={htmlTab}
-            language={Language.HTML}
-            currentView={visibleView}
-            onClick={handleButtonClick}
-          >
-            index.html
-          </Tab>
-          <Tab
-            ref={scssTab}
-            language={Language.SCSS}
-            currentView={visibleView}
-            onClick={handleButtonClick}
-          >
-            styles.scss
-          </Tab>
-          <Tab
-            // ref={scssTab}
-            language={Language.TypeScript}
-            currentView={visibleView}
-            onClick={handleButtonClick}
-          >
-            scripts.ts
-          </Tab>
-        </div>
+        <div className={styles.tabs}>{tabComponents}</div>
       </div>
-      <div className={styles.code}>
-        <Code
-          language={Language.HTML}
-          isVisible={visibleView === Language.HTML}
-          content={html}
-          numLines={numLines}
-          setNumLines={setNumLines}
-        />
-        <Code
-          language={Language.SCSS}
-          isVisible={visibleView === Language.SCSS}
-          content={scss}
-          numLines={numLines}
-          setNumLines={setNumLines}
-        />
-        <Code
-          language={Language.TypeScript}
-          isVisible={visibleView === Language.TypeScript}
-          content={'const test = "hello";'}
-          numLines={numLines}
-          setNumLines={setNumLines}
-        />
-      </div>
+      <div className={styles.code}>{codeComponents}</div>
     </div>
   );
 });
@@ -169,7 +188,7 @@ type EditorProps = {
 };
 
 const Tab = forwardRef<TabHandle, TabProps>(function Tab(
-  { language, currentView, children, onClick },
+  { language, index, currentIndex, label, onClick },
   ref
 ) {
   const el = useRef<HTMLButtonElement>(null);
@@ -181,7 +200,7 @@ const Tab = forwardRef<TabHandle, TabProps>(function Tab(
     <div
       className={classNames(styles.tabWrapper, {
         [styles.hover]: isHovered,
-        [styles.active]: currentView === language
+        [styles.active]: index === currentIndex
       })}
       onClick={() => onClick(language)}
     >
@@ -193,11 +212,17 @@ const Tab = forwardRef<TabHandle, TabProps>(function Tab(
         <svg aria-hidden="true">
           <use href={`#icon-${language}`} />
         </svg>
-        {children}
+        {label}
       </button>
     </div>
   );
 });
+
+type EditorView = {
+  language: Language;
+  ref: RefObject<TabHandle>;
+  label: string;
+};
 
 export type TabHandle = {
   setIsHovered(x: boolean): void;
@@ -206,7 +231,8 @@ export type TabHandle = {
 
 type TabProps = {
   language: Language;
-  currentView: Language;
-  children?: ReactNode;
+  label: string;
+  index: number;
+  currentIndex: number;
   onClick(x: Language): void;
 };

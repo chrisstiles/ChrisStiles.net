@@ -14,7 +14,8 @@ import classNames from 'classnames';
 export default memo(function Code({
   language,
   content,
-  isVisible,
+  index,
+  currentIndex,
   numLines,
   setNumLines
 }: CodeProps) {
@@ -23,6 +24,7 @@ export default memo(function Code({
     content
   );
 
+  const isVisible = index === currentIndex;
   const prevNumLines = useRef(1);
 
   useEffect(() => {
@@ -75,7 +77,9 @@ export default memo(function Code({
   return (
     <div
       className={classNames(styles.wrapper, {
-        [styles.visible]: isVisible
+        [styles.visible]: isVisible,
+        [styles.shiftLeft]: currentIndex > index,
+        [styles.shiftRight]: currentIndex < index
       })}
     >
       <div className={styles.contentWrapper}>
@@ -103,7 +107,8 @@ export default memo(function Code({
 type CodeProps = {
   language: Language;
   content: string;
-  isVisible: boolean;
+  index: number;
+  currentIndex: number;
   numLines: number;
   setNumLines: Dispatch<SetStateAction<number>>;
   children?: React.ReactNode;

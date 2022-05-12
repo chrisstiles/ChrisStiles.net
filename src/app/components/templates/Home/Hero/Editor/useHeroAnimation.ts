@@ -21,6 +21,7 @@ export default function useHeroAnimation({
   startDelay = 1000,
   minTypingDelay = 40,
   maxTypingDelay = 90,
+  typescriptTab,
   htmlTab,
   scssTab,
   mouse: _mouse,
@@ -30,7 +31,7 @@ export default function useHeroAnimation({
 }: HeroAnimationConfig) {
   // The list of steps that runs one at a time
   // to build the entire hero animation
-  const steps = useAnimationSteps(
+  const { steps, initialView } = useAnimationSteps(
     setState,
     setHeaderBoundsVisible,
     setHeaderBullets
@@ -38,13 +39,14 @@ export default function useHeroAnimation({
 
   // This object manages the simulated mouse element
   const mouse = useMemo(() => {
-    return new Mouse(_mouse, htmlTab, scssTab);
-  }, [_mouse, htmlTab, scssTab]);
+    return new Mouse(_mouse, typescriptTab, htmlTab, scssTab);
+  }, [_mouse, typescriptTab, htmlTab, scssTab]);
 
   const [hasStarted, setHasStarted] = useState(startDelay === 0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
+  const [typescript, setTypescript] = useState('');
   const [html, setHtml] = useState('');
   const [scss, setScss] = useState('');
   const timer = useRef<number>();
@@ -57,9 +59,9 @@ export default function useHeroAnimation({
   // track of which editor the current animation step
   // belongs to, and if necessary will switch back to
   // the correct tab when the animation resumes
-  const [visibleView, setVisibleView] = useState(Language.HTML);
-  const visibleViewRef = useRef(Language.HTML);
-  const animatingView = useRef(Language.HTML);
+  const [visibleView, setVisibleView] = useState(initialView);
+  const visibleViewRef = useRef(initialView);
+  const animatingView = useRef(initialView);
 
   useEffect(() => {
     visibleViewRef.current = visibleView;
@@ -121,10 +123,22 @@ export default function useHeroAnimation({
     [ensureAnimatingViewIsVisible]
   );
 
+  const updateViewContent = useCallback((view: Language, text: string) => {
+    const fn = {
+      [Language.TypeScript]: setTypescript,
+      [Language.JavaScript]: null,
+      [Language.HTML]: setHtml,
+      [Language.SCSS]: setScss
+    }[view];
+
+    if (fn) {
+      fn(text);
+    }
+  }, []);
+
   const type = useCallback(
     async (step: Step, view: Language) => {
       const { text = '' } = step;
-      const fn = view === Language.HTML ? setHtml : setScss;
       const splitLines: string[] = text.split('\n');
       const lines: TypedLine[] = [];
       let hasStarted = false;
@@ -137,7 +151,7 @@ export default function useHeroAnimation({
             setState(step.startState);
           }
 
-          fn(lines.map(({ text }) => text).join('\n'));
+          updateViewContent(view, lines.map(({ text }) => text).join('\n'));
         }, delay);
       };
 
@@ -234,7 +248,7 @@ export default function useHeroAnimation({
         resolve();
       });
     },
-    [queue, setState, minTypingDelay, maxTypingDelay]
+    [queue, updateViewContent, setState, minTypingDelay, maxTypingDelay]
   );
 
   // Handle updating specific step
@@ -258,15 +272,14 @@ export default function useHeroAnimation({
 
           return queue(async () => {
             if (step.instant || shouldSelectText) {
-              const fn = view === Language.HTML ? setHtml : setScss;
               await queue(async () => {
                 step.onStart?.();
                 setState(step.startState);
 
                 if (shouldSelectText) {
-                  flushSync(() => fn(step.text ?? ''));
+                  flushSync(() => updateViewContent(view, step.text ?? ''));
                 } else {
-                  fn(step.text ?? '');
+                  updateViewContent(view, step.text ?? '');
                 }
               }, 0);
             } else {
@@ -294,7 +307,7 @@ export default function useHeroAnimation({
             step.onComplete?.();
 
             if (shoudIncrement) {
-              setStepIndex(i => i + 1);
+              // setStepIndex(i => i + 1);
             }
           }, step.delay);
         }
@@ -302,7 +315,14 @@ export default function useHeroAnimation({
         return Promise.resolve();
       }
     },
-    [ensureAnimatingViewIsVisible, queue, setState, type, mouse]
+    [
+      ensureAnimatingViewIsVisible,
+      queue,
+      setState,
+      updateViewContent,
+      type,
+      mouse
+    ]
   );
 
   // Start running animation initially after a delay
@@ -369,6 +389,7 @@ export default function useHeroAnimation({
 
   return {
     visibleView,
+    typescript,
     html,
     scss,
     hasStarted,
@@ -393,6 +414,7 @@ type HeroAnimationConfig = {
   minTypingDelay?: number;
   maxTypingDelay?: number;
   mouse: RefObject<HTMLDivElement>;
+  typescriptTab: RefObject<TabHandle>;
   htmlTab: RefObject<TabHandle>;
   scssTab: RefObject<TabHandle>;
   setState: SetHeroStateFunction;

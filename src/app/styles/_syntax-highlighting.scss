@@ -66,22 +66,49 @@
 }
 
 /* --------------------------- */
-/* JavaScript */
+/* JavaScript & TypeScript */
 
 .code-javascript {
   color: #9fb4cf;
+}
 
+.code-typescript {
+  color: #a6accd;
+}
+
+.code-javascript,
+.code-typescript {
   .operator,
   .keyword {
     color: #c791ea;
+  }
+
+  .import {
+    color: #89ddff;
+
+    + .operator {
+      color: #f78c6c;
+    }
   }
 
   .this {
     color: #ff5270;
   }
 
+  .string {
+    color: #c3e88d;
+  }
+
+  .function {
+    color: #82aaff;
+  }
+
   .class-name {
     color: #ffcb6b;
+  }
+
+  .parentheses {
+    color: #179fff;
   }
 
   .semicolon {

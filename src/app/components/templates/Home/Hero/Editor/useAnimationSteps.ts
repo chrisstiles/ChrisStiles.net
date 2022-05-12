@@ -25,12 +25,31 @@ export default function useAnimationState(
   setState: SetHeroStateFunction,
   setHeaderBoundsVisible: Dispatch<boolean>,
   setHeaderBullets: Dispatch<SetStateAction<string[]>>
-): Step[] {
-  const steps: Step[] = useMemo(() => {
+): AnimationSteps {
+  const { steps, initialView }: AnimationSteps = useMemo(() => {
     const steps: Step[] = [
       {
-        text: '<header>',
-        view: Language.HTML
+        view: Language.TypeScript,
+        text: `
+          import './styles.scss';
+          [-import * a-]
+        `
+        // blockIsComplete: true
+      },
+      // {
+      //   view: Language.TypeScript,
+      //   text: `
+      //     import './styles.scss';
+      //     [-import * as effects from './fancy-effects';-]
+      //   `,
+      //   blockIsComplete: true
+      // },
+      {
+        text: 'effects.addFlair();'
+      },
+      {
+        view: Language.HTML,
+        text: '<header>'
       },
       {
         text: '<header>*|*</header>',
@@ -298,8 +317,8 @@ export default function useAnimationState(
         }
       },
       {
-        text: '.headline {',
         view: Language.SCSS,
+        text: '.headline {',
         delay: 500
       },
       { text: '.headline {*|*}', instant: true, delay: closeTagDelay },
@@ -332,6 +351,7 @@ export default function useAnimationState(
         completeState: { alternateGlyphs: true }
       },
       {
+        view: Language.HTML,
         text: `
           <main>
             <h1 class="headline">
@@ -339,7 +359,6 @@ export default function useAnimationState(
             </h1>
           </main>
         `,
-        view: Language.HTML,
         forceMouseVisible: true,
         instant: true,
         delay: 0,
@@ -402,6 +421,7 @@ export default function useAnimationState(
         }
       },
       {
+        view: Language.SCSS,
         text: `
           .headline {
             font-weight: 800;
@@ -410,7 +430,6 @@ export default function useAnimationState(
             [-transform: skewY(-3.5deg);-]
           }
         `,
-        view: Language.SCSS,
         completeState: { skewText: true }
       },
       {
@@ -472,7 +491,8 @@ export default function useAnimationState(
     // When a top level element or block of code is complete,
     // we store and automatically append it to avoid
     // having to retype the same code for every step
-    let currentView: Language = Language.HTML;
+    const initialView = steps.find(s => s.view)?.view ?? Language.TypeScript;
+    let currentView = initialView;
     let shouldAddDelay = false;
 
     const blocks: { [key in Language]?: string } = {
@@ -528,11 +548,16 @@ export default function useAnimationState(
       }
     });
 
-    return newSteps;
+    return { steps: newSteps, initialView };
   }, [setState, setHeaderBoundsVisible, setHeaderBullets]);
 
-  return steps;
+  return { steps, initialView };
 }
+
+type AnimationSteps = {
+  steps: Step[];
+  initialView: Language;
+};
 
 export type Step = {
   text?: string;

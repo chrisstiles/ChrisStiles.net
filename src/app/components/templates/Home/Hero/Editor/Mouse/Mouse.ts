@@ -9,11 +9,13 @@ import type { TabHandle } from '../Editor';
 export default class Mouse {
   constructor(
     mouse: RefObject<HTMLDivElement>,
+    typescriptTab: RefObject<TabHandle>,
     htmlTab: RefObject<TabHandle>,
     scssTab: RefObject<TabHandle>
   ) {
     this._mouse = mouse;
     this.tabs = {
+      [Language.TypeScript]: typescriptTab,
       [Language.HTML]: htmlTab,
       [Language.SCSS]: scssTab
     };
