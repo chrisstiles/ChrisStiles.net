@@ -38,6 +38,7 @@ export default function Headline({
 
   return (
     <h1
+      aria-label="Good ideas need great developers"
       className={classNames(styles.headline, {
         [styles.empty]: !content,
         [styles.selectEmphasis]: selectEmphasis,
@@ -49,7 +50,12 @@ export default function Headline({
         [styles.uppercase]: uppercaseText
       })}
     >
-      <span className={styles.content}>{content}</span>
+      <span
+        className={styles.content}
+        aria-hidden="true"
+      >
+        {content}
+      </span>
       <BoundingBox
         className={styles.box}
         isVisible={showBoundingBox}

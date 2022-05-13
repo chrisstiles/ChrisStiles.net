@@ -14,9 +14,15 @@ export default function Header({ bullets, showBoundingBox }: HeaderProps) {
         className={styles.logo}
         aria-label="Chris Stiles"
       />
-      <div className={styles.itemsWrapper}>
+      <div
+        className={styles.itemsWrapper}
+        aria-label="Software engineer, interaction designer, problem solver"
+      >
         {!!bullets.length && (
-          <ul className={styles.items}>
+          <ul
+            aria-hidden="true"
+            className={styles.items}
+          >
             {bullets.map((text, index) => (
               <Bullet key={index}>
                 {text}
