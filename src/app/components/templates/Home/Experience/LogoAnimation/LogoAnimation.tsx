@@ -112,7 +112,6 @@ function LogoColumn({
   const hasStartedLogoAnimation = useRef(false);
   const isPlayingRef = useRef(false);
   const logoTween = useRef<gsap.core.Tween | null>(null);
-  const logoVelocity = useRef(5);
 
   useEffect(() => {
     isPlayingRef.current =
@@ -137,7 +136,7 @@ function LogoColumn({
       // number of logos to ensure all
       // columns animate at the same speed
       const baseCount = 10;
-      const baseDuration = 30;
+      const baseDuration = 28;
       const duration = (baseDuration * logoCount) / baseCount;
       const distance = logoCount * size;
 
@@ -181,12 +180,16 @@ function LogoColumn({
       gsap.set(wrapper.current, { y: Math.round(translate) });
       setHasInitialPosition(true);
 
-      const multiplier = 0.7;
+      const multiplier = 0.6;
+      const minBlur = 0;
+      const minBlurThreshold = 0.05;
+      const zeroBlurVelocity = 0.06;
+
       const getValue = gsap.getProperty(wrapper.current);
       const getPosition = () => {
         return {
-          x: Number(getValue('x')),
-          y: Number(getValue('y'))
+          x: getValue('x') as number,
+          y: getValue('y') as number
         };
       };
 
@@ -202,58 +205,89 @@ function LogoColumn({
         animVal: 0
       };
 
+      let hasInitialPosition = false;
+      let hasBlurX = false;
+      let hasBlurY = false;
+      let hasCompleteBlurX = false;
+      let hasCompleteBlurY = false;
+
       columnTween.current = gsap.to(wrapper.current, {
         y:
           direction === 'down'
             ? 0
             : -height + wrapperSize + (logoSize + logoOffset) * 2,
-        duration: 3.8 - index * 0.51,
+        duration: 3.2 - index * 0.5,
         ease: 'expo.out',
         paused: !isVisible,
         delay: index * 0.25,
+        onStart() {
+          hasStartedLogoAnimation.current = true;
+          isPlayingRef.current = true;
+          logoTween.current?.play();
+        },
         onUpdate() {
+          if (!blurFilter.current || hasCompleteBlurX || hasCompleteBlurY) {
+            return;
+          }
+
           const { x, y } = getPosition();
 
-          if (x === prevPosition.x && y === prevPosition.y) {
+          // Don't add blur on first frame since we don't
+          // know the starting velocity yet
+          if (!hasInitialPosition) {
+            hasInitialPosition = true;
+            prevPosition.x = x;
+            prevPosition.y = y;
             return;
           }
 
           const deltaRatio = gsap.ticker.deltaRatio(60);
-
           const dx = Math.abs(x - prevPosition.x);
           const dy = Math.abs(y - prevPosition.y);
 
-          const vx = dx / deltaRatio;
-          const vy = dy / deltaRatio;
+          let vx = dx / deltaRatio;
+          let vy = dy / deltaRatio;
 
-          const startLogoAnimationVelocity = logoVelocity.current + 0.2;
-          const canStartLogoAnimation =
-            (vx > 0 && vx <= startLogoAnimationVelocity) ||
-            (vy > 0 && vy <= startLogoAnimationVelocity);
+          if (vx <= zeroBlurVelocity) vx = 0;
+          if (vy <= zeroBlurVelocity) vy = 0;
 
-          if (
-            !hasStartedLogoAnimation.current &&
-            canStartLogoAnimation &&
-            this.progress() >= 0.4
-          ) {
-            hasStartedLogoAnimation.current = true;
-            isPlayingRef.current = true;
-            logoTween.current?.play();
+          let bx = vx * multiplier;
+          let by = vy * multiplier;
+
+          if ((hasBlurX || hasBlurY) && (vx > 0 || vy > 0)) {
+            const progress = this.progress();
+
+            if (progress >= 0.4) {
+              const adjustment = progress < 0.6 ? 1 - progress : 0;
+
+              if (hasBlurX && bx <= minBlurThreshold) by *= adjustment;
+              if (hasBlurY && by <= minBlurThreshold) by *= adjustment;
+            }
           }
 
-          if (!blurFilter.current) {
+          if (hasBlurX && bx === 0) hasCompleteBlurX = true;
+          if (hasBlurY && by === 0) hasCompleteBlurY = true;
+
+          // Ensure the motion blur does not increase during animation
+          if (
+            (hasBlurX && blurX.baseVal && blurX.baseVal < bx) ||
+            (hasBlurY && blurY.baseVal && blurY.baseVal < by)
+          ) {
             return;
           }
 
-          blurX.baseVal = vx * multiplier;
-          blurY.baseVal = vy * multiplier;
+          if (!hasBlurX && bx !== blurX.baseVal) hasBlurX = true;
+          if (!hasBlurY && by !== blurY.baseVal) hasBlurY = true;
+
+          blurX.baseVal = bx && minBlur ? Math.max(bx, minBlur) : bx;
+          blurY.baseVal = by && minBlur ? Math.max(by, minBlur) : by;
 
           prevPosition.x = x;
           prevPosition.y = y;
         },
         onComplete() {
-          blurX.baseVal = 0;
-          blurY.baseVal = 0;
+          blurX.baseVal = minBlur;
+          blurY.baseVal = minBlur;
         }
       });
     }
