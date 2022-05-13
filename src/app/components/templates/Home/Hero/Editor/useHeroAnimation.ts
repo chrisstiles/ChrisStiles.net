@@ -73,17 +73,22 @@ export default function useHeroAnimation({
     async (
       view = animatingView.current,
       hideOnComplete = true,
-      delay = 700
+      startDelay = 300,
+      endDelay = 700
     ) => {
       if (
         (isPlayingRef.current && visibleViewRef.current !== view) ||
         animatingView.current !== view
       ) {
-        await mouse.clickTab(view, hideOnComplete);
+        await mouse.clickTab(view, {
+          hideOnComplete,
+          delay: startDelay / 1000
+        });
+
         visibleViewRef.current = animatingView.current;
         animatingView.current = view;
         setVisibleView(view);
-        await sleep(delay);
+        await sleep(endDelay);
       }
     },
     [mouse]

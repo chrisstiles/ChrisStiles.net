@@ -1,4 +1,5 @@
 import { useMemo, type Dispatch, type SetStateAction } from 'react';
+import { sleep } from '@helpers';
 import { Language } from '@global';
 import type { HeroState, SetHeroStateFunction } from '../Hero';
 
@@ -54,7 +55,8 @@ export default function useAnimationState({
       {
         text: 'effects.addFlair();',
         delay: 300,
-        onComplete() {
+        async onComplete() {
+          await sleep(300);
           setAccentsVisible(true);
         }
       },

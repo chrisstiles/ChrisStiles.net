@@ -245,7 +245,8 @@ export default class Mouse {
   }
 
   // Animates mouse to a tab and clicks it
-  async clickTab(language: Language, hideOnComplete = true) {
+  // async clickTab(language: Language, hideOnComplete = true) {
+  async clickTab(language: Language, opts: AnimationOptions = {}) {
     const tab = this.getTab(language);
 
     if (!tab?.el.current) {
@@ -256,8 +257,12 @@ export default class Mouse {
     let hasHovered = false;
 
     return this.clickElement(tab.el.current, {
-      hideOnComplete,
+      ...opts,
       onUpdate: () => {
+        if (opts.onUpdate) {
+          opts.onUpdate();
+        }
+
         if (!hasHovered && this.mouse) {
           const mouseRect = this.mouse.getBoundingClientRect();
           const xOverlap =
@@ -273,6 +278,10 @@ export default class Mouse {
         }
       },
       onComplete: () => {
+        if (opts.onComplete) {
+          opts.onComplete();
+        }
+
         tab.setIsHovered(false);
       }
     });
