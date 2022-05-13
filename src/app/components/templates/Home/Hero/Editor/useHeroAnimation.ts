@@ -27,15 +27,17 @@ export default function useHeroAnimation({
   mouse: _mouse,
   setState,
   setHeaderBoundsVisible,
-  setHeaderBullets
+  setHeaderBullets,
+  setAccentsVisible
 }: HeroAnimationConfig) {
   // The list of steps that runs one at a time
   // to build the entire hero animation
-  const { steps, initialView, baseText } = useAnimationSteps(
+  const { steps, initialView, baseText } = useAnimationSteps({
     setState,
     setHeaderBoundsVisible,
-    setHeaderBullets
-  );
+    setHeaderBullets,
+    setAccentsVisible
+  });
 
   // This object manages the simulated mouse element
   const mouse = useMemo(() => {
@@ -420,4 +422,5 @@ type HeroAnimationConfig = {
   setState: SetHeroStateFunction;
   setHeaderBoundsVisible: Dispatch<boolean>;
   setHeaderBullets: Dispatch<SetStateAction<string[]>>;
+  setAccentsVisible: Dispatch<boolean>;
 };

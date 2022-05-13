@@ -4,7 +4,10 @@ import LogoAnimation from './LogoAnimation';
 import BackgroundAccent from './BackgroundAccent';
 import { Section, Content, H2, GridLines } from '@elements';
 
-export default memo(function Experience({ iconFileNames }: ExperienceProps) {
+export default memo(function Experience({
+  iconFileNames,
+  accentsVisible
+}: ExperienceProps) {
   return (
     <Section
       className={styles.wrapper}
@@ -33,11 +36,12 @@ export default memo(function Experience({ iconFileNames }: ExperienceProps) {
           dashColor="#262B3F"
         />
       </div>
-      <BackgroundAccent />
+      <BackgroundAccent isVisible={accentsVisible} />
     </Section>
   );
 });
 
 type ExperienceProps = {
   iconFileNames: string[];
+  accentsVisible: boolean;
 };

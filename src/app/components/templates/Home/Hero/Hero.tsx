@@ -13,7 +13,8 @@ import { getState } from '@helpers';
 
 export default function Hero({
   setHeaderBoundsVisible,
-  setHeaderBullets
+  setHeaderBullets,
+  setAccentsVisible
 }: HeroProps) {
   const [state, _setState] = useState(initialState);
   const setState: SetHeroStateFunction = useCallback((value, name) => {
@@ -42,6 +43,7 @@ export default function Hero({
           setState={setState}
           setHeaderBoundsVisible={setHeaderBoundsVisible}
           setHeaderBullets={setHeaderBullets}
+          setAccentsVisible={setAccentsVisible}
         />
       </div>
     </Section>
@@ -65,6 +67,7 @@ const initialState: HeroState = {
 type HeroProps = {
   setHeaderBoundsVisible: Dispatch<SetStateAction<boolean>>;
   setHeaderBullets: Dispatch<SetStateAction<string[]>>;
+  setAccentsVisible: Dispatch<SetStateAction<boolean>>;
 };
 
 export type HeroState = HeadlineStyleProps & {

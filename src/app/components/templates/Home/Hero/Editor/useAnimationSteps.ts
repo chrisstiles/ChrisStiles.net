@@ -21,11 +21,12 @@ Select text: (- -)
 const closeTagDelay = 200;
 const tagNewlineDelay = 250;
 
-export default function useAnimationState(
-  setState: SetHeroStateFunction,
-  setHeaderBoundsVisible: Dispatch<boolean>,
-  setHeaderBullets: Dispatch<SetStateAction<string[]>>
-): AnimationSteps {
+export default function useAnimationState({
+  setState,
+  setHeaderBoundsVisible,
+  setHeaderBullets,
+  setAccentsVisible
+}: AnimationStepsConfig): AnimationSteps {
   const { steps, initialView, baseText }: AnimationSteps = useMemo(() => {
     const steps: Step[] = [
       {
@@ -52,7 +53,10 @@ export default function useAnimationState(
       },
       {
         text: 'effects.addFlair();',
-        delay: 300
+        delay: 300,
+        onComplete() {
+          setAccentsVisible(true);
+        }
       },
       {
         view: Language.HTML,
@@ -576,6 +580,13 @@ export default function useAnimationState(
 
   return { steps, initialView, baseText };
 }
+
+type AnimationStepsConfig = {
+  setState: SetHeroStateFunction;
+  setHeaderBoundsVisible: Dispatch<boolean>;
+  setHeaderBullets: Dispatch<SetStateAction<string[]>>;
+  setAccentsVisible: Dispatch<boolean>;
+};
 
 type AnimationSteps = {
   steps: Step[];

@@ -1,13 +1,16 @@
 import styles from './BackgroundAccent.module.scss';
 import classNames from 'classnames';
 
-export default function BackgroundAccent() {
+export default function BackgroundAccent({ isVisible }: BackgroundAccentProps) {
   return (
     <>
       <svg
         width="0"
         height="0"
         viewBox="0 0 825 235"
+        className={classNames({
+          [styles.hidden]: !isVisible
+        })}
         aria-hidden="true"
       >
         <svg
@@ -94,6 +97,10 @@ export default function BackgroundAccent() {
     </>
   );
 }
+
+type BackgroundAccentProps = {
+  isVisible: boolean;
+};
 
 function Shape({ className }: { className?: string }) {
   return (

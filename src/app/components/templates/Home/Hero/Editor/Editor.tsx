@@ -20,7 +20,8 @@ export default memo(function Editor({
   showSelectHighlight = false,
   setState,
   setHeaderBoundsVisible,
-  setHeaderBullets
+  setHeaderBullets,
+  setAccentsVisible
 }: EditorProps) {
   const typescriptTab = useRef<TabHandle>(null);
   const htmlTab = useRef<TabHandle>(null);
@@ -42,6 +43,7 @@ export default memo(function Editor({
     setState,
     setHeaderBoundsVisible,
     setHeaderBullets,
+    setAccentsVisible,
     typescriptTab,
     htmlTab,
     scssTab,
@@ -185,6 +187,7 @@ type EditorProps = {
   setState: (value: any, name?: any) => void;
   setHeaderBoundsVisible: Dispatch<SetStateAction<boolean>>;
   setHeaderBullets: Dispatch<SetStateAction<string[]>>;
+  setAccentsVisible: Dispatch<SetStateAction<boolean>>;
 };
 
 const Tab = forwardRef<TabHandle, TabProps>(function Tab(
