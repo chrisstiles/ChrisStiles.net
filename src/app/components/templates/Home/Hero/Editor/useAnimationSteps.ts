@@ -578,7 +578,7 @@ export default function useAnimationState({
     });
 
     return { steps: newSteps, initialView, baseText };
-  }, [setState, setHeaderBoundsVisible, setHeaderBullets]);
+  }, [setState, setHeaderBoundsVisible, setHeaderBullets, setAccentsVisible]);
 
   return { steps, initialView, baseText };
 }

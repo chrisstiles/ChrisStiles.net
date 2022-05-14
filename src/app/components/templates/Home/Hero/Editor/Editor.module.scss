@@ -50,6 +50,7 @@ $borderRadius: 8px;
   color: #525976;
   position: relative;
   flex-grow: 0;
+  flex-shrink: 0;
   margin-left: 10px;
 
   &:before,
@@ -167,11 +168,11 @@ $borderRadius: 8px;
 
 $clickPulseDuration: 420ms;
 $doubleClickPulseDuration: 400ms;
+$initialMouseX: 70%;
+$initialMouseY: 30%;
 
 .mouse {
   $size: 30px;
-  $initialX: 70%;
-  $initialY: 30%;
   $pulseOffset: 9px;
   $pulseOpacity: 0.25;
 
@@ -183,8 +184,6 @@ $doubleClickPulseDuration: 400ms;
   background-color: currentColor;
   z-index: 300;
   pointer-events: none;
-  top: $initialY;
-  left: $initialX;
   transition: opacity 0.2s;
   opacity: 0;
 
@@ -255,4 +254,6 @@ $doubleClickPulseDuration: 400ms;
 :export {
   clickPulseDuration: $clickPulseDuration;
   clickColor: app.$greenAccentDark;
+  initialMouseX: $initialMouseX;
+  initialMouseY: $initialMouseY;
 }

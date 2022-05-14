@@ -1,10 +1,18 @@
-import { clickPulseDuration, clickColor } from '../Editor.module.scss';
+import {
+  clickPulseDuration,
+  clickColor,
+  initialMouseX,
+  initialMouseY
+} from '../Editor.module.scss';
 import { sleep } from '@helpers';
 import gsap from 'gsap';
 import { round } from 'lodash';
+import BezierEasing from 'bezier-easing';
 import { Language } from '@global';
 import type { RefObject } from 'react';
 import type { TabHandle } from '../Editor';
+
+const mouseEase = BezierEasing(0.6, 0.01, 0.2, 1);
 
 export default class Mouse {
   constructor(
@@ -14,6 +22,7 @@ export default class Mouse {
     scssTab: RefObject<TabHandle>
   ) {
     this._mouse = mouse;
+    this.updatePosition = this.updatePosition.bind(this);
     this.tabs = {
       [Language.TypeScript]: typescriptTab,
       [Language.HTML]: htmlTab,
@@ -21,12 +30,11 @@ export default class Mouse {
     };
   }
 
+  private animation?: gsap.core.Tween | null;
   private _mouse: RefObject<HTMLDivElement>;
   private get mouse() {
     return this._mouse?.current ?? null;
   }
-
-  private animation?: gsap.core.Tween | null;
 
   private tabs: {
     [key in Language]?: RefObject<TabHandle>;
@@ -52,9 +60,33 @@ export default class Mouse {
     }
   }
 
-  private currentX = 0;
-  private currentY = 0;
   private currentEl?: HTMLElement;
+  private position = { left: 0, top: 0, x: 0, y: 0 };
+  private hasSetInitialPosition = false;
+
+  private getValue:
+    | null
+    | ((property: string, unit?: string) => string | number) = null;
+
+  private getPosition(left?: number, top?: number) {
+    if (!this.getValue) {
+      this.getValue = gsap.getProperty(this.mouse);
+    }
+
+    left ??= this.getValue('left') as number;
+    top ??= this.getValue('top') as number;
+
+    return {
+      left,
+      top,
+      x: this.getValue('x') as number,
+      y: this.getValue('y') as number
+    };
+  }
+
+  private updatePosition(left?: number, top?: number) {
+    this.position = this.getPosition(left, top);
+  }
 
   private async animateTo(el: HTMLElement, opts: AnimationOptions = {}) {
     this.show();
@@ -89,45 +121,82 @@ export default class Mouse {
       const mouseRect = this.mouse.getBoundingClientRect();
       const elRect = el.getBoundingClientRect();
 
-      const x = Math.round(
+      if (!this.hasSetInitialPosition) {
+        const parent = this.mouse.parentElement;
+
+        if (parent) {
+          this.hasSetInitialPosition = true;
+          this.position.x = Math.round(
+            parent.offsetWidth * (parseFloat(initialMouseX) / 100)
+          );
+          this.position.y = Math.round(
+            parent.offsetHeight * (parseFloat(initialMouseY) / 100)
+          );
+
+          gsap.set(this.mouse, {
+            x: this.position.x,
+            y: this.position.y
+          });
+        }
+      }
+
+      const left = Math.round(
         elRect.left +
           elRect.width / 2 -
           mouseRect.left -
           mouseRect.width / 2 +
-          this.currentX
+          this.position.left
       );
 
-      const y = Math.round(
+      const top = Math.round(
         elRect.top +
           elRect.height / 2 -
           mouseRect.top -
           mouseRect.height / 2 +
-          this.currentY
+          this.position.top
       );
 
+      gsap.set(this.mouse, {
+        left,
+        top,
+        x: this.position.x + this.position.left - left,
+        y: this.position.y + this.position.top - top
+      });
+
+      this.updatePosition();
+
       if (duration === undefined) {
-        const baseDuration = 0.3;
-        const baseDistance = 250;
+        const baseDuration = 0.4;
+        const baseDistance = 170;
+        console.log(this.position);
+
         const distance = Math.max(
-          Math.abs(this.mouse.offsetLeft - x),
-          Math.abs(this.mouse.offsetTop - y)
+          Math.abs(this.position.x),
+          Math.abs(this.position.y)
         );
 
         duration = round((baseDuration * distance) / baseDistance, 2);
       }
 
-      this.currentX = x;
-      this.currentY = y;
       this.currentEl = el;
+      const updatePosition = this.updatePosition;
 
       this.animation = gsap.to(this.mouse, {
-        x,
-        y,
+        x: 0,
+        y: 0,
         duration,
         delay,
-        ease: 'power4.inOut',
-        onUpdate,
+        ease: mouseEase,
+        onUpdate() {
+          updatePosition(left, top);
+
+          if (onUpdate) {
+            onUpdate();
+          }
+        },
         onComplete: () => {
+          updatePosition(left, top);
+
           this.animation = null;
 
           if (onComplete) {
