@@ -164,15 +164,13 @@ export default class Mouse {
       this.updatePosition();
 
       if (duration === undefined) {
-        const baseDuration = 0.4;
-        const baseDistance = 170;
-
+        const velocity = 430;
         const distance = Math.max(
           Math.abs(this.position.x),
           Math.abs(this.position.y)
         );
 
-        duration = round((baseDuration * distance) / baseDistance, 2);
+        duration = round(distance / velocity, 2);
       }
 
       this.currentEl = el;

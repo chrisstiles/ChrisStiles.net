@@ -22,6 +22,7 @@
     "prismjs": "^1.26.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
+    "react-intersection-observer": "^9.1.0",
     "resize-observer-polyfill": "^1.5.1"
   },
   "devDependencies": {

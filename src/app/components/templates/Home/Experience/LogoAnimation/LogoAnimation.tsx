@@ -1,17 +1,20 @@
-import { memo, useMemo, useRef, useEffect, useState, useId } from 'react';
+import { memo, useMemo, useRef, useEffect, useState } from 'react';
 import styles from './LogoAnimation.module.scss';
 import gsap from 'gsap';
+import BezierEasing from 'bezier-easing';
 import classNames from 'classnames';
+import { useInView } from 'react-intersection-observer';
 import ResizeObserver from 'resize-observer-polyfill';
 import { round, shuffle, chunk } from 'lodash';
 
+const columnEase = BezierEasing(0.06, 0.49, 0.04, 1);
 const baseLogoSize = parseInt(styles.logoSize);
 const baseLogoOffset = parseInt(styles.logoOffset);
+const startThreshold = 0.4;
 
 export default memo(function LogoAnimation({
   iconFileNames = []
 }: LogoAnimationProps) {
-  const [isVisible, setIsVisible] = useState(false);
   const [icons, setIcons] = useState<string[][]>([]);
 
   useEffect(() => {
@@ -19,36 +22,46 @@ export default memo(function LogoAnimation({
     setIcons(chunk(shuffle(iconFileNames), columnLength));
   }, [iconFileNames]);
 
-  useEffect(() => {
-    const delay = 1000;
-    const timer = window.setTimeout(() => setIsVisible(true), delay);
+  const [isVisible, setIsVisible] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const { ref, inView, entry } = useInView({
+    fallbackInView: true,
+    threshold: [0, startThreshold]
+  });
 
-    return () => window.clearTimeout(timer);
-  }, []);
+  useEffect(() => {
+    if (inView && entry && entry.intersectionRatio >= startThreshold) {
+      setIsVisible(true);
+    }
+
+    setIsPlaying(inView);
+  }, [inView, entry]);
 
   return (
     <div
+      ref={ref}
       role="presentation"
       aria-hidden="true"
       className={styles.wrapper}
     >
       <div className={styles.content}>
-        {icons.map((list, index) => (
-          <LogoColumn
-            key={index}
-            logos={list}
-            isVisible={isVisible}
-            isPlaying={true}
-            direction={index % 2 === 0 ? 'down' : 'up'}
-            index={index}
-          />
-        ))}
+        {!!icons?.length &&
+          icons.map((list, index) => (
+            <LogoColumn
+              key={index}
+              logos={list}
+              isVisible={isVisible}
+              isPlaying={isPlaying}
+              direction={index % 2 === 0 ? 'down' : 'up'}
+              index={index}
+            />
+          ))}
       </div>
     </div>
   );
 });
 
-function LogoColumn({
+const LogoColumn = memo(function LogoColumn({
   logos,
   isVisible,
   isPlaying,
@@ -57,9 +70,7 @@ function LogoColumn({
 }: LogoColumnProps) {
   const wrapper = useRef<HTMLDivElement>(null);
   const logoCount = logos?.length ?? 0;
-
-  const id = useId();
-  const filterId = useMemo(() => `blur-filter-${id}`, [id]);
+  const filterId = useMemo(() => `blur-filter-${index}`, [index]);
   const blurFilter = useRef<SVGFEGaussianBlurElement>(null);
 
   const components = useMemo(() => {
@@ -76,10 +87,11 @@ function LogoColumn({
             </svg>
           </div>
         ));
-  }, [logos, logoCount, filterId]);
+  }, [logoCount, logos, filterId]);
 
   // The distance each logo must animate before wrapping
   const [wrapperSize, setWrapperSize] = useState(0);
+  const [hasInitialWrapperSize, setHasInitialWrapperSize] = useState(false);
   const [logoSize, setLogoSize] = useState(baseLogoSize);
   const [logoOffset, setLogoOffset] = useState(baseLogoOffset);
 
@@ -98,10 +110,12 @@ function LogoColumn({
         setLogoSize(logo.offsetHeight);
         setLogoOffset(!isNaN(offset) ? offset : 20);
       }
+
+      setHasInitialWrapperSize(true);
     });
 
     if (wrapperEl) {
-      setWrapperSize(wrapperEl.offsetHeight);
+      setWrapperSize(Math.ceil(wrapperEl.offsetHeight));
       observer.observe(wrapperEl);
     }
 
@@ -127,22 +141,19 @@ function LogoColumn({
   useEffect(() => {
     const wrapperEl = wrapper.current;
 
-    if (wrapperEl && logoCount) {
+    if (hasInitialWrapperSize && wrapperEl && logoCount) {
       const size = logoSize + logoOffset;
-
       gsap.set(wrapperEl.children, { y: i => i * size });
 
       // Calculate duration based on the
       // number of logos to ensure all
       // columns animate at the same speed
-      const baseCount = 10;
-      const baseDuration = 28;
-      const duration = (baseDuration * logoCount) / baseCount;
+      const velocity = 5.4;
       const distance = logoCount * size;
 
       logoTween.current = gsap.to(wrapperEl.children, {
         y: () => `+=${distance}`,
-        duration: round(duration, 3),
+        duration: round(size / velocity, 3),
         ease: 'none',
         repeat: -1,
         paused: !isPlayingRef.current,
@@ -156,7 +167,14 @@ function LogoColumn({
     return () => {
       logoTween.current?.kill();
     };
-  }, [logoCount, direction, components, logoSize, logoOffset]);
+  }, [
+    logoCount,
+    direction,
+    components,
+    logoSize,
+    logoOffset,
+    hasInitialWrapperSize
+  ]);
 
   // Animate column in before starting individual logo animations
   const columnTween = useRef<gsap.core.Tween | null>(null);
@@ -180,10 +198,10 @@ function LogoColumn({
       gsap.set(wrapper.current, { y: Math.round(translate) });
       setHasInitialPosition(true);
 
-      const multiplier = direction === 'up' ? 0.8 : 0.6;
+      const multiplier = direction === 'up' ? 0.83 : 0.8;
       const minBlur = 0;
       const minBlurThreshold = 0.05;
-      const zeroBlurVelocity = 0.06;
+      const zeroBlurVelocity = 0.07;
 
       const getValue = gsap.getProperty(wrapper.current);
       const getPosition = () => {
@@ -216,10 +234,10 @@ function LogoColumn({
           direction === 'down'
             ? 0
             : -height + wrapperSize + (logoSize + logoOffset) * 2,
-        duration: 3.2 - index * 0.5,
-        ease: 'expo.out',
+        duration: 4.2,
+        ease: columnEase,
         paused: !isVisible,
-        delay: index * 0.25,
+        delay: 0.3 + index * 0.25,
         onStart() {
           hasStartedLogoAnimation.current = true;
           isPlayingRef.current = true;
@@ -246,7 +264,7 @@ function LogoColumn({
           const dy = Math.abs(y - prevPosition.y);
 
           let vx = dx / deltaRatio;
-          let vy = dy / deltaRatio;
+          let vy = round(dy / deltaRatio, 4);
 
           if (vx <= zeroBlurVelocity) vx = 0;
           if (vy <= zeroBlurVelocity) vy = 0;
@@ -258,7 +276,7 @@ function LogoColumn({
             const progress = this.progress();
 
             if (progress >= 0.4) {
-              const adjustment = progress < 0.6 ? 1 - progress : 0;
+              const adjustment = progress < 0.7 ? 1 - progress : 0;
 
               if (hasBlurX && bx <= minBlurThreshold) by *= adjustment;
               if (hasBlurY && by <= minBlurThreshold) by *= adjustment;
@@ -267,14 +285,6 @@ function LogoColumn({
 
           if (hasBlurX && bx === 0) hasCompleteBlurX = true;
           if (hasBlurY && by === 0) hasCompleteBlurY = true;
-
-          // Ensure the motion blur does not increase during animation
-          if (
-            (hasBlurX && blurX.baseVal && blurX.baseVal < bx) ||
-            (hasBlurY && blurY.baseVal && blurY.baseVal < by)
-          ) {
-            return;
-          }
 
           if (!hasBlurX && bx !== blurX.baseVal) hasBlurX = true;
           if (!hasBlurY && by !== blurY.baseVal) hasBlurY = true;
@@ -331,7 +341,7 @@ function LogoColumn({
       </svg>
     </div>
   );
-}
+});
 
 type LogoAnimationProps = {
   iconFileNames: string[];
