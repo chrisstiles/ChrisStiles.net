@@ -110,11 +110,9 @@ export default class Mouse {
           await sleep(150);
         }
 
-        if (onComplete) {
-          onComplete();
-        }
-
+        onComplete?.();
         resolve();
+
         return;
       }
 
@@ -168,7 +166,6 @@ export default class Mouse {
       if (duration === undefined) {
         const baseDuration = 0.4;
         const baseDistance = 170;
-        console.log(this.position);
 
         const distance = Math.max(
           Math.abs(this.position.x),
@@ -189,20 +186,13 @@ export default class Mouse {
         ease: mouseEase,
         onUpdate() {
           updatePosition(left, top);
-
-          if (onUpdate) {
-            onUpdate();
-          }
+          onUpdate?.();
         },
         onComplete: () => {
-          updatePosition(left, top);
-
           this.animation = null;
 
-          if (onComplete) {
-            onComplete();
-          }
-
+          updatePosition(left, top);
+          onComplete?.();
           resolve();
         }
       });
@@ -299,7 +289,11 @@ export default class Mouse {
   }
 
   // Animates mouse to element and clicks it
-  async clickElement(el: HTMLElement, opts: AnimationOptions = {}) {
+  async clickElement(
+    el: HTMLElement,
+    opts: AnimationOptions = {},
+    tab?: TabHandle
+  ) {
     if (!el) {
       return Promise.reject('Element not found');
     }
@@ -307,8 +301,20 @@ export default class Mouse {
     this.show();
 
     return new Promise<void>(async resolve => {
-      await this.animateTo(el, opts);
+      await this.animateTo(el, {
+        ...opts,
+        onComplete() {
+          opts.onComplete?.();
+          tab?.setIsHovered(true);
+        }
+      });
+
       await this.click(opts.hideOnComplete);
+
+      if (tab && opts.hideOnComplete) {
+        tab.setIsHovered(false);
+      }
+
       resolve();
     });
   }
@@ -325,35 +331,42 @@ export default class Mouse {
     const tabRect = tab.el.current.getBoundingClientRect();
     let hasHovered = false;
 
-    return this.clickElement(tab.el.current, {
-      ...opts,
-      onUpdate: () => {
-        if (opts.onUpdate) {
-          opts.onUpdate();
-        }
-
-        if (!hasHovered && this.mouse) {
-          const mouseRect = this.mouse.getBoundingClientRect();
-          const xOverlap =
-            mouseRect.left < tabRect.left + tabRect.width &&
-            mouseRect.left + mouseRect.width > tabRect.left;
-
-          const yOverlap = mouseRect.top < tabRect.top + tabRect.height;
-
-          if (xOverlap && yOverlap) {
-            tab.setIsHovered(true);
-            hasHovered = true;
+    return this.clickElement(
+      tab.el.current,
+      {
+        ...opts,
+        onUpdate: () => {
+          if (opts.onUpdate) {
+            opts.onUpdate();
           }
-        }
-      },
-      onComplete: () => {
-        if (opts.onComplete) {
-          opts.onComplete();
-        }
 
-        tab.setIsHovered(false);
-      }
-    });
+          if (!hasHovered && this.mouse) {
+            const mouseRect = this.mouse.getBoundingClientRect();
+            const xOverlap =
+              mouseRect.left < tabRect.left + tabRect.width &&
+              mouseRect.left + mouseRect.width > tabRect.left;
+
+            const yOverlap = mouseRect.top < tabRect.top + tabRect.height;
+
+            if (xOverlap && yOverlap) {
+              tab.setIsHovered(true);
+              hasHovered = true;
+            }
+          }
+        },
+        onComplete: opts.onComplete
+        // onComplete: () => {
+        //   if (opts.onComplete) {
+        //     opts.onComplete();
+        //   }
+
+        //   if (opts.hideOnComplete) {
+        //     // tab.setIsHovered(false);
+        //   }
+        // }
+      },
+      tab
+    );
   }
 
   async selectElement(el: HTMLElement, mouseDownCallback?: () => void) {

@@ -4,6 +4,7 @@ import {
   useCallback,
   useRef,
   useState,
+  useEffect,
   useMemo,
   useImperativeHandle,
   type RefObject,
@@ -195,15 +196,20 @@ const Tab = forwardRef<TabHandle, TabProps>(function Tab(
   ref
 ) {
   const el = useRef<HTMLButtonElement>(null);
+  const isActive = index === currentIndex;
   const [isHovered, setIsHovered] = useState(false);
 
   useImperativeHandle(ref, () => ({ setIsHovered, el }));
+
+  useEffect(() => {
+    setIsHovered(false);
+  }, [isActive]);
 
   return (
     <div
       className={classNames(styles.tabWrapper, {
         [styles.hover]: isHovered,
-        [styles.active]: index === currentIndex
+        [styles.active]: isActive
       })}
       onClick={() => onClick(language)}
     >

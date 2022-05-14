@@ -180,7 +180,7 @@ function LogoColumn({
       gsap.set(wrapper.current, { y: Math.round(translate) });
       setHasInitialPosition(true);
 
-      const multiplier = 0.6;
+      const multiplier = direction === 'up' ? 0.8 : 0.6;
       const minBlur = 0;
       const minBlurThreshold = 0.05;
       const zeroBlurVelocity = 0.06;
