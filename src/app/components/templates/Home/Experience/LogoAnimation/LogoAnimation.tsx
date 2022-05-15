@@ -150,7 +150,6 @@ const LogoColumn = memo(function LogoColumn({
       // number of logos to ensure all
       // columns animate at the same speed
       const distance = logoCount * size;
-      console.log(round(size / logoVelocity, 5));
 
       logoTween.current = gsap.to(wrapperEl.children, {
         y: () => `+=${distance}`,
