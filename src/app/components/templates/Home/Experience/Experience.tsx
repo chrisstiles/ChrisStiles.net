@@ -13,6 +13,11 @@ export default memo(function Experience({
       className={styles.wrapper}
       wrapContent={false}
     >
+      <BackgroundAccent
+        position="left"
+        isVisible={accentsVisible}
+        addDefinitions
+      />
       <div className={styles.contentWrapper}>
         <Content className={styles.content}>
           <div className={styles.text}>
@@ -36,7 +41,10 @@ export default memo(function Experience({
           dashColor="#262B3F"
         />
       </div>
-      <BackgroundAccent isVisible={accentsVisible} />
+      <BackgroundAccent
+        position="right"
+        isVisible={accentsVisible}
+      />
     </Section>
   );
 });

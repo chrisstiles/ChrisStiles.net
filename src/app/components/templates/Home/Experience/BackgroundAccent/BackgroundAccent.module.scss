@@ -2,41 +2,40 @@
 /* Background Accents */
 /* --------------------------- */
 
+.wrapper {
+  position: relative;
+  width: 100%;
+  flex-grow: 0;
+  flex-shrink: 0;
+
+  &.hidden {
+    visibility: hidden;
+  }
+
+  svg {
+    position: absolute;
+  }
+}
+
 .accent {
-  position: absolute;
   width: 825px;
   height: 235px;
   z-index: -1;
-  top: 50px;
+  top: -50px;
   left: -110px;
 
-  &.right {
+  @at-root .right & {
     top: auto;
     left: auto;
     transform: rotate(180deg);
     right: -310px;
-    bottom: 100px;
+    bottom: -27px;
   }
 }
 
 .back,
 .front {
-  transform-origin: bottom left;
-  transform: rotate(15deg);
-  animation: rotateIn 1.1s cubic-bezier(0.08, 0.88, 0.25, 1) forwards;
-
-  @at-root .hidden & {
-    animation-play-state: paused;
-  }
-}
-
-.front {
-  animation-delay: 0.1s;
-  animation-duration: 1.2s;
-}
-
-@keyframes rotateIn {
-  to {
-    transform: rotate(0);
-  }
+  transform-style: preserve-3d;
+  will-change: transform;
+  backface-visibility: hidden;
 }

@@ -36,12 +36,12 @@
   display: flex;
   justify-content: flex-end;
 
-  &:first-child {
-    border-left: 1px solid #2d334a;
-  }
-
   svg {
     width: 1px;
     height: 100%;
+  }
+
+  .solid {
+    margin-right: auto;
   }
 }
