@@ -10,7 +10,8 @@ import { round, shuffle, chunk } from 'lodash';
 const columnEase = BezierEasing(0.06, 0.49, 0.04, 1);
 const baseLogoSize = parseInt(styles.logoSize);
 const baseLogoOffset = parseInt(styles.logoOffset);
-const startThreshold = 0.4;
+const startThreshold = 0.45;
+const logoVelocity = 4.8;
 
 export default memo(function LogoAnimation({
   iconFileNames = []
@@ -148,15 +149,16 @@ const LogoColumn = memo(function LogoColumn({
       // Calculate duration based on the
       // number of logos to ensure all
       // columns animate at the same speed
-      const velocity = 5.4;
       const distance = logoCount * size;
+      console.log(round(size / logoVelocity, 5));
 
       logoTween.current = gsap.to(wrapperEl.children, {
         y: () => `+=${distance}`,
-        duration: round(size / velocity, 3),
+        duration: round(size / logoVelocity, 5),
         ease: 'none',
         repeat: -1,
         paused: !isPlayingRef.current,
+        immediateRender: true,
         runBackwards: direction === 'up',
         modifiers: {
           y: gsap.utils.unitize(y => parseFloat(y) % distance)
@@ -198,11 +200,7 @@ const LogoColumn = memo(function LogoColumn({
       gsap.set(wrapper.current, { y: Math.round(translate) });
       setHasInitialPosition(true);
 
-      const multiplier = direction === 'up' ? 0.83 : 0.8;
-      const minBlur = 0;
-      const minBlurThreshold = 0.05;
-      const zeroBlurVelocity = 0.07;
-
+      const multiplier = direction === 'up' ? 1.3 : 1.1;
       const getValue = gsap.getProperty(wrapper.current);
       const getPosition = () => {
         return {
@@ -233,8 +231,8 @@ const LogoColumn = memo(function LogoColumn({
         y:
           direction === 'down'
             ? 0
-            : -height + wrapperSize + (logoSize + logoOffset) * 2,
-        duration: 4.2,
+            : Math.round(-height + wrapperSize + (logoSize + logoOffset) * 2),
+        duration: 3.5,
         ease: columnEase,
         paused: !isVisible,
         delay: 0.3 + index * 0.25,
@@ -259,29 +257,11 @@ const LogoColumn = memo(function LogoColumn({
             return;
           }
 
-          const deltaRatio = gsap.ticker.deltaRatio(60);
+          const deltaRatio = gsap.ticker.deltaRatio();
           const dx = Math.abs(x - prevPosition.x);
           const dy = Math.abs(y - prevPosition.y);
-
-          let vx = dx / deltaRatio;
-          let vy = round(dy / deltaRatio, 4);
-
-          if (vx <= zeroBlurVelocity) vx = 0;
-          if (vy <= zeroBlurVelocity) vy = 0;
-
-          let bx = vx * multiplier;
-          let by = vy * multiplier;
-
-          if ((hasBlurX || hasBlurY) && (vx > 0 || vy > 0)) {
-            const progress = this.progress();
-
-            if (progress >= 0.4) {
-              const adjustment = progress < 0.7 ? 1 - progress : 0;
-
-              if (hasBlurX && bx <= minBlurThreshold) by *= adjustment;
-              if (hasBlurY && by <= minBlurThreshold) by *= adjustment;
-            }
-          }
+          const bx = Math.max(dx / deltaRatio - logoVelocity, 0) * multiplier;
+          const by = Math.max(dy / deltaRatio - logoVelocity, 0) * multiplier;
 
           if (hasBlurX && bx === 0) hasCompleteBlurX = true;
           if (hasBlurY && by === 0) hasCompleteBlurY = true;
@@ -289,15 +269,15 @@ const LogoColumn = memo(function LogoColumn({
           if (!hasBlurX && bx !== blurX.baseVal) hasBlurX = true;
           if (!hasBlurY && by !== blurY.baseVal) hasBlurY = true;
 
-          blurX.baseVal = bx && minBlur ? Math.max(bx, minBlur) : bx;
-          blurY.baseVal = by && minBlur ? Math.max(by, minBlur) : by;
+          blurX.baseVal = Math.max(bx, 0);
+          blurY.baseVal = Math.max(by, 0);
 
           prevPosition.x = x;
           prevPosition.y = y;
         },
         onComplete() {
-          blurX.baseVal = minBlur;
-          blurY.baseVal = minBlur;
+          blurX.baseVal = 0;
+          blurY.baseVal = 0;
         }
       });
     }

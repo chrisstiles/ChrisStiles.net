@@ -18,26 +18,27 @@
     left: 3px;
     right: 3px;
     z-index: 3;
-    height: 320px;
-    opacity: 0.8;
+    height: 380px;
+    opacity: 0.95;
+    $color: #161929;
     background: linear-gradient(
       173deg,
-      #161929 0%,
-      rgba(22, 25, 41, 0.991353) 4.39%,
-      rgba(22, 25, 41, 0.96449) 8.79%,
-      rgba(22, 25, 41, 0.91834) 13.18%,
-      rgba(22, 25, 41, 0.852589) 17.58%,
-      rgba(22, 25, 41, 0.768225) 21.97%,
-      rgba(22, 25, 41, 0.668116) 26.36%,
-      rgba(22, 25, 41, 0.557309) 30.76%,
-      rgba(22, 25, 41, 0.442691) 35.15%,
-      rgba(22, 25, 41, 0.331884) 39.55%,
-      rgba(22, 25, 41, 0.231775) 43.94%,
-      rgba(22, 25, 41, 0.147411) 48.33%,
-      rgba(22, 25, 41, 0.0816599) 52.73%,
-      rgba(22, 25, 41, 0.03551) 57.12%,
-      rgba(22, 25, 41, 0.0086472) 61.52%,
-      rgba(22, 25, 41, 0) 65.91%
+      $color 0%,
+      rgba($color, 0.991353) 4.39%,
+      rgba($color, 0.96449) 8.79%,
+      rgba($color, 0.91834) 13.18%,
+      rgba($color, 0.852589) 17.58%,
+      rgba($color, 0.768225) 21.97%,
+      rgba($color, 0.668116) 26.36%,
+      rgba($color, 0.557309) 30.76%,
+      rgba($color, 0.442691) 35.15%,
+      rgba($color, 0.331884) 39.55%,
+      rgba($color, 0.231775) 43.94%,
+      rgba($color, 0.147411) 48.33%,
+      rgba($color, 0.0816599) 52.73%,
+      rgba($color, 0.03551) 57.12%,
+      rgba($color, 0.0086472) 61.52%,
+      rgba($color, 0) 65.91%
     );
   }
 
@@ -59,6 +60,7 @@
   bottom: 0;
   display: flex;
   justify-content: center;
+  // filter: saturate(0.5) brightness(0.8);
 }
 
 .column,
@@ -69,7 +71,7 @@
 }
 
 .columnWrapper {
-  margin-right: 35px;
+  margin-right: 45px;
   position: relative;
   height: 100%;
 
@@ -85,8 +87,8 @@
   transform-style: preserve-3d;
 }
 
-$baseLogoSize: 130px;
-$baseLogoOffset: 20px;
+$baseLogoSize: 120px;
+$baseLogoOffset: 25px;
 
 @mixin position-logos($size, $offset) {
   @at-root {
