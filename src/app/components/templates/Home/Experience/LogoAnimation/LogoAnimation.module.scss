@@ -10,6 +10,7 @@
   text-align: center;
   position: relative;
   pointer-events: none;
+  isolation: isolate;
 
   &:before,
   &:after {
@@ -18,8 +19,7 @@
     left: 3px;
     right: 3px;
     z-index: 3;
-    height: 380px;
-    opacity: 0.95;
+    height: 330px;
     $color: #161929;
     background: linear-gradient(
       173deg,
@@ -60,7 +60,16 @@
   bottom: 0;
   display: flex;
   justify-content: center;
-  // filter: saturate(0.5) brightness(0.8);
+  transform: translateZ(0);
+}
+
+.sentinel {
+  position: absolute;
+  top: 240px;
+  bottom: 180px;
+  left: 0;
+  width: 1px;
+  visibility: hidden;
 }
 
 .column,

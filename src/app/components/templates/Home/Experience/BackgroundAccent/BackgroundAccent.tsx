@@ -7,16 +7,16 @@ import BezierEasing from 'bezier-easing';
 const accentEase = BezierEasing(0.13, 0.82, 0.16, 1);
 
 const BackgroundAccentDefinitions = memo(function BackgroundAccentDefinitions({
-  isVisible
-}: {
-  isVisible: boolean;
-}) {
+  isVisible,
+  position = 'left',
+  delay = 0
+}: BackgroundAccentDefinitionsProps) {
   const back = useRef<SVGPathElement>(null);
   const front = useRef<SVGPathElement>(null);
   const hasAnimated = useRef(false);
 
   useEffect(() => {
-    if (!isVisible) {
+    if (!isVisible && !hasAnimated.current) {
       gsap.set([back.current, front.current], {
         rotate: 16,
         transformOrigin: 'left bottom'
@@ -29,14 +29,15 @@ const BackgroundAccentDefinitions = memo(function BackgroundAccentDefinitions({
         [back.current, front.current],
         { rotate: 16 },
         {
+          delay,
           rotate: 0,
-          duration: 0.8,
+          duration: 1.2,
           ease: accentEase,
-          stagger: 0.13
+          stagger: 0.25
         }
       );
     }
-  }, [isVisible]);
+  }, [isVisible, delay]);
 
   return (
     <>
@@ -55,7 +56,7 @@ const BackgroundAccentDefinitions = memo(function BackgroundAccentDefinitions({
         >
           <defs>
             <linearGradient
-              id="accent-gradient-back"
+              id={`${position}-accent-gradient-back`}
               gradientTransform="rotate(-20)"
               gradientUnits="userSpaceOnUse"
             >
@@ -69,7 +70,7 @@ const BackgroundAccentDefinitions = memo(function BackgroundAccentDefinitions({
               />
             </linearGradient>
             <linearGradient
-              id="accent-gradient-front-left"
+              id={`${position}-accent-gradient-front-left`}
               gradientTransform="rotate(-25)"
               gradientUnits="userSpaceOnUse"
             >
@@ -83,7 +84,7 @@ const BackgroundAccentDefinitions = memo(function BackgroundAccentDefinitions({
               />
             </linearGradient>
             <linearGradient
-              id="accent-gradient-front-right"
+              id={`${position}-accent-gradient-front-right`}
               gradientTransform="rotate(-25)"
               gradientUnits="userSpaceOnUse"
             >
@@ -98,31 +99,31 @@ const BackgroundAccentDefinitions = memo(function BackgroundAccentDefinitions({
             </linearGradient>
             <path
               ref={back}
-              id="accent-path-back"
+              id={`${position}-accent-path-back`}
               d="M819.587.909.683 141.855 4.91 234h825.37L819.587.909Z"
               className={styles.back}
             />
             <path
               ref={front}
-              id="accent-path-front"
+              id={`${position}-accent-path-front`}
               d="M150.779 148.02 971.348 30.983l7.66 203.021-824.63-.039-3.599-85.945Z"
               className={styles.front}
             />
-            <clipPath id="accent-back-clip">
-              <use href="#accent-path-back" />
+            <clipPath id={`${position}-accent-back-clip`}>
+              <use href={`#${position}-accent-path-back`} />
             </clipPath>
             <use
-              id="accent-shape-back"
-              href="#accent-path-back"
+              id={`${position}-accent-shape-back`}
+              href={`#${position}-accent-path-back`}
             />
             <use
-              id="accent-shape-front-right"
-              href="#accent-path-front"
+              id={`${position}-accent-shape-front-right`}
+              href={`#${position}-accent-path-front`}
             />
             <use
-              id="accent-shape-front-left"
-              href="#accent-path-front"
-              clipPath="url(#accent-back-clip)"
+              id={`${position}-accent-shape-front-left`}
+              href={`#${position}-accent-path-front`}
+              clipPath={`url(#${position}-accent-back-clip)`}
             />
           </defs>
         </svg>
@@ -135,7 +136,7 @@ export default memo(function BackgroundAccentShape({
   className,
   isVisible,
   position = 'left',
-  addDefinitions
+  delay = 0
 }: BackgroundAccentProps) {
   return (
     <div
@@ -144,9 +145,11 @@ export default memo(function BackgroundAccentShape({
         [styles.hidden]: !isVisible
       })}
     >
-      {!!addDefinitions && (
-        <BackgroundAccentDefinitions isVisible={isVisible} />
-      )}
+      <BackgroundAccentDefinitions
+        position={position}
+        isVisible={isVisible}
+        delay={delay}
+      />
       <svg
         className={styles.accent}
         viewBox="0 0 825 235"
@@ -158,16 +161,16 @@ export default memo(function BackgroundAccentShape({
           fill="none"
         >
           <use
-            href="#accent-shape-back"
-            fill="url(#accent-gradient-back)"
+            href={`#${position}-accent-shape-back`}
+            fill={`url(#${position}-accent-gradient-back)`}
           />
           <use
-            href="#accent-shape-front-right"
-            fill="url(#accent-gradient-front-right)"
+            href={`#${position}-accent-shape-front-right`}
+            fill={`url(#${position}-accent-gradient-front-right)`}
           />
           <use
-            href="#accent-shape-front-left"
-            fill="url(#accent-gradient-front-left)"
+            href={`#${position}-accent-shape-front-left`}
+            fill={`url(#${position}-accent-gradient-front-left)`}
           />
         </svg>
       </svg>
@@ -175,9 +178,15 @@ export default memo(function BackgroundAccentShape({
   );
 });
 
+type BackgroundAccentDefinitionsProps = {
+  isVisible: boolean;
+  position?: 'left' | 'right';
+  delay?: number;
+};
+
 type BackgroundAccentProps = {
   isVisible: boolean;
   className?: string;
-  position?: string;
-  addDefinitions?: boolean;
+  position?: 'left' | 'right';
+  delay?: number;
 };

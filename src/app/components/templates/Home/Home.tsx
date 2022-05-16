@@ -25,6 +25,7 @@ export default function HomeTemplate({ iconFileNames }: HomeTemplateProps) {
         <Experience
           iconFileNames={iconFileNames}
           accentsVisible={accentsVisible}
+          setAccentsVisible={setAccentsVisible}
         />
         <Highlights />
       </main>

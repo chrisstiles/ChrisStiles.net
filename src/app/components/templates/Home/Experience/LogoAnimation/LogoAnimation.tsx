@@ -1,4 +1,12 @@
-import { memo, useMemo, useRef, useEffect, useState } from 'react';
+import {
+  memo,
+  useMemo,
+  useRef,
+  useEffect,
+  useState,
+  type SetStateAction,
+  type Dispatch
+} from 'react';
 import styles from './LogoAnimation.module.scss';
 import gsap from 'gsap';
 import BezierEasing from 'bezier-easing';
@@ -11,10 +19,12 @@ const columnEase = BezierEasing(0.06, 0.49, 0.04, 1);
 const baseLogoSize = parseInt(styles.logoSize);
 const baseLogoOffset = parseInt(styles.logoOffset);
 const startThreshold = 0.45;
+const showAccentsThreshold = 0.6;
 const logoVelocity = 4.8;
 
 export default memo(function LogoAnimation({
-  iconFileNames = []
+  iconFileNames = [],
+  setAccentsVisible
 }: LogoAnimationProps) {
   const [icons, setIcons] = useState<string[][]>([]);
 
@@ -27,16 +37,70 @@ export default memo(function LogoAnimation({
   const [isPlaying, setIsPlaying] = useState(false);
   const { ref, inView, entry } = useInView({
     fallbackInView: true,
-    threshold: [0, startThreshold]
+    threshold: [0, startThreshold, showAccentsThreshold]
   });
 
   useEffect(() => {
-    if (inView && entry && entry.intersectionRatio >= startThreshold) {
-      setIsVisible(true);
+    let showAccentsTimer: number;
+
+    if (inView && entry) {
+      if (entry.intersectionRatio >= startThreshold) {
+        setIsVisible(true);
+      }
+
+      if (entry.intersectionRatio >= showAccentsThreshold) {
+        showAccentsTimer = window.setTimeout(() => {
+          setAccentsVisible(true);
+        }, 500);
+      }
     }
 
     setIsPlaying(inView);
-  }, [inView, entry]);
+
+    return () => clearTimeout(showAccentsTimer);
+  }, [inView, entry, setAccentsVisible]);
+
+  // We dim the logo animation when it is
+  // mostly outside the viewport to prevent it
+  // distracting from the hero animation
+  const content = useRef<HTMLDivElement>(null);
+  const filterTween = useRef<gsap.core.Tween | null>(null);
+  const filterProgress = useRef(0);
+
+  const { ref: sentinel, entry: sentinelEntry } = useInView({
+    fallbackInView: true,
+    threshold: observerThresholds
+  });
+
+  useEffect(() => {
+    if ('IntersectionObserver' in window && content.current) {
+      gsap.set(content.current, {
+        filter: 'saturate(0.2) brightness(0.7) opacity(0.3)'
+      });
+
+      filterTween.current = gsap.to(content.current, {
+        filter: 'saturate(1) brightness(1) opacity(1)',
+        duration: 2,
+        paused: true,
+        ease: 'linear',
+        immediateRender: true
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (filterTween.current && sentinelEntry) {
+      const ratio =
+        sentinelEntry.boundingClientRect.top < 0
+          ? 1
+          : sentinelEntry.intersectionRatio;
+
+      if (ratio !== filterProgress.current) {
+        filterProgress.current = sentinelEntry.intersectionRatio;
+        filterTween.current.progress(sentinelEntry.intersectionRatio, true);
+      }
+    }
+  }, [sentinelEntry]);
 
   return (
     <div
@@ -45,7 +109,10 @@ export default memo(function LogoAnimation({
       aria-hidden="true"
       className={styles.wrapper}
     >
-      <div className={styles.content}>
+      <div
+        ref={content}
+        className={styles.content}
+      >
         {!!icons?.length &&
           icons.map((list, index) => (
             <LogoColumn
@@ -58,6 +125,10 @@ export default memo(function LogoAnimation({
             />
           ))}
       </div>
+      <div
+        ref={sentinel}
+        className={styles.sentinel}
+      />
     </div>
   );
 });
@@ -73,7 +144,6 @@ const LogoColumn = memo(function LogoColumn({
   const logoCount = logos?.length ?? 0;
   const filterId = useMemo(() => `blur-filter-${index}`, [index]);
   const blurFilter = useRef<SVGFEGaussianBlurElement>(null);
-
   const components = useMemo(() => {
     return !logoCount
       ? null
@@ -324,6 +394,7 @@ const LogoColumn = memo(function LogoColumn({
 
 type LogoAnimationProps = {
   iconFileNames: string[];
+  setAccentsVisible: Dispatch<SetStateAction<boolean>>;
 };
 
 type LogoColumnProps = {
@@ -333,3 +404,9 @@ type LogoColumnProps = {
   direction?: 'up' | 'down';
   index: number;
 };
+
+const observerThresholds = [startThreshold, showAccentsThreshold];
+
+for (let i = 0; i <= 100; i += 0.2) {
+  observerThresholds.push(i / 100);
+}

@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, type SetStateAction, type Dispatch } from 'react';
 import styles from './Experience.module.scss';
 import LogoAnimation from './LogoAnimation';
 import BackgroundAccent from './BackgroundAccent';
@@ -6,7 +6,8 @@ import { Section, Content, H2, GridLines } from '@elements';
 
 export default memo(function Experience({
   iconFileNames,
-  accentsVisible
+  accentsVisible,
+  setAccentsVisible
 }: ExperienceProps) {
   return (
     <Section
@@ -16,7 +17,6 @@ export default memo(function Experience({
       <BackgroundAccent
         position="left"
         isVisible={accentsVisible}
-        addDefinitions
       />
       <div className={styles.contentWrapper}>
         <Content className={styles.content}>
@@ -32,7 +32,10 @@ export default memo(function Experience({
             </p>
           </div>
           {iconFileNames?.length && (
-            <LogoAnimation iconFileNames={iconFileNames} />
+            <LogoAnimation
+              iconFileNames={iconFileNames}
+              setAccentsVisible={setAccentsVisible}
+            />
           )}
         </Content>
         <GridLines
@@ -44,6 +47,7 @@ export default memo(function Experience({
       <BackgroundAccent
         position="right"
         isVisible={accentsVisible}
+        delay={0.4}
       />
     </Section>
   );
@@ -52,4 +56,5 @@ export default memo(function Experience({
 type ExperienceProps = {
   iconFileNames: string[];
   accentsVisible: boolean;
+  setAccentsVisible: Dispatch<SetStateAction<boolean>>;
 };
