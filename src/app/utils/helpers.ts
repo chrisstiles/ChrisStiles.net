@@ -35,3 +35,7 @@ export function sleep(ms: number) {
 export function getElementIndex(node: Element) {
   return Array.prototype.indexOf.call(node.parentNode?.children ?? [], node);
 }
+
+export function stripHtml(text: string) {
+  return text.replace(/<\/?[^> \s\n]*>?/g, '');
+}

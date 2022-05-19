@@ -11,11 +11,12 @@ import {
 import { flushSync } from 'react-dom';
 import useAnimationSteps, { StepType, type Step } from './useAnimationSteps';
 import Mouse from './Mouse';
-import { sleep } from '@helpers';
+import { sleep, stripHtml } from '@helpers';
 import { random } from 'lodash';
 import { Language } from '@global';
 import type { SetHeroStateFunction } from '../Hero';
 import type { TabHandle } from './Editor';
+import type { AutocompleteHandle } from './Autocomplete';
 
 export default function useHeroAnimation({
   startDelay = 1000,
@@ -24,50 +25,37 @@ export default function useHeroAnimation({
   typescriptTab,
   htmlTab,
   scssTab,
+  autocomplete,
   mouse: _mouse,
   setState,
   setHeaderBoundsVisible,
   setHeaderBullets,
   setAccentsVisible
 }: HeroAnimationConfig) {
-  // The list of steps that runs one at a time
-  // to build the entire hero animation
-  const { steps, initialView, baseText } = useAnimationSteps({
-    setState,
-    setHeaderBoundsVisible,
-    setHeaderBullets,
-    setAccentsVisible
-  });
-
-  // This object manages the simulated mouse element
-  const mouse = useMemo(() => {
-    return new Mouse(_mouse, typescriptTab, htmlTab, scssTab);
-  }, [_mouse, typescriptTab, htmlTab, scssTab]);
-
+  // Animation state
   const [hasStarted, setHasStarted] = useState(startDelay === 0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
-  const [typescript, setTypescript] = useState(baseText.typescript);
-  const [html, setHtml] = useState(baseText.html);
-  const [scss, setScss] = useState(baseText.scss);
   const timer = useRef<number>();
   const queuedAnimation = useRef<(() => void) | null>(null);
   const isPlayingRef = useRef(isPlaying);
   const isPausedRef = useRef(false);
 
-  // The user can change the current editor by clicking
-  // one of the tabs, which pauses the animation. We keep
-  // track of which editor the current animation step
-  // belongs to, and if necessary will switch back to
-  // the correct tab when the animation resumes
-  const [visibleView, setVisibleView] = useState(initialView);
-  const visibleViewRef = useRef(initialView);
-  const animatingView = useRef(initialView);
+  // Simulated mouse
+  const mouse = useMemo(() => {
+    return new Mouse(_mouse, typescriptTab, htmlTab, scssTab);
+  }, [_mouse, typescriptTab, htmlTab, scssTab]);
+
+  // Autocomplete
+  const [autocompleteVisible, setAutocompleteVisible] = useState(false);
+  const [autocompleteItems, setAutocompleteItems] = useState<string[]>([]);
+  const [autocompleteText, setAutocompleteText] = useState('');
+  const autocompleteVisibleRef = useRef(false);
 
   useEffect(() => {
-    visibleViewRef.current = visibleView;
-  }, [visibleView]);
+    autocompleteVisibleRef.current = autocompleteVisible;
+  }, [autocompleteVisible]);
 
   const ensureAnimatingViewIsVisible = useCallback(
     async (
@@ -93,6 +81,58 @@ export default function useHeroAnimation({
     },
     [mouse]
   );
+
+  const play = useCallback(
+    async (onResume?: () => void) => {
+      if (isComplete) {
+        return;
+      }
+
+      isPlayingRef.current = true;
+      isPausedRef.current = false;
+
+      await ensureAnimatingViewIsVisible();
+      onResume?.();
+      setHasStarted(true);
+      setIsPlaying(true);
+    },
+    [ensureAnimatingViewIsVisible, isComplete]
+  );
+
+  const pause = useCallback(() => {
+    isPlayingRef.current = false;
+    isPausedRef.current = true;
+    setIsPlaying(false);
+  }, []);
+
+  // The list of steps that runs one at a time
+  // to build the entire hero animation
+  const { steps, initialView, baseText } = useAnimationSteps({
+    setState,
+    setHeaderBoundsVisible,
+    setHeaderBullets,
+    setAccentsVisible,
+    setAutocompleteVisible,
+    pause
+  });
+
+  // The user can change the current editor by clicking
+  // one of the tabs, which pauses the animation. We keep
+  // track of which editor the current animation step
+  // belongs to, and if necessary will switch back to
+  // the correct tab when the animation resumes
+  const [visibleView, setVisibleView] = useState(initialView);
+  const visibleViewRef = useRef(initialView);
+  const animatingView = useRef(initialView);
+
+  useEffect(() => {
+    visibleViewRef.current = visibleView;
+  }, [visibleView]);
+
+  // Current code
+  const [typescript, setTypescript] = useState(baseText.typescript);
+  const [html, setHtml] = useState(baseText.html);
+  const [scss, setScss] = useState(baseText.scss);
 
   // Queue the next step in the animation
   const queue = useCallback(
@@ -195,10 +235,20 @@ export default function useHeroAnimation({
 
       return new Promise<void>(async resolve => {
         const typeLine = async (line: TypedLine) => {
-          return new Promise<string>(resolve => {
+          return new Promise<string>(async resolve => {
             let hasStarted = false;
+            let text = line.match ?? line.text;
 
-            const text = line.match ?? line.text;
+            // if (step.autocomplete) {
+            //   await typeLine({
+            //     text: text.substring(0, step.autocomplete.at.length),
+            //     shouldType: true
+            //   });
+
+            //   pause();
+            //   // text = text.substring(step.autocomplete.at.length);
+            // }
+
             const fn = line.shouldReverse ? 'reduceRight' : 'reduce';
             const endText = line.text.substring(
               (line.start ?? 0) + text.length
@@ -217,6 +267,12 @@ export default function useHeroAnimation({
                 ) => {
                   await prevPromise;
 
+                  // if (step.autocomplete) {
+                  //   console.log('Here', nextText, charIndex);
+                  //   flushSync(pause);
+                  //   // pause();
+                  // }
+
                   return await new Promise<string>(async resolve => {
                     const start = (line.start ?? 0) + charIndex;
                     const delay = !hasStarted ? 0 : random(minDelay, maxDelay);
@@ -233,7 +289,31 @@ export default function useHeroAnimation({
                     }
 
                     await updateText(delay);
-                    step.onType?.(line.text.replace('#|#', '').trim());
+
+                    if (step.autocomplete && !autocompleteVisibleRef.current) {
+                      autocompleteVisibleRef.current = true;
+                      setAutocompleteVisible(true);
+                    }
+
+                    if (step.onType || autocompleteVisibleRef.current) {
+                      const typedText = stripHtml(
+                        line.text.replace('#|#', '').trim()
+                      );
+
+                      step.onType?.(typedText);
+                      setAutocompleteText(typedText);
+                      console.log(typedText);
+
+                      // if (
+                      //   step.autocomplete &&
+                      //   typedText === step.autocomplete.at
+                      // ) {
+                      //   // pause();
+                      //   // await sleep(2000);
+                      //   // line.text +=
+                      //   // flushSync(pause);
+                      // }
+                    }
 
                     if (isPlayingRef.current) {
                       resolve(nextText);
@@ -255,7 +335,7 @@ export default function useHeroAnimation({
         resolve();
       });
     },
-    [queue, updateViewContent, setState, minTypingDelay, maxTypingDelay]
+    [queue, updateViewContent, setState, minTypingDelay, maxTypingDelay, pause]
   );
 
   // Handle updating specific step
@@ -278,6 +358,10 @@ export default function useHeroAnimation({
             step.type === StepType.Select || step.text?.match(/\(-(.*)-\)/);
 
           return queue(async () => {
+            if (step.autocomplete?.items) {
+              setAutocompleteItems(step.autocomplete.items);
+            }
+
             if (step.instant || shouldSelectText) {
               await queue(async () => {
                 step.onStart?.();
@@ -310,6 +394,12 @@ export default function useHeroAnimation({
               setState({ showSelectHighlight: false });
             }
 
+            if (step.autocomplete) {
+              await autocomplete.current?.selectItem(
+                step.autocomplete.selectedItem
+              );
+            }
+
             setState(step.completeState);
             step.onComplete?.();
 
@@ -324,6 +414,7 @@ export default function useHeroAnimation({
     },
     [
       ensureAnimatingViewIsVisible,
+      autocomplete,
       queue,
       setState,
       updateViewContent,
@@ -371,40 +462,21 @@ export default function useHeroAnimation({
     }
   }, [steps, isPlaying, stepIndex, handleStep]);
 
-  const play = useCallback(
-    async (onResume?: () => void) => {
-      if (isComplete) {
-        return;
-      }
-
-      isPlayingRef.current = true;
-      isPausedRef.current = false;
-
-      await ensureAnimatingViewIsVisible();
-      onResume?.();
-      setHasStarted(true);
-      setIsPlaying(true);
-    },
-    [ensureAnimatingViewIsVisible, isComplete]
-  );
-
-  const pause = useCallback(() => {
-    isPlayingRef.current = false;
-    isPausedRef.current = true;
-    setIsPlaying(false);
-  }, []);
-
   return {
     visibleView,
+    setVisibleView,
     typescript,
     html,
     scss,
+    autocompleteVisible,
+    autocompleteItems,
+    autocompleteText,
+    setAutocompleteVisible,
     hasStarted,
     isPlaying,
     isComplete,
     play,
-    pause,
-    setVisibleView
+    pause
   };
 }
 
@@ -424,6 +496,7 @@ type HeroAnimationConfig = {
   typescriptTab: RefObject<TabHandle>;
   htmlTab: RefObject<TabHandle>;
   scssTab: RefObject<TabHandle>;
+  autocomplete: RefObject<AutocompleteHandle>;
   setState: SetHeroStateFunction;
   setHeaderBoundsVisible: Dispatch<boolean>;
   setHeaderBullets: Dispatch<SetStateAction<string[]>>;

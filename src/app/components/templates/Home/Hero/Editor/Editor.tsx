@@ -14,6 +14,7 @@ import {
 import styles from './Editor.module.scss';
 import useHeroAnimation from './useHeroAnimation';
 import Code from './Code';
+import Autocomplete, { type AutocompleteHandle } from './Autocomplete';
 import classNames from 'classnames';
 import { Language } from '@global';
 
@@ -28,33 +29,42 @@ export default memo(function Editor({
   const htmlTab = useRef<TabHandle>(null);
   const scssTab = useRef<TabHandle>(null);
   const mouse = useRef<HTMLDivElement>(null);
+  const autocomplete = useRef<AutocompleteHandle>(null);
 
   const {
     typescript,
     html,
     scss,
+    autocompleteVisible,
+    autocompleteItems,
+    autocompleteText,
+    setAutocompleteVisible,
     hasStarted,
     isPlaying,
     isComplete,
     visibleView,
+    setVisibleView,
     play,
-    pause,
-    setVisibleView
+    pause
   } = useHeroAnimation({
-    setState,
-    setHeaderBoundsVisible,
-    setHeaderBullets,
-    setAccentsVisible,
     typescriptTab,
     htmlTab,
     scssTab,
-    mouse
+    mouse,
+    autocomplete,
+    setState,
+    setHeaderBoundsVisible,
+    setHeaderBullets,
+    setAccentsVisible
   });
+
+  const userInitiatedPause = useRef(false);
 
   const handleButtonClick = useCallback(
     (view: Language) => {
       setVisibleView(view);
       pause();
+      userInitiatedPause.current = true;
     },
     [setVisibleView, pause]
   );
@@ -96,7 +106,7 @@ export default memo(function Editor({
     clearTimeout(mouseLeaveTimer.current);
     clearTimeout(mouseLeaveTimer.current);
 
-    if (!isPlaying && !isComplete) {
+    if (!isPlaying && !isComplete && userInitiatedPause.current) {
       const resumeDelay = 1000;
 
       showCaretTimer.current = window.setTimeout(() => {
@@ -104,6 +114,7 @@ export default memo(function Editor({
       }, resumeDelay / 3);
 
       mouseLeaveTimer.current = window.setTimeout(() => {
+        userInitiatedPause.current = false;
         play(() => setForceCaretVisible(false));
       }, resumeDelay);
     }
@@ -179,17 +190,16 @@ export default memo(function Editor({
         <div className={styles.tabs}>{tabComponents}</div>
       </div>
       <div className={styles.code}>{codeComponents}</div>
+      <Autocomplete
+        ref={autocomplete}
+        isVisible={autocompleteVisible}
+        setIsVisible={setAutocompleteVisible}
+        items={autocompleteItems}
+        typedText={autocompleteText}
+      />
     </div>
   );
 });
-
-type EditorProps = {
-  showSelectHighlight: boolean;
-  setState: (value: any, name?: any) => void;
-  setHeaderBoundsVisible: Dispatch<SetStateAction<boolean>>;
-  setHeaderBullets: Dispatch<SetStateAction<string[]>>;
-  setAccentsVisible: Dispatch<SetStateAction<boolean>>;
-};
 
 const Tab = forwardRef<TabHandle, TabProps>(function Tab(
   { language, index, currentIndex, label, onClick },
@@ -227,6 +237,14 @@ const Tab = forwardRef<TabHandle, TabProps>(function Tab(
   );
 });
 
+type EditorProps = {
+  showSelectHighlight: boolean;
+  setState: (value: any, name?: any) => void;
+  setHeaderBoundsVisible: Dispatch<SetStateAction<boolean>>;
+  setHeaderBullets: Dispatch<SetStateAction<string[]>>;
+  setAccentsVisible: Dispatch<SetStateAction<boolean>>;
+};
+
 type EditorView = {
   language: Language;
   ref: RefObject<TabHandle>;
@@ -234,7 +252,7 @@ type EditorView = {
 };
 
 export type TabHandle = {
-  setIsHovered(x: boolean): void;
+  setIsHovered(isHovered: boolean): void;
   el: RefObject<HTMLButtonElement>;
 };
 

@@ -77,6 +77,7 @@ export default memo(function Code({
   return (
     <div
       className={classNames(styles.wrapper, {
+        'visible-code-editor': isVisible,
         [styles.visible]: isVisible,
         [styles.shiftLeft]: currentIndex > index,
         [styles.shiftRight]: currentIndex < index

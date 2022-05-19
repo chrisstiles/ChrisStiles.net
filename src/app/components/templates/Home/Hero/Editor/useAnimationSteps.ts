@@ -26,7 +26,9 @@ export default function useAnimationState({
   setState,
   setHeaderBoundsVisible,
   setHeaderBullets,
-  setAccentsVisible
+  setAccentsVisible,
+  setAutocompleteVisible,
+  pause
 }: AnimationStepsConfig): AnimationSteps {
   const { steps, initialView, baseText }: AnimationSteps = useMemo(() => {
     const steps: Step[] = [
@@ -53,11 +55,30 @@ export default function useAnimationState({
         blockIsComplete: true
       },
       {
-        text: 'effects.addFlair();',
+        text: 'eff',
         delay: 300,
+        autocomplete: {
+          // at: 'eff',
+          selectedItem: 'effects',
+          items: [
+            'effects',
+            'encodeURI',
+            'encodeURIComponent',
+            'error',
+            'effort'
+          ]
+        },
         async onComplete() {
           await sleep(300);
           setAccentsVisible(true);
+        }
+      },
+      {
+        text: 'effects[-.-]',
+        autocomplete: {
+          selectedItem: 'init',
+          value: '.init[-();-]',
+          items: ['addFlair', 'item', 'init', 'item', 'item', 'item', 'item']
         }
       },
       {
@@ -138,7 +159,7 @@ export default function useAnimationState({
         `,
         moveCaretToLineEnd: true,
         onType(text) {
-          setHeaderBullets([strip(text)]);
+          setHeaderBullets([text]);
         }
       },
       {
@@ -175,7 +196,7 @@ export default function useAnimationState({
         `,
         moveCaretToLineEnd: true,
         onType(text) {
-          setHeaderBullets(t => [t[0], strip(text)]);
+          setHeaderBullets(t => [t[0], text]);
         }
       },
       {
@@ -214,7 +235,7 @@ export default function useAnimationState({
           </header>
         `,
         onType(text) {
-          setHeaderBullets(t => [t[0], t[1], strip(text)]);
+          setHeaderBullets(t => [t[0], t[1], text]);
         }
       },
       {
@@ -231,7 +252,7 @@ export default function useAnimationState({
         minTypingDelay: 30,
         maxTypingDelay: 50,
         onType(text) {
-          setHeaderBullets(t => [t[0], t[1], strip(text)]);
+          setHeaderBullets(t => [t[0], t[1], text]);
         }
       },
       {
@@ -247,7 +268,7 @@ export default function useAnimationState({
         blockIsComplete: true,
         delay: 300,
         onType(text) {
-          setHeaderBullets(t => [t[0], t[1], strip(text)]);
+          setHeaderBullets(t => [t[0], t[1], text]);
         },
         onComplete() {
           setHeaderBoundsVisible(false);
@@ -402,9 +423,7 @@ export default function useAnimationState({
         `,
         delay: 950,
         onType(headlineText) {
-          setState({
-            headlineText: strip(headlineText)
-          });
+          setState({ headlineText });
         }
       },
       {
@@ -428,9 +447,7 @@ export default function useAnimationState({
         `,
         delay: 400,
         onType(headlineText) {
-          setState({
-            headlineText: strip(headlineText)
-          });
+          setState({ headlineText });
         }
       },
       {
@@ -544,19 +561,75 @@ export default function useAnimationState({
         if (step.blockIsComplete) {
           blocks[currentView] =
             step.text.replace(/[([]!?-|-[)\]]|#\|#/g, '') + '\n';
+        } else {
+          newSteps.push(step);
+
+          let isTyped = step.text.includes('-]');
+          let text = step.text;
+
+          // {
+          //   text: '[-eff-]',
+          //   delay: 300,
+          //   autocomplete: {
+          //     // at: 'eff',
+          //     selectedItem: 'effects',
+          //     items: [
+          //       'effects',
+          //       'encodeURI',
+          //       'encodeURIComponent',
+          //       'error',
+          //       'effort'
+          //     ]
+          //   },
+          //   async onComplete() {
+          //     await sleep(300);
+          //     setAccentsVisible(true);
+          //   }
+          // },
+          // {
+          //   text: 'effects[-.-]',
+          //   autocomplete: {
+          //     selectedItem: 'init',
+          //     value: 'init[-();-]',
+          //     items: ['addFlair', 'item', 'init', 'item', 'item', 'item', 'item']
+          //   }
+          // },
+
+          if (step.autocomplete) {
+            const autocompleteValue =
+              step.autocomplete.value ?? step.autocomplete.selectedItem;
+
+            text = text.replace(/\[-(.*)\]/, autocompleteValue);
+            isTyped = text.includes('-]');
+
+            newSteps.push({ text, instant: !isTyped, delay: 200 });
+
+            // if (text.includes('-]')) {
+            //   isTyped = true;
+
+            // } else {
+            //   newSteps.push({ text });
+            // }
+
+            // const onComplete = step.onComplete;
+            // step.onComplete = async () => {
+
+            // };
+          }
+
+          if (step.moveCaretToLineEnd && isTyped) {
+            newSteps.push({
+              text: text.replace(/\[!?-/, '').replace(/-\](.*)/, '$1#|#'),
+              // text: step.text.replace(/\[!?-/, '').replace(/-\](.*)/, '$1#|#'),
+              delay: 100
+            });
+          }
         }
       }
 
-      if (!step.isBaseText) {
-        newSteps.push(step);
+      // if (!step.isBaseText) {
 
-        if (step.moveCaretToLineEnd && step.text?.includes('-]')) {
-          newSteps.push({
-            text: step.text.replace(/\[!?-/, '').replace(/-\](.*)/, '$1#|#'),
-            delay: 100
-          });
-        }
-      }
+      // }
 
       if (step.blockIsComplete || step.isBaseText) {
         shouldAddDelay = true;
@@ -577,8 +650,10 @@ export default function useAnimationState({
       }
     });
 
+    // console.log(steps);
+
     return { steps: newSteps, initialView, baseText };
-  }, [setState, setHeaderBoundsVisible, setHeaderBullets, setAccentsVisible]);
+  }, [setAccentsVisible, setHeaderBoundsVisible, setHeaderBullets, setState]);
 
   return { steps, initialView, baseText };
 }
@@ -588,12 +663,21 @@ type AnimationStepsConfig = {
   setHeaderBoundsVisible: Dispatch<boolean>;
   setHeaderBullets: Dispatch<SetStateAction<string[]>>;
   setAccentsVisible: Dispatch<boolean>;
+  setAutocompleteVisible: Dispatch<boolean>;
+  pause: () => void;
 };
 
 type AnimationSteps = {
   steps: Step[];
   initialView: Language;
   baseText: { [key in Language]?: string };
+};
+
+type AutocompleteConfig = {
+  items?: string[];
+  // at: string;
+  selectedItem: string;
+  value?: string;
 };
 
 export type Step = {
@@ -611,12 +695,14 @@ export type Step = {
   startState?: Partial<HeroState>;
   completeState?: Partial<HeroState>;
   blockIsComplete?: boolean;
+  // autocompleteItems?: string[];
+  autocomplete?: AutocompleteConfig;
   onStart?(): void;
   onComplete?(): void;
   onType?(text: string): void;
   onMouseDown?(): void;
 };
 
-function strip(text: string) {
-  return text.replace(/<\/?[^> \s\n]*>?/g, '');
-}
+// function strip(text: string) {
+//   return text.replace(/<\/?[^> \s\n]*>?/g, '');
+// }

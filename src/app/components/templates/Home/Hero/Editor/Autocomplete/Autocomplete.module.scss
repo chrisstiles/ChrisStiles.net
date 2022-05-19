@@ -1,0 +1,38 @@
+/* --------------------------- */
+/* Autocomplete */
+/* --------------------------- */
+
+.wrapper {
+  position: absolute;
+  background-color: #404e69;
+  width: 200px;
+  max-height: 300px;
+  overflow: hidden;
+  display: none;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  top: 0;
+  left: 0;
+  z-index: 50;
+  font-size: 12px;
+  border-radius: 4px;
+  font-family: var(--font-code);
+
+  &.visible {
+    display: inline-block;
+  }
+
+  li {
+    padding: 4px 8px;
+    margin: 0;
+
+    &.current {
+      background-color: #38455d;
+    }
+
+    strong {
+      color: #7ad2ca;
+    }
+  }
+}
