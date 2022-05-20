@@ -353,15 +353,6 @@ export default class Mouse {
           }
         },
         onComplete: opts.onComplete
-        // onComplete: () => {
-        //   if (opts.onComplete) {
-        //     opts.onComplete();
-        //   }
-
-        //   if (opts.hideOnComplete) {
-        //     // tab.setIsHovered(false);
-        //   }
-        // }
       },
       tab
     );

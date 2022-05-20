@@ -1,12 +1,8 @@
 import { useMemo, type Dispatch, type SetStateAction } from 'react';
+import { autocompleteLists } from './Autocomplete';
 import { sleep } from '@helpers';
 import { Language } from '@global';
 import type { HeroState, SetHeroStateFunction } from '../Hero';
-
-export enum StepType {
-  Text = 'text',
-  Select = 'select'
-}
 
 /*
 
@@ -21,6 +17,8 @@ Select text: (- -)
 
 const closeTagDelay = 200;
 const tagNewlineDelay = 250;
+const afterAutocompleteDelay = 200;
+const typingRegex = /\[-(.*)-\]/;
 
 export default function useAnimationState({
   setState,
@@ -31,6 +29,10 @@ export default function useAnimationState({
   pause
 }: AnimationStepsConfig): AnimationSteps {
   const { steps, initialView, baseText }: AnimationSteps = useMemo(() => {
+    /*-----------------------------------*/
+    // Animation steps
+    /*-----------------------------------*/
+
     const steps: Step[] = [
       {
         view: Language.TypeScript,
@@ -58,27 +60,47 @@ export default function useAnimationState({
         text: 'eff',
         delay: 300,
         autocomplete: {
-          // at: 'eff',
           selectedItem: 'effects',
-          items: [
-            'effects',
-            'encodeURI',
-            'encodeURIComponent',
-            'error',
-            'effort'
-          ]
-        },
-        async onComplete() {
-          await sleep(300);
-          setAccentsVisible(true);
+          items: autocompleteLists.general
         }
+        // onComplete() {
+        //   pause();
+        // }
       },
       {
         text: 'effects[-.-]',
+        delay: afterAutocompleteDelay,
         autocomplete: {
           selectedItem: 'init',
           value: '.init[-();-]',
-          items: ['addFlair', 'item', 'init', 'item', 'item', 'item', 'item']
+          items: autocompleteLists.effects
+        }
+      },
+      {
+        text: `
+          effects.init();
+          [-effe-]
+        `,
+        delay: 300,
+        autocomplete: {
+          selectedItem: 'effects',
+          items: autocompleteLists.general
+        }
+      },
+      {
+        text: `
+          effects.init();
+          effects[-.-]
+        `,
+        delay: afterAutocompleteDelay,
+        autocomplete: {
+          selectedItem: 'addFlair',
+          value: '.addFlair[-();-]',
+          items: autocompleteLists.effects
+        },
+        async onComplete() {
+          // await sleep(300);
+          setAccentsVisible(true);
         }
       },
       {
@@ -518,6 +540,10 @@ export default function useAnimationState({
       }
     ];
 
+    /*-----------------------------------*/
+    // Transform step configuration
+    /*-----------------------------------*/
+
     // When a top level element or block of code is complete,
     // we store and automatically append it to avoid
     // having to retype the same code for every step
@@ -561,75 +587,45 @@ export default function useAnimationState({
         if (step.blockIsComplete) {
           blocks[currentView] =
             step.text.replace(/[([]!?-|-[)\]]|#\|#/g, '') + '\n';
-        } else {
-          newSteps.push(step);
-
-          let isTyped = step.text.includes('-]');
-          let text = step.text;
-
-          // {
-          //   text: '[-eff-]',
-          //   delay: 300,
-          //   autocomplete: {
-          //     // at: 'eff',
-          //     selectedItem: 'effects',
-          //     items: [
-          //       'effects',
-          //       'encodeURI',
-          //       'encodeURIComponent',
-          //       'error',
-          //       'effort'
-          //     ]
-          //   },
-          //   async onComplete() {
-          //     await sleep(300);
-          //     setAccentsVisible(true);
-          //   }
-          // },
-          // {
-          //   text: 'effects[-.-]',
-          //   autocomplete: {
-          //     selectedItem: 'init',
-          //     value: 'init[-();-]',
-          //     items: ['addFlair', 'item', 'init', 'item', 'item', 'item', 'item']
-          //   }
-          // },
-
-          if (step.autocomplete) {
-            const autocompleteValue =
-              step.autocomplete.value ?? step.autocomplete.selectedItem;
-
-            text = text.replace(/\[-(.*)\]/, autocompleteValue);
-            isTyped = text.includes('-]');
-
-            newSteps.push({ text, instant: !isTyped, delay: 200 });
-
-            // if (text.includes('-]')) {
-            //   isTyped = true;
-
-            // } else {
-            //   newSteps.push({ text });
-            // }
-
-            // const onComplete = step.onComplete;
-            // step.onComplete = async () => {
-
-            // };
-          }
-
-          if (step.moveCaretToLineEnd && isTyped) {
-            newSteps.push({
-              text: text.replace(/\[!?-/, '').replace(/-\](.*)/, '$1#|#'),
-              // text: step.text.replace(/\[!?-/, '').replace(/-\](.*)/, '$1#|#'),
-              delay: 100
-            });
-          }
         }
       }
 
-      // if (!step.isBaseText) {
+      if (!step.isBaseText) {
+        newSteps.push(step);
 
-      // }
+        if (step.autocomplete && step.text) {
+          if (!step.text.includes('-]')) {
+            step.text = `[-${step.text}-]`;
+          }
+
+          const autocompleteValue =
+            step.autocomplete.value ?? step.autocomplete.selectedItem;
+          const hasAdditionalTypedText = autocompleteValue.includes('-]');
+          const newText = !hasAdditionalTypedText
+            ? autocompleteValue
+            : autocompleteValue.replace(typingRegex, '');
+
+          newSteps.push({
+            text: step.text.replace(typingRegex, newText),
+            instant: true,
+            delay: 0
+          });
+
+          if (hasAdditionalTypedText) {
+            newSteps.push({
+              text: step.text.replace(typingRegex, autocompleteValue),
+              delay: afterAutocompleteDelay
+            });
+          }
+        }
+
+        if (step.moveCaretToLineEnd && step.text?.includes('-]')) {
+          newSteps.push({
+            text: step.text.replace(/\[!?-/, '').replace(/-\](.*)/, '$1#|#'),
+            delay: 100
+          });
+        }
+      }
 
       if (step.blockIsComplete || step.isBaseText) {
         shouldAddDelay = true;
@@ -649,8 +645,6 @@ export default function useAnimationState({
         shouldAddDelay = false;
       }
     });
-
-    // console.log(steps);
 
     return { steps: newSteps, initialView, baseText };
   }, [setAccentsVisible, setHeaderBoundsVisible, setHeaderBullets, setState]);
@@ -675,10 +669,14 @@ type AnimationSteps = {
 
 type AutocompleteConfig = {
   items?: string[];
-  // at: string;
   selectedItem: string;
   value?: string;
 };
+
+export enum StepType {
+  Text = 'text',
+  Select = 'select'
+}
 
 export type Step = {
   text?: string;
@@ -695,14 +693,9 @@ export type Step = {
   startState?: Partial<HeroState>;
   completeState?: Partial<HeroState>;
   blockIsComplete?: boolean;
-  // autocompleteItems?: string[];
   autocomplete?: AutocompleteConfig;
   onStart?(): void;
   onComplete?(): void;
   onType?(text: string): void;
   onMouseDown?(): void;
 };
-
-// function strip(text: string) {
-//   return text.replace(/<\/?[^> \s\n]*>?/g, '');
-// }

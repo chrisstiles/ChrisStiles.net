@@ -1,1 +1,5 @@
-export { default, type AutocompleteHandle } from './Autocomplete';
+export {
+  default,
+  autocompleteLists,
+  type AutocompleteHandle
+} from './Autocomplete';

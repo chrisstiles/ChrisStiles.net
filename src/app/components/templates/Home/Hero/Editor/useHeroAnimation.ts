@@ -237,18 +237,8 @@ export default function useHeroAnimation({
         const typeLine = async (line: TypedLine) => {
           return new Promise<string>(async resolve => {
             let hasStarted = false;
-            let text = line.match ?? line.text;
 
-            // if (step.autocomplete) {
-            //   await typeLine({
-            //     text: text.substring(0, step.autocomplete.at.length),
-            //     shouldType: true
-            //   });
-
-            //   pause();
-            //   // text = text.substring(step.autocomplete.at.length);
-            // }
-
+            const text = line.match ?? line.text;
             const fn = line.shouldReverse ? 'reduceRight' : 'reduce';
             const endText = line.text.substring(
               (line.start ?? 0) + text.length
@@ -266,12 +256,6 @@ export default function useHeroAnimation({
                   charIndex: number
                 ) => {
                   await prevPromise;
-
-                  // if (step.autocomplete) {
-                  //   console.log('Here', nextText, charIndex);
-                  //   flushSync(pause);
-                  //   // pause();
-                  // }
 
                   return await new Promise<string>(async resolve => {
                     const start = (line.start ?? 0) + charIndex;
@@ -302,17 +286,6 @@ export default function useHeroAnimation({
 
                       step.onType?.(typedText);
                       setAutocompleteText(typedText);
-                      console.log(typedText);
-
-                      // if (
-                      //   step.autocomplete &&
-                      //   typedText === step.autocomplete.at
-                      // ) {
-                      //   // pause();
-                      //   // await sleep(2000);
-                      //   // line.text +=
-                      //   // flushSync(pause);
-                      // }
                     }
 
                     if (isPlayingRef.current) {
@@ -335,7 +308,7 @@ export default function useHeroAnimation({
         resolve();
       });
     },
-    [queue, updateViewContent, setState, minTypingDelay, maxTypingDelay, pause]
+    [queue, updateViewContent, setState, minTypingDelay, maxTypingDelay]
   );
 
   // Handle updating specific step
@@ -346,6 +319,10 @@ export default function useHeroAnimation({
         return Promise.resolve();
       }
 
+      if (step.autocomplete?.items) {
+        setAutocompleteItems(step.autocomplete.items);
+      }
+
       // Type text into an editor view
       if (step.text?.trim()) {
         // Get the current view and update it if needed
@@ -353,63 +330,55 @@ export default function useHeroAnimation({
         await ensureAnimatingViewIsVisible(view, !step.forceMouseVisible);
 
         // Update editor text
-        if (step.text) {
-          const shouldSelectText =
-            step.type === StepType.Select || step.text?.match(/\(-(.*)-\)/);
+        const shouldSelectText =
+          step.type === StepType.Select || step.text?.match(/\(-(.*)-\)/);
 
-          return queue(async () => {
-            if (step.autocomplete?.items) {
-              setAutocompleteItems(step.autocomplete.items);
-            }
+        return queue(async () => {
+          if (step.instant || shouldSelectText) {
+            await queue(async () => {
+              step.onStart?.();
+              setState(step.startState);
 
-            if (step.instant || shouldSelectText) {
-              await queue(async () => {
-                step.onStart?.();
-                setState(step.startState);
-
-                if (shouldSelectText) {
-                  flushSync(() => updateViewContent(view, step.text ?? ''));
-                } else {
-                  updateViewContent(view, step.text ?? '');
-                }
-              }, 0);
-            } else {
-              await type(step, view);
-            }
-
-            if (shouldSelectText) {
-              const el: HTMLElement | null =
-                document.querySelector('.token.select');
-
-              if (el) {
-                await mouse.selectElement(el, async () => {
-                  setState({ showSelectHighlight: true });
-                  step?.onMouseDown?.();
-                });
+              if (shouldSelectText) {
+                flushSync(() => updateViewContent(view, step.text ?? ''));
               } else {
-                console.error('Select element not found');
-                setState({ showSelectHighlight: false });
+                updateViewContent(view, step.text ?? '');
               }
+            }, 0);
+          } else {
+            await type(step, view);
+          }
+
+          if (shouldSelectText) {
+            const el: HTMLElement | null =
+              document.querySelector('.token.select');
+
+            if (el) {
+              await mouse.selectElement(el, async () => {
+                setState({ showSelectHighlight: true });
+                step?.onMouseDown?.();
+              });
             } else {
+              console.error('Select element not found');
               setState({ showSelectHighlight: false });
             }
+          } else {
+            setState({ showSelectHighlight: false });
+          }
 
-            if (step.autocomplete) {
-              await autocomplete.current?.selectItem(
-                step.autocomplete.selectedItem
-              );
-            }
+          if (step.autocomplete) {
+            await autocomplete.current?.selectItem(
+              step.autocomplete.selectedItem
+            );
+          }
 
-            setState(step.completeState);
-            step.onComplete?.();
+          setState(step.completeState);
+          step.onComplete?.();
 
-            if (shoudIncrement) {
-              setStepIndex(i => i + 1);
-            }
-          }, step.delay);
-        }
-
-        return Promise.resolve();
+          if (shoudIncrement) {
+            setStepIndex(i => i + 1);
+          }
+        }, step.delay);
       }
     },
     [

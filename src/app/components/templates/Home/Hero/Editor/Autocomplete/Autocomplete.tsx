@@ -7,16 +7,17 @@ import {
   useRef,
   useCallback,
   useImperativeHandle,
-  type Dispatch,
-  type SetStateAction
+  type Dispatch
 } from 'react';
+import { flushSync } from 'react-dom';
 import styles from './Autocomplete.module.scss';
 import { sleep } from '@helpers';
 import classNames from 'classnames';
+import { random } from 'lodash';
 
 const Autocomplete = memo(
   forwardRef<AutocompleteHandle, AutocompleteProps>(
-    ({ isVisible = false, items = [], typedText, setIsVisible }, ref) => {
+    ({ isVisible = false, items = [], typedText = '', setIsVisible }, ref) => {
       const [currentIndex, setCurrentIndex] = useState(0);
       const [position, setPosition] = useState({ x: 0, y: 0 });
       const wrapper = useRef<HTMLUListElement>(null);
@@ -24,24 +25,31 @@ const Autocomplete = memo(
       // Only show items that contain at least
       // part of the currently typed text
       const matchingItems = useMemo(() => {
-        return items
-          .map((text): [string, number] => {
-            let start = '';
+        return typedText.endsWith('.')
+          ? items.slice()
+          : items
+              .slice()
+              .map((text): [string, number] => {
+                let start = '';
 
-            const numMatchedLetters = typedText
-              .split('')
-              .reduce((count, letter) => {
-                const score = start && text.startsWith(start + letter) ? 5 : 1;
-                start += letter;
-                return text.includes(letter) ? count + score : count;
-              }, 0);
+                const numMatchedLetters = typedText
+                  .split('')
+                  .reduce((count, letter) => {
+                    const score =
+                      start && text.startsWith(start + letter) ? 5 : 1;
+                    start += letter;
+                    return text.includes(letter) ? count + score : count;
+                  }, 0);
 
-            return [text, numMatchedLetters];
-          })
-          .sort((item1, item2) => item2[1] - item1[1])
-          .filter(item => item[1] >= Math.floor(typedText.length / 2))
-          .map(item => item[0]);
+                return [text, numMatchedLetters];
+              })
+              .sort((item1, item2) => item2[1] - item1[1])
+              .filter(item => item[1] >= Math.floor(typedText.length / 2))
+              .map(item => item[0]);
       }, [items, typedText]);
+
+      const matchingItemsRef = useRef(matchingItems);
+      matchingItemsRef.current = matchingItems;
 
       const components = useMemo(() => {
         const visibleIndex =
@@ -93,13 +101,47 @@ const Autocomplete = memo(
         });
       }, [matchingItems, typedText, currentIndex]);
 
+      const currentIndexRef = useRef(currentIndex);
+
+      useEffect(() => {
+        currentIndexRef.current = currentIndex;
+      }, [currentIndex]);
+
       const selectItem = useCallback(
-        async (item: string) => {
+        async (
+          item: string,
+          startDelay: number = 250,
+          endDelay: number = 160
+        ) => {
           setIsVisible(true);
-          console.log(`Selecting ${item}`);
-          await sleep(1000);
-          console.log(`Finished selecting ${item}`);
+          await sleep(startDelay);
+
+          const start = Math.max(currentIndexRef.current, 0);
+          const end = matchingItemsRef.current.indexOf(item);
+
+          if (start === end || end === -1) {
+            await sleep(endDelay);
+            setIsVisible(false);
+            return;
+          }
+
+          const isBelow = start < end;
+          const minDelay = 140;
+          const maxDelay = 180;
+
+          for (
+            let i = start;
+            isBelow ? i <= end : i >= end;
+            isBelow ? i++ : i--
+          ) {
+            const delay = i === start ? 0 : random(minDelay, maxDelay);
+            await sleep(delay);
+            setCurrentIndex(i);
+          }
+
+          await sleep(endDelay);
           setIsVisible(false);
+          setCurrentIndex(0);
         },
         [setIsVisible]
       );
@@ -160,4 +202,19 @@ type AutocompleteProps = {
   items?: string[];
   typedText: string;
   setIsVisible: Dispatch<boolean>;
+};
+
+export const autocompleteLists = {
+  general: [
+    'addEventListener',
+    'effects',
+    'encodeURI',
+    'encodeURIComponent',
+    'error',
+    'eval',
+    'exports',
+    'requestAnimationFrame',
+    'querySelector'
+  ],
+  effects: ['addFlair', 'init']
 };

@@ -23,12 +23,17 @@
     display: inline-block;
   }
 
+  @at-root :global(.paused) & {
+    visibility: hidden;
+  }
+
   li {
     padding: 4px 8px;
     margin: 0;
 
     &.current {
-      background-color: #38455d;
+      background-color: #222739;
+      color: #dbfffc;
     }
 
     strong {
