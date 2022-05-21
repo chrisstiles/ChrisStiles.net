@@ -1,0 +1,28 @@
+/* --------------------------- */
+/* Buttons */
+/* --------------------------- */
+
+.button {
+  appearance: none;
+  -webkit-appearance: none;
+  border: none;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  cursor: pointer;
+  background-color: var(--yellow-accent-color);
+  font-family: var(--font);
+  font-weight: 700;
+  color: var(--page-background-color);
+  line-height: 1;
+  font-size: 15px;
+  transition: background-color 0.2s;
+  padding: 0.83em 2.2em 0.95em 2.2em;
+  letter-spacing: -0.01em;
+  font-feature-settings: 'salt';
+  border-radius: 3em;
+
+  &:hover {
+    background-color: #ffe983;
+  }
+}

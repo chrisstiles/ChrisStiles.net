@@ -83,6 +83,18 @@ p {
   margin-bottom: 1em;
 }
 
+a,
+button {
+  outline: none;
+
+  &.focus-visible {
+    outline-color: #fff;
+    outline-style: dashed;
+    outline-offset: 4px;
+    outline-width: 2px;
+  }
+}
+
 @include app.highlight {
   background-color: var(--highlight-dark-color);
   color: #fff;

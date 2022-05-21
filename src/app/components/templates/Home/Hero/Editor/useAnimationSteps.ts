@@ -30,13 +30,13 @@ export default function useAnimationState({
 }: AnimationStepsConfig): AnimationSteps {
   const { steps, initialView, baseText }: AnimationSteps = useMemo(() => {
     /*-----------------------------------*/
-    // Animation steps
+    /* Animation steps
     /*-----------------------------------*/
 
     const steps: Step[] = [
       {
         view: Language.TypeScript,
-        text: `import './styles.scss';`,
+        text: `import './styles.scss';#|#`,
         isBaseText: true
       },
       {
@@ -63,9 +63,6 @@ export default function useAnimationState({
           selectedItem: 'effects',
           items: autocompleteLists.general
         }
-        // onComplete() {
-        //   pause();
-        // }
       },
       {
         text: 'effects[-.-]',
@@ -98,8 +95,7 @@ export default function useAnimationState({
           value: '.addFlair[-();-]',
           items: autocompleteLists.effects
         },
-        async onComplete() {
-          // await sleep(300);
+        onComplete() {
           setAccentsVisible(true);
         }
       },
@@ -541,7 +537,7 @@ export default function useAnimationState({
     ];
 
     /*-----------------------------------*/
-    // Transform step configuration
+    /* Transform step configuration
     /*-----------------------------------*/
 
     // When a top level element or block of code is complete,
@@ -579,7 +575,7 @@ export default function useAnimationState({
           const text = step.text + '\n';
 
           baseText[currentView] += text;
-          blocks[currentView] += text;
+          blocks[currentView] += text.replace('#|#', '');
         }
 
         step.text = (blocks[currentView] ?? '') + step.text.trimStart();

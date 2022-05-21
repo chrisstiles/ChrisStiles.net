@@ -173,7 +173,8 @@ export default memo(function Editor({
         playing: isPlaying && !isComplete,
         paused: hasStarted && !isPlaying && !isComplete,
         complete: !isPlaying && isComplete,
-        showCaret: isPlaying || (!isComplete && forceCaretVisible),
+        showCaret:
+          isPlaying || !hasStarted || (!isComplete && forceCaretVisible),
         selectText: showSelectHighlight
       })}
       onMouseEnter={handleMouseEnter}

@@ -1,0 +1,72 @@
+/* --------------------------- */
+/* Navigation */
+/* --------------------------- */
+
+.wrapper {
+  margin-left: auto;
+  align-self: flex-start;
+
+  ul {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  li {
+    flex-grow: 0;
+    flex-shrink: 0;
+    margin-left: 11px;
+
+    &:first-child {
+      margin-left: 0;
+    }
+
+    &.cta {
+      margin-left: 28px;
+      margin-right: -8px;
+    }
+
+    &:not(.cta) {
+      a {
+        padding: 3px;
+        outline-offset: 1px;
+      }
+    }
+  }
+
+  svg {
+    display: block;
+    width: 30px;
+    height: 30px;
+  }
+
+  path {
+    transition: fill 0.2s;
+  }
+
+  a {
+    display: block;
+
+    &:hover,
+    &:global(.focus-visible) {
+      path {
+        fill: var(--yellow-accent-color);
+      }
+    }
+
+    &:global(.focus-visible) {
+      path {
+        transition: none;
+      }
+    }
+
+    &.linkedIn {
+      border-radius: 50%;
+    }
+
+    &.gitHub {
+      border-radius: 3px;
+    }
+  }
+}

@@ -1,4 +1,5 @@
 import '@styles/main.scss';
+import 'focus-visible';
 import Head from 'next/head';
 import type { ReactElement, ReactNode } from 'react';
 import type { NextPage } from 'next';

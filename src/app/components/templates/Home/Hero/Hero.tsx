@@ -25,7 +25,10 @@ export default function Hero({
     <Section className={styles.wrapper}>
       <div className={styles.top}>
         <div className={styles.content}>
-          <Title text={state.titleText} />
+          <Title
+            hasStartedAnimation={state.hasStartedAnimation}
+            text={state.titleText}
+          />
           <Headline
             text={state.headlineText}
             selectEmphasis={state.selectEmphasis}
@@ -51,6 +54,7 @@ export default function Hero({
 }
 
 const initialState: HeroState = {
+  hasStartedAnimation: false,
   titleText: 'this.developer = new ChrisStiles();',
   headlineText: '',
   showSelectHighlight: false,
@@ -71,6 +75,7 @@ type HeroProps = {
 };
 
 export type HeroState = HeadlineStyleProps & {
+  hasStartedAnimation: boolean;
   titleText: string;
   headlineText: string;
   showSelectHighlight: boolean;

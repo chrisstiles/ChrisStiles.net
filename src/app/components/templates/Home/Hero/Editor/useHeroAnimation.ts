@@ -399,11 +399,12 @@ export default function useHeroAnimation({
         !isPausedRef.current &&
         visibleViewRef.current === animatingView.current
       ) {
+        setState({ hasStartedAnimation: true });
         setHasStarted(true);
         setIsPlaying(true);
       }
     }, startDelay);
-  }, [startDelay]);
+  }, [startDelay, setState]);
 
   // If the animation pauses and plays again, play a queued animation
   useEffect(() => {
