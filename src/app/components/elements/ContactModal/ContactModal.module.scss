@@ -2,6 +2,8 @@
 /* Contact Modal */
 /* --------------------------- */
 
+@use 'app';
+
 .wrapper {
   position: fixed;
   z-index: 99999;
@@ -9,7 +11,6 @@
   left: 0;
   right: 0;
   bottom: 0;
-  // display: none;
   display: flex;
   visibility: hidden;
   padding: 40px;
@@ -19,7 +20,6 @@
   overflow-y: auto;
 
   &.open {
-    // display: flex;
     visibility: visible;
   }
 }
@@ -36,7 +36,7 @@
 
 .modal {
   width: 100%;
-  max-width: 950px;
+  max-width: 970px;
   position: relative;
   z-index: 99999;
   flex-shrink: 0;
@@ -45,24 +45,25 @@
 
 .details,
 .form {
-  padding: 60px;
+  padding: 75px 80px;
 }
 
 $borderRadius: 9px;
 
 .details {
   background-color: var(--editor-background-color);
-  width: 410px;
+  width: 420px;
   flex-grow: 0;
   flex-shrink: 0;
-  border-radius: 0 $borderRadius $borderRadius 0;
+  border-radius: $borderRadius 0 0 $borderRadius;
 
   h2 {
-    font-size: 23px;
+    font-size: 30px;
+    line-height: 1.3;
 
     :global(.eyebrow) {
-      font-size: 18px;
-      margin-bottom: 1em;
+      font-size: 19px;
+      margin-bottom: 0.85em;
     }
   }
 }
@@ -70,5 +71,32 @@ $borderRadius: 9px;
 .form {
   flex-grow: 1;
   background-color: #323952;
-  border-radius: $borderRadius 0 0 $borderRadius;
+  border-radius: 0 $borderRadius $borderRadius 0;
+  position: relative;
+}
+
+.close {
+  @include app.disable-native-button(true);
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+
+  path {
+    transition: fill 0.2s;
+  }
+
+  &:hover {
+    background-color: #3a405a;
+
+    path {
+      fill: #9197a7;
+    }
+  }
 }

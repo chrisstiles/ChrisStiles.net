@@ -2,24 +2,20 @@
 /* Buttons */
 /* --------------------------- */
 
+@use 'app';
+
 .button {
-  appearance: none;
-  -webkit-appearance: none;
-  border: none;
+  @include app.disable-native-button;
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
-  cursor: pointer;
   background-color: var(--yellow-accent-color);
-  font-family: var(--font);
-  font-weight: 700;
+  font-weight: 600;
   color: var(--page-background-color);
   line-height: 1;
   font-size: 15px;
   transition: background-color 0.2s;
-  // padding: 0.83em 2.2em 0.95em 2.2em;
   padding: 0.95em 2em 1.05em 2em;
-  // padding: 14px 28px 15px 28px;
   letter-spacing: -0.01em;
   font-feature-settings: 'salt';
   border-radius: 6px;
@@ -34,7 +30,7 @@
 
   &[disabled] {
     background-color: #4a526d;
-    color: #fff;
+    color: #8990a7;
     transition: none;
     cursor: default;
   }

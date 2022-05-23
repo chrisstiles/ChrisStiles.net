@@ -110,22 +110,8 @@ const Field = memo(function Field({
 }: FieldProps) {
   const id = useId();
   const [hasBlurred, setHasBlurred] = useState(false);
-  const props = {
-    id,
-    name,
-    value,
-    required: true,
-    className: classNames(styles.input, className, {
-      [styles.hasIcon]: !!icon
-    }),
-    onChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      handleChange(name, e.target.value);
-    },
-    onBlur: () => setHasBlurred(true),
-    ...restProps
-  };
-
   const Component = type === 'textarea' ? 'textarea' : 'input';
+  const shouldShowInvalid = !isValid && (hasBlurred || hasSubmitted);
   const errorMessage = useMemo(() => {
     const word = name === 'message' ? 'a' : 'your';
 
@@ -136,24 +122,47 @@ const Field = memo(function Field({
       : `Please enter a valid ${name}`;
   }, [hasBlurred, hasSubmitted, isValid, name, type, value]);
 
+  const props = {
+    id: `${id}-input`,
+    name,
+    value,
+    required: true,
+    className: classNames(styles.input, className, {
+      [styles.hasIcon]: !!icon
+    }),
+    onChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      handleChange(name, e.target.value);
+    },
+    onBlur: () => setHasBlurred(true),
+    'aria-invalid': shouldShowInvalid,
+    'aria-errormessage':
+      shouldShowInvalid && errorMessage ? `${id}-error` : undefined,
+    ...restProps
+  };
+
   return (
     <div
       className={classNames(styles.field, {
         [styles.valid]: isValid,
         [styles.invalid]: !isValid,
-        [styles.showInvalidIcon]: !isValid && (hasBlurred || hasSubmitted)
+        [styles.showInvalidIcon]: shouldShowInvalid
       })}
     >
       {label && (
         <div className={styles.labelWrapper}>
           <label
-            htmlFor={id}
+            htmlFor={`${id}-input`}
             className={styles.label}
           >
             {label}
           </label>
           {!!errorMessage && (
-            <div className={styles.fieldError}>{errorMessage}</div>
+            <span
+              id={`${id}-error`}
+              className={styles.fieldError}
+            >
+              {errorMessage}
+            </span>
           )}
         </div>
       )}

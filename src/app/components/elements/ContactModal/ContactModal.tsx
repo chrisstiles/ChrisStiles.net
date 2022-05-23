@@ -1,14 +1,13 @@
 import { useState, useEffect, useRef, type Dispatch } from 'react';
 import { createPortal } from 'react-dom';
 import styles from './ContactModal.module.scss';
+import Close from './close.svg';
 import useClickOutside from '@hooks/useClickOutside';
 import useEventListener from '@hooks/useEventListener';
 import { H2, ContactForm } from '@elements';
 import classNames from 'classnames';
 import FocusLock from 'react-focus-lock';
 import { RemoveScroll } from 'react-remove-scroll';
-
-// TODO Add aria tags for modal
 
 export default function ContactModal({ isOpen, setIsOpen }: ContactModalProps) {
   const [isMounted, setIsMounted] = useState(false);
@@ -43,17 +42,31 @@ export default function ContactModal({ isOpen, setIsOpen }: ContactModalProps) {
             <div
               ref={modal}
               className={styles.modal}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="contact-modal-title"
+              aria-describedby="contact-modal-description"
             >
-              <div className={styles.form}>
-                <ContactForm />
-              </div>
               <div className={styles.details}>
                 <H2
                   className={styles.headline}
-                  eyebrow="Section headline"
+                  eyebrow="Contact me"
+                  eyebrowId="contact-modal-title"
                 >
-                  Vestibulum nec nulla rutrum nine semper
+                  <span id="contact-modal-description">
+                    I look forward to working with you
+                  </span>
                 </H2>
+              </div>
+              <div className={styles.form}>
+                <button
+                  className={styles.close}
+                  onClick={() => setIsOpen(false)}
+                >
+                  <div className="sr">Close modal</div>
+                  <Close aria-hidden="true" />
+                </button>
+                <ContactForm />
               </div>
             </div>
             <div className={styles.bg} />

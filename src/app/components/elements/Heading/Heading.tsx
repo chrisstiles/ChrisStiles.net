@@ -5,6 +5,7 @@ import classNames from 'classnames';
 const Heading: FunctionComponent<HeadingComponentProps> = ({
   tag: Tag,
   eyebrow,
+  eyebrowId,
   eyebrowSeparator = ':',
   children,
   ...rest
@@ -13,7 +14,10 @@ const Heading: FunctionComponent<HeadingComponentProps> = ({
     <Tag {...rest}>
       {eyebrow && (
         <>
-          <span className={classNames('eyebrow', styles.eyebrow)}>
+          <span
+            id={eyebrowId}
+            className={classNames('eyebrow', styles.eyebrow)}
+          >
             {eyebrow}
             {eyebrowSeparator && <span className="sr">{eyebrowSeparator}</span>}
           </span>
@@ -34,6 +38,7 @@ export const H6 = (p: HeadingProps) => <Heading {...p} tag="h6" />;
 
 type HeadingProps = {
   eyebrow?: string;
+  eyebrowId?: string;
   eyebrowSeparator?: string | null;
 } & HTMLAttributes<HTMLInputElement>;
 
