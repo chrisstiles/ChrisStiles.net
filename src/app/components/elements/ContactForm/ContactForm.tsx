@@ -1,35 +1,94 @@
-import { useId, type ReactNode } from 'react';
+import {
+  memo,
+  startTransition,
+  useState,
+  useCallback,
+  useId,
+  useMemo,
+  type ReactNode,
+  type ChangeEvent
+} from 'react';
 import styles from './ContactForm.module.scss';
-import PersonIcon from './person.svg';
-import EmailIcon from './email.svg';
+import * as Icon from './icons';
 import { Button } from '@elements';
 import classNames from 'classnames';
 
 export default function ContactForm() {
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [data, setData] = useState<FormState>({
+    name: '',
+    email: '',
+    message: ''
+  });
+
+  const [isValid, setIsValid] = useState({
+    name: false,
+    email: false,
+    message: false
+  });
+
+  const canSubmit = useMemo(() => {
+    return Object.values(isValid).every(v => v);
+  }, [isValid]);
+
+  const handleChange = useCallback((name: keyof FormState, value: string) => {
+    setData(data => ({ ...data, [name]: value }));
+
+    startTransition(() => {
+      setIsValid(isValid => ({
+        ...isValid,
+        [name]: validations[name](value.trim())
+      }));
+    });
+  }, []);
+
   return (
-    <form>
+    <form
+      noValidate
+      onSubmit={e => {
+        e.preventDefault();
+        setHasSubmitted(true);
+
+        if (canSubmit) {
+          console.log('SUBMIT FORM');
+        }
+      }}
+    >
       <Field
         name="name"
+        value={data.name}
         label="Your name"
-        icon={<PersonIcon />}
+        icon={<Icon.Person />}
         placeholder="Enter your name"
+        isValid={isValid.name}
+        hasSubmitted={hasSubmitted}
+        onChange={handleChange}
       />
       <Field
         name="email"
+        value={data.email}
         type="email"
         label="Email address"
-        icon={<EmailIcon />}
+        icon={<Icon.Email />}
         placeholder="Enter your email address"
+        isValid={isValid.email}
+        hasSubmitted={hasSubmitted}
+        onChange={handleChange}
       />
       <Field
         name="message"
+        value={data.message}
         label="Message"
         type="textarea"
         placeholder="How can I help you?"
+        isValid={isValid.message}
+        hasSubmitted={hasSubmitted}
+        onChange={handleChange}
       />
       <Button
         type="submit"
         className={styles.submit}
+        disabled={!canSubmit}
       >
         Send your message
       </Button>
@@ -37,53 +96,112 @@ export default function ContactForm() {
   );
 }
 
-function Field({
-  icon,
+const Field = memo(function Field({
+  name,
+  value,
   label,
   className,
   type = 'text',
+  icon,
+  isValid,
+  hasSubmitted,
+  onChange: handleChange,
   ...restProps
 }: FieldProps) {
   const id = useId();
-
+  const [hasBlurred, setHasBlurred] = useState(false);
   const props = {
     id,
+    name,
+    value,
+    required: true,
     className: classNames(styles.input, className, {
       [styles.hasIcon]: !!icon
     }),
+    onChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      handleChange(name, e.target.value);
+    },
+    onBlur: () => setHasBlurred(true),
     ...restProps
   };
 
+  const Component = type === 'textarea' ? 'textarea' : 'input';
+  const errorMessage = useMemo(() => {
+    const word = name === 'message' ? 'a' : 'your';
+
+    return isValid || (!hasBlurred && !hasSubmitted)
+      ? null
+      : !value.trim() || type === 'textarea'
+      ? `Please enter ${word} ${name}`
+      : `Please enter a valid ${name}`;
+  }, [hasBlurred, hasSubmitted, isValid, name, type, value]);
+
   return (
-    <div className={styles.field}>
+    <div
+      className={classNames(styles.field, {
+        [styles.valid]: isValid,
+        [styles.invalid]: !isValid,
+        [styles.showInvalidIcon]: !isValid && (hasBlurred || hasSubmitted)
+      })}
+    >
       {label && (
-        <label
-          htmlFor={id}
-          className={styles.label}
-        >
-          {label}
-        </label>
+        <div className={styles.labelWrapper}>
+          <label
+            htmlFor={id}
+            className={styles.label}
+          >
+            {label}
+          </label>
+          {!!errorMessage && (
+            <div className={styles.fieldError}>{errorMessage}</div>
+          )}
+        </div>
       )}
       <div className={styles.inputWrapper}>
-        {type === 'textarea' ? (
-          <textarea {...props} />
-        ) : (
-          <input
-            type={type}
-            {...props}
-          />
+        <Component {...props} />
+        {icon && (
+          <div
+            className={styles.icon}
+            aria-hidden="true"
+          >
+            {icon}
+          </div>
         )}
-        {icon && <div className={styles.icon}>{icon}</div>}
+        {type !== 'textarea' && (
+          <div className={styles.validityIcon}>
+            {isValid ? <Icon.Valid /> : <Icon.Invalid />}
+          </div>
+        )}
       </div>
     </div>
   );
-}
+});
+
+const validations: ValidationFunctions = {
+  name: (v: string) => v.length >= 2,
+  email: v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v),
+  message: (v: string) => v.length >= 3
+};
+
+type FormState = {
+  name: string;
+  email: string;
+  message: string;
+};
+
+type ValidationFunctions = {
+  [key in keyof FormState]: (v: string) => boolean;
+};
 
 type FieldProps = {
-  icon?: ReactNode;
+  name: keyof FormState;
+  value: string;
   label: string;
-  name: string;
   className?: string;
+  icon?: ReactNode;
   placeholder?: string;
   type?: string;
+  isValid: boolean;
+  hasSubmitted: boolean;
+  onChange: (name: keyof FormState, value: string) => void;
 };

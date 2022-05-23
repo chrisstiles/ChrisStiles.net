@@ -12,39 +12,54 @@
   }
 }
 
+.labelWrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
 .label {
   font-size: 16px;
   font-weight: 500;
   color: #fff;
   display: inline-block;
   line-height: 1;
-  margin-bottom: 16px;
+}
+
+.fieldError {
+  color: #fb898f;
+  font-size: 14px;
+  line-height: 1.1;
 }
 
 .inputWrapper {
   position: relative;
   border-radius: 6px;
   overflow: hidden;
+  background-color: #3f465f;
+
+  &:focus-within {
+    background-color: #4a526c;
+  }
 }
 
 .input {
-  background-color: #3f465f;
+  background-color: transparent !important;
   border: none;
   border-radius: 6px;
   width: 100%;
   resize: none;
-  padding: 17px 24px 19px 24px;
+  padding: 17px 55px 19px 24px;
   color: #fff;
   font-weight: 400;
   font-size: 16px;
   font-family: var(--font);
   line-height: 1;
   outline: none;
-  overflow: hidden;
+  text-overflow: ellipsis;
 
   &:focus {
-    background-color: #4a526c;
-
     @include app.placeholder {
       color: #8289a1;
     }
@@ -69,6 +84,10 @@
     -webkit-text-fill-color: #fff;
   }
 
+  &:-webkit-autofill {
+    transition: background-color 4000s ease-in-out 0s;
+  }
+
   &:-webkit-autofill,
   &:-webkit-autofill:hover,
   &:-webkit-autofill:focus,
@@ -77,14 +96,19 @@
   }
 }
 
-.icon {
+.icon,
+.validityIcon {
   width: 22px;
   position: absolute;
   top: 0;
-  left: 24px;
   bottom: 0;
-  display: flex;
   align-items: center;
+  pointer-events: none;
+}
+
+.icon {
+  left: 24px;
+  display: flex;
 
   svg {
     flex-grow: 0;
@@ -95,11 +119,24 @@
     fill: #6d7285;
 
     @at-root .input:focus + & {
-      fill: var(--green-accent-color);
+      fill: #fff;
+    }
+  }
+}
+
+.validityIcon {
+  right: 16px;
+  display: none;
+
+  @at-root {
+    .valid &,
+    .invalid.showInvalidIcon & {
+      display: flex;
     }
   }
 }
 
 .submit {
   margin-top: 10px;
+  font-size: 16px;
 }

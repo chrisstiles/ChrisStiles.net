@@ -1,12 +1,39 @@
+import { useState, useEffect, useRef } from 'react';
 import styles from './Button.module.scss';
+import useIsMounted from '@hooks/useIsMounted';
 import Link, { type LinkProps } from 'next/link';
 import classNames from 'classnames';
 import type { ComponentProps, ReactNode } from 'react';
-//{ className, href, children, ...restProps }
-export function Button({ className, ...props }: ComponentProps<'button'>) {
+
+export function Button({
+  className,
+  disabled,
+  ...props
+}: ComponentProps<'button'>) {
+  const [disableTransition, setDisableTransition] = useState(!!disabled);
+  const disableTransitionTimer = useRef<number>();
+  const isMounted = useIsMounted();
+
+  useEffect(() => {
+    clearTimeout(disableTransitionTimer.current);
+
+    if (disabled) {
+      setDisableTransition(true);
+    } else {
+      disableTransitionTimer.current = window.setTimeout(() => {
+        if (isMounted()) {
+          setDisableTransition(false);
+        }
+      }, 200);
+    }
+  }, [disabled, isMounted]);
+
   return (
     <button
-      className={classNames(styles.button, className)}
+      className={classNames(styles.button, className, {
+        [styles.noTransition]: disabled || disableTransition
+      })}
+      disabled={disabled}
       {...props}
     />
   );

@@ -22,10 +22,20 @@
   // padding: 14px 28px 15px 28px;
   letter-spacing: -0.01em;
   font-feature-settings: 'salt';
-  // border-radius: 3em;
   border-radius: 6px;
 
   &:hover {
     background-color: #ffe983;
+  }
+
+  &.noTransition {
+    transition: none !important;
+  }
+
+  &[disabled] {
+    background-color: #4a526d;
+    color: #fff;
+    transition: none;
+    cursor: default;
   }
 }
