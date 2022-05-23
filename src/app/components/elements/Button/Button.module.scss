@@ -17,10 +17,13 @@
   line-height: 1;
   font-size: 15px;
   transition: background-color 0.2s;
-  padding: 0.83em 2.2em 0.95em 2.2em;
+  // padding: 0.83em 2.2em 0.95em 2.2em;
+  padding: 0.95em 2em 1.05em 2em;
+  // padding: 14px 28px 15px 28px;
   letter-spacing: -0.01em;
   font-feature-settings: 'salt';
-  border-radius: 3em;
+  // border-radius: 3em;
+  border-radius: 6px;
 
   &:hover {
     background-color: #ffe983;

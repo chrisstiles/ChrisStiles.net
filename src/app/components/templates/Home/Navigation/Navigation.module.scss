@@ -17,14 +17,20 @@
     flex-grow: 0;
     flex-shrink: 0;
     margin-left: 11px;
+    display: inline-flex;
+    align-items: center;
 
     &:first-child {
       margin-left: 0;
     }
 
     &.cta {
-      margin-left: 28px;
+      margin-left: 22px;
       margin-right: -8px;
+
+      button {
+        margin-top: -1px;
+      }
     }
 
     &:not(.cta) {
@@ -37,8 +43,8 @@
 
   svg {
     display: block;
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
   }
 
   path {

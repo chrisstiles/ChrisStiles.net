@@ -1,0 +1,105 @@
+/* --------------------------- */
+/* Contact Form */
+/* --------------------------- */
+
+@use 'app';
+
+.field {
+  margin-bottom: 28px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.label {
+  font-size: 16px;
+  font-weight: 500;
+  color: #fff;
+  display: inline-block;
+  line-height: 1;
+  margin-bottom: 16px;
+}
+
+.inputWrapper {
+  position: relative;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.input {
+  background-color: #3f465f;
+  border: none;
+  border-radius: 6px;
+  width: 100%;
+  resize: none;
+  padding: 17px 24px 19px 24px;
+  color: #fff;
+  font-weight: 400;
+  font-size: 16px;
+  font-family: var(--font);
+  line-height: 1;
+  outline: none;
+  overflow: hidden;
+
+  &:focus {
+    background-color: #4a526c;
+
+    @include app.placeholder {
+      color: #8289a1;
+    }
+  }
+
+  &.hasIcon {
+    padding-left: 57px;
+  }
+
+  @include app.placeholder {
+    color: #737a92;
+  }
+
+  @at-root textarea.input {
+    height: 165px;
+    padding: 23px 28px 25px 28px;
+    line-height: 1.4;
+  }
+
+  &:-webkit-autofill,
+  &:-internal-autofill-selected {
+    -webkit-text-fill-color: #fff;
+  }
+
+  &:-webkit-autofill,
+  &:-webkit-autofill:hover,
+  &:-webkit-autofill:focus,
+  &:-webkit-autofill:active {
+    transition: background-color 5000s ease-in-out 0s;
+  }
+}
+
+.icon {
+  width: 22px;
+  position: absolute;
+  top: 0;
+  left: 24px;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+
+  svg {
+    flex-grow: 0;
+    flex-shrink: 0;
+  }
+
+  path {
+    fill: #6d7285;
+
+    @at-root .input:focus + & {
+      fill: var(--green-accent-color);
+    }
+  }
+}
+
+.submit {
+  margin-top: 10px;
+}

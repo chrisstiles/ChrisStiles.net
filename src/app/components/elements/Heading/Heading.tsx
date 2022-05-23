@@ -1,5 +1,6 @@
 import { type FunctionComponent, type HTMLAttributes } from 'react';
 import styles from './Heading.module.scss';
+import classNames from 'classnames';
 
 const Heading: FunctionComponent<HeadingComponentProps> = ({
   tag: Tag,
@@ -12,7 +13,7 @@ const Heading: FunctionComponent<HeadingComponentProps> = ({
     <Tag {...rest}>
       {eyebrow && (
         <>
-          <span className={styles.eyebrow}>
+          <span className={classNames('eyebrow', styles.eyebrow)}>
             {eyebrow}
             {eyebrowSeparator && <span className="sr">{eyebrowSeparator}</span>}
           </span>

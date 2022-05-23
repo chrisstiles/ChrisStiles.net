@@ -11,6 +11,9 @@ import styles from './Code.module.scss';
 import useSyntaxHighlighting, { Language } from '@hooks/useSyntaxHighlighting';
 import classNames from 'classnames';
 
+// TODO Ensure view always animates to/from the correct direction
+// TODO Line number animation start index can sometimes be wrong
+
 export default memo(function Code({
   language,
   content,
