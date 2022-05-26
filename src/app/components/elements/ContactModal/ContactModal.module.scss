@@ -36,7 +36,7 @@
 
 .modal {
   width: 100%;
-  max-width: 970px;
+  max-width: 1000px;
   position: relative;
   z-index: 99999;
   flex-shrink: 0;
@@ -52,7 +52,7 @@ $borderRadius: 9px;
 
 .details {
   background-color: var(--editor-background-color);
-  width: 420px;
+  width: 450px;
   flex-grow: 0;
   flex-shrink: 0;
   border-radius: $borderRadius 0 0 $borderRadius;
@@ -87,6 +87,18 @@ $borderRadius: 9px;
   align-items: center;
   justify-content: center;
   transition: background-color 0.2s;
+  color: #fff;
+
+  &:global(.focus-visible) {
+    outline-offset: 0;
+    transition: none;
+    outline-color: var(--green-accent-color);
+
+    path {
+      transition: none;
+      fill: #fff;
+    }
+  }
 
   path {
     transition: fill 0.2s;

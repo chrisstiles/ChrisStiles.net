@@ -54,7 +54,7 @@ export default function ContactModal({ isOpen, setIsOpen }: ContactModalProps) {
                   eyebrowId="contact-modal-title"
                 >
                   <span id="contact-modal-description">
-                    I look forward to working with you
+                    I&apos;m looking forward to hearing from you
                   </span>
                 </H2>
               </div>

@@ -1,0 +1,61 @@
+/* --------------------------- */
+/* Loading Spinner */
+/* --------------------------- */
+
+$size: 44px;
+$thickness: 6.8;
+
+.wrapper {
+  width: 1.0625em;
+  height: 1.0625em;
+  flex-grow: 0;
+  flex-shrink: 0;
+  color: currentColor;
+  animation: wrapperRotate 1.4s linear infinite;
+  display: inline-block;
+}
+
+.spinner {
+  display: block;
+}
+
+.circle {
+  stroke: currentColor;
+  stroke-width: 15.4%;
+  animation: circleDash 1.4s ease-in-out infinite;
+  stroke-dasharray: 80px 200px;
+  stroke-dashoffset: 0px;
+  stroke-linecap: butt;
+}
+
+@keyframes wrapperRotate {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes circleDash {
+  0% {
+    stroke-dasharray: 1px, 200px;
+    stroke-dashoffset: 0;
+  }
+
+  50% {
+    stroke-dasharray: 100px, 200px;
+    stroke-dashoffset: -10px;
+  }
+
+  100% {
+    stroke-dasharray: 100px, 200px;
+    stroke-dashoffset: -125px;
+  }
+}
+
+:export {
+  baseSize: $size;
+  baseThickness: $thickness;
+}

@@ -4,6 +4,10 @@
 
 @use 'app';
 
+.formWrapper {
+  position: relative;
+}
+
 .field {
   margin-bottom: 28px;
 
@@ -38,9 +42,18 @@
   border-radius: 6px;
   overflow: hidden;
   background-color: #3f465f;
+  color: #fff;
 
   &:focus-within {
     background-color: #4a526c;
+  }
+
+  @at-root .serverError & {
+    background-color: #594b5d;
+
+    &:focus-within {
+      background-color: #625060;
+    }
   }
 }
 
@@ -71,6 +84,18 @@
 
   @include app.placeholder {
     color: #737a92;
+  }
+
+  @at-root .serverError & {
+    @include app.placeholder {
+      color: #958697;
+    }
+
+    &:focus {
+      @include app.placeholder {
+        color: #a599a6;
+      }
+    }
   }
 
   @at-root textarea.input {
@@ -118,6 +143,10 @@
   path {
     fill: #6d7285;
 
+    @at-root .serverError & {
+      fill: #807382;
+    }
+
     @at-root .input:focus + & {
       fill: #fff;
     }
@@ -139,4 +168,138 @@
 .submit {
   margin-top: 15px;
   font-size: 16px;
+}
+
+.formError {
+  background: #bc4343;
+  padding: 13px 20px 14px 18px;
+  border-radius: 4px;
+  margin-bottom: 40px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  line-height: 1.3;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  width: calc(100% + 30px);
+  margin-left: -15px;
+
+  svg {
+    flex-grow: 0;
+    flex-shrink: 0;
+    margin-right: 10px;
+    width: 15px;
+    height: 15px;
+    margin-top: 2px;
+
+    path {
+      fill: #fff;
+    }
+  }
+}
+
+$checkmarkSize: 60px;
+$checkmarkGreen: var(--green-accent-color);
+$checkmarkEase: cubic-bezier(0.65, 0, 0.45, 1);
+$checkmarkShowDelay: 0.3s;
+
+.successWrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  opacity: 0;
+  animation: successFadeIn 0.6 forwards;
+}
+
+.successText {
+  font-size: 14px;
+  text-align: center;
+  opacity: 0;
+  animation: successTextFade 1s ease #{$checkmarkShowDelay + 0.9s} forwards;
+
+  strong {
+    display: block;
+    font-size: 1.2em;
+    color: #fff;
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+}
+
+.checkmark {
+  width: $checkmarkSize;
+  height: $checkmarkSize;
+  flex-grow: 0;
+  flex-shrink: 0;
+  margin-bottom: 20px;
+  border-radius: 50%;
+  display: block;
+  stroke-width: 2;
+  stroke: var(--editor-background-color);
+  stroke-miterlimit: 10;
+  margin-top: -30px;
+  box-shadow: inset 0px 0px 0px $checkmarkGreen;
+  animation: checkmarkFill 0.4s ease-in-out #{$checkmarkShowDelay + 0.4s} forwards,
+    checkmarkScale 0.3s ease-in-out #{$checkmarkShowDelay + 0.9s} both;
+
+  circle {
+    stroke-dasharray: 166;
+    stroke-dashoffset: 166;
+    stroke-width: 2;
+    stroke-miterlimit: 10;
+    stroke: $checkmarkGreen;
+    fill: none;
+    animation: checkmarkStroke 0.6s $checkmarkEase $checkmarkShowDelay forwards;
+  }
+
+  path {
+    transform-origin: 50% 50%;
+    stroke-dasharray: 48;
+    stroke-dashoffset: 48;
+    animation: checkmarkStroke 0.3s $checkmarkEase #{$checkmarkShowDelay + 0.8s}
+      forwards;
+  }
+}
+
+@keyframes successFadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes checkmarkStroke {
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes checkmarkScale {
+  0%,
+  100% {
+    transform: none;
+  }
+
+  50% {
+    transform: scale3d(1.1, 1.1, 1);
+  }
+}
+
+@keyframes checkmarkFill {
+  100% {
+    box-shadow: inset 0px 0px 0px #{$checkmarkSize / 2} $checkmarkGreen;
+  }
+}
+
+@keyframes successTextFade {
+  100% {
+    opacity: 1;
+  }
 }

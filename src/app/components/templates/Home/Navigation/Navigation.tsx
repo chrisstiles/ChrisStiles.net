@@ -16,7 +16,7 @@ export default function Navigation() {
               href="https://github.com/chrisstiles"
               className={styles.linkedIn}
             >
-              <GitHub />
+              <GitHub className={styles.icon} />
             </a>
           </li>
           <li>
@@ -24,7 +24,7 @@ export default function Navigation() {
               href="https://www.linkedin.com/in/christopherstiles/"
               className={styles.gitHub}
             >
-              <LinkedIn />
+              <LinkedIn className={styles.icon} />
             </a>
           </li>
           <li className={styles.cta}>
