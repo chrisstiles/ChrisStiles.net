@@ -13,6 +13,7 @@ import { RemoveScroll } from 'react-remove-scroll';
 
 // TODO Add sidebar contact details
 // TODO Make this animation not suck
+// TODO Calculate correct modal position when window resizes
 
 export default memo(function ContactModal({
   isOpen,
