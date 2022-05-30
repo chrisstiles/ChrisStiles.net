@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { memo, useContext } from 'react';
 import styles from './Navigation.module.scss';
 import GitHub from './github.svg';
 import LinkedIn from './linkedin.svg';
+import { HomeTemplateContext } from '@templates/Home';
 import { Button, ContactModal } from '@elements';
 
-export default function Navigation() {
-  const [modalIsOpen, setModalIsOpen] = useState(false);
+export default memo(function Navigation() {
+  const { modalIsOpen, setModalIsOpen } = useContext(HomeTemplateContext);
 
   return (
     <>
@@ -28,7 +29,15 @@ export default function Navigation() {
             </a>
           </li>
           <li className={styles.cta}>
-            <Button onClick={() => setModalIsOpen(true)}>Get in touch</Button>
+            <Button
+              onClick={() => {
+                if (!modalIsOpen) {
+                  setModalIsOpen(true);
+                }
+              }}
+            >
+              Get in touch
+            </Button>
           </li>
         </ul>
       </nav>
@@ -38,4 +47,4 @@ export default function Navigation() {
       />
     </>
   );
-}
+});

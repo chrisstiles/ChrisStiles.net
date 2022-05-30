@@ -20,6 +20,8 @@ const tagNewlineDelay = 250;
 const afterAutocompleteDelay = 200;
 const typingRegex = /\[-(.*)-\]/;
 
+export const initialView = Language.TypeScript;
+
 export default function useAnimationState({
   setState,
   setHeaderBoundsVisible,

@@ -8,6 +8,7 @@ import {
   type Dispatch
 } from 'react';
 import styles from './LogoAnimation.module.scss';
+import { useGlobalState } from '@templates/Home';
 import gsap from 'gsap';
 import BezierEasing from 'bezier-easing';
 import classNames from 'classnames';
@@ -35,6 +36,7 @@ export default memo(function LogoAnimation({
 
   const [isVisible, setIsVisible] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const { modalIsOpen } = useGlobalState();
   const { ref, inView, entry } = useInView({
     fallbackInView: true,
     threshold: [0, startThreshold, showAccentsThreshold]
@@ -48,7 +50,7 @@ export default memo(function LogoAnimation({
         setIsVisible(true);
       }
 
-      if (entry.intersectionRatio >= showAccentsThreshold) {
+      if (!modalIsOpen && entry.intersectionRatio >= showAccentsThreshold) {
         showAccentsTimer = window.setTimeout(() => {
           setAccentsVisible(true);
         }, 500);
@@ -58,7 +60,7 @@ export default memo(function LogoAnimation({
     setIsPlaying(inView);
 
     return () => clearTimeout(showAccentsTimer);
-  }, [inView, entry, setAccentsVisible]);
+  }, [modalIsOpen, inView, entry, setAccentsVisible]);
 
   // We dim the logo animation when it is
   // mostly outside the viewport to prevent it

@@ -65,7 +65,6 @@ export default function ContactForm() {
       e.preventDefault();
 
       if (apiResponse?.success || isLoadingRef.current) {
-        console.log('Not submitting');
         return;
       }
 

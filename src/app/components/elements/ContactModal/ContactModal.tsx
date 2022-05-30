@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef, useCallback, type Dispatch } from 'react';
+import { memo, useState, useEffect, useRef, type Dispatch } from 'react';
 import { createPortal } from 'react-dom';
 import styles from './ContactModal.module.scss';
 import Close from './close.svg';
 import useClickOutside from '@hooks/useClickOutside';
 import useEventListener from '@hooks/useEventListener';
+import useSize from '@hooks/useSize';
 import { H2, ContactForm } from '@elements';
 import gsap from 'gsap';
 import classNames from 'classnames';
@@ -11,8 +12,12 @@ import FocusLock from 'react-focus-lock';
 import { RemoveScroll } from 'react-remove-scroll';
 
 // TODO Add sidebar contact details
+// TODO Make this animation not suck
 
-export default function ContactModal({ isOpen, setIsOpen }: ContactModalProps) {
+export default memo(function ContactModal({
+  isOpen,
+  setIsOpen
+}: ContactModalProps) {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -20,11 +25,8 @@ export default function ContactModal({ isOpen, setIsOpen }: ContactModalProps) {
   }, []);
 
   const modal = useRef<HTMLDivElement>(null);
-
-  // const close = useCallback(() => {
-  //   isAnimatingRef.current = true;
-  //   setIsOpen(false);
-  // }, [setIsOpen]);
+  const [isVisible, setIsVisible] = useState(isOpen);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   useClickOutside(modal, () => setIsOpen(false));
   useEventListener('keydown', e => {
@@ -33,129 +35,106 @@ export default function ContactModal({ isOpen, setIsOpen }: ContactModalProps) {
     }
   });
 
-  // useClickOutside(modal, close);
-  // useEventListener('keydown', e => {
-  //   if (e.key === 'Escape' || e.key === 'Esc') {
-  //     close();
-  //   }
-  // });
-
-  // Open/close animation
-  // const [isAnimating, setIsAnimating] = useState(false);
-  // const isAnimatingRef = useRef(false);
-  // const hasStartedAnimating = useRef(false);
-  // const animation = useRef<gsap.core.Timeline | null>(null);
-  const divider = useRef<HTMLDivElement>(null);
+  const animation = useRef<gsap.core.Timeline | null>(null);
+  const bg = useRef<HTMLDivElement>(null);
+  const detailsWrapper = useRef<HTMLDivElement>(null);
+  const detailsBg = useRef<HTMLDivElement>(null);
   const details = useRef<HTMLDivElement>(null);
+  const formWrapper = useRef<HTMLDivElement>(null);
   const form = useRef<HTMLDivElement>(null);
+  const { width: formWidth } = useSize(formWrapper) ?? {};
 
-  // useEffect(() => {
-  //   const dividerEl = divider.current;
-  //   const detailsEl = details.current;
-  //   const formEl = form.current;
+  useEffect(() => {
+    const bgEl = bg.current;
+    const detailsWrapperEl = detailsWrapper.current;
+    const detailsBgEl = detailsBg.current;
+    const detailsEl = details.current;
+    const formEl = form.current;
 
-  //   if (!dividerEl || !detailsEl || !formEl) return;
+    console.log('Here', formWidth);
 
-  //   const t1 = gsap.timeline({
-  //     onStart: () => {
-  //       console.log('start');
-  //       isAnimatingRef.current = true;
-  //       setIsAnimating(true);
-  //     },
-  //     onComplete: () => {
-  //       console.log('end');
-  //       isAnimatingRef.current = false;
-  //       setIsAnimating(false);
-  //     },
-  //     onReverseComplete: () => {
-  //       isAnimatingRef.current = false;
-  //       console.log('reverse end');
+    if (
+      !formWidth ||
+      !bgEl ||
+      !detailsWrapperEl ||
+      !detailsEl ||
+      !detailsBgEl ||
+      !formEl
+    )
+      return;
 
-  //       // console.log(isAnimatingRef.current, isOpen);
+    animation.current = gsap.timeline({
+      paused: true,
+      onStart: () => setIsAnimating(true),
+      onComplete: () => setIsAnimating(false),
+      onReverseComplete: () => setIsAnimating(false)
+    });
 
-  //       setIsAnimating(false);
-  //       setIsOpen(false);
-  //     },
-  //     // onUpdate: () => {
-  //     //   isAnimatingRef.current = true;
-  //     // },
-  //     paused: true,
-  //     smoothChildTiming: true
-  //   });
+    animation.current.fromTo(
+      detailsBgEl,
+      { y: '-100%' },
+      {
+        y: 0,
+        duration: () => (animation.current?.reversed() ? 0.4 : 0.6),
+        ease: 'expo.inOut'
+      }
+    );
 
-  //   t1.to(
-  //     dividerEl,
-  //     // { scaleY: 0 },
-  //     { scaleY: 1, ease: 'expo.inOut', duration: 0.6, delay: 0.1 }
-  //   );
+    animation.current.fromTo(
+      bgEl,
+      { opacity: 0 },
+      {
+        opacity: 0.95,
+        duration: () => (animation.current?.reversed() ? 0.35 : 0.3)
+      },
+      '<+=0.1'
+    );
 
-  //   const t2 = gsap.timeline();
+    animation.current.fromTo(
+      detailsEl,
+      { opacity: 0 },
+      { opacity: 1, duration: 0.35 },
+      '<+0.15'
+    );
 
-  //   t2.to(
-  //     detailsEl,
-  //     // { x: '100%' },
-  //     { x: 0, ease: 'expo.out', duration: 0.6 }
-  //   );
+    animation.current.fromTo(
+      formEl,
+      { x: '-100%' },
+      { x: 0, ease: 'expo.out', duration: 0.3 },
+      '-=0.05'
+    );
 
-  //   t2.to(
-  //     formEl,
-  //     // { x: '-100%' },
-  //     { x: 0, ease: 'expo.out', duration: 0.6 },
-  //     '-=0.6'
-  //   );
+    animation.current.fromTo(
+      detailsWrapperEl,
+      { x: Math.round(formWidth / 2) },
+      {
+        x: 0,
+        duration: 0.5,
+        ease: 'expo.inOut'
+      },
+      '<-=0.2'
+    );
 
-  //   t1.add(t2, '-=0.1');
+    return () => {
+      animation.current?.kill();
+    };
+  }, [formWidth]);
 
-  //   animation.current = t1;
-  // }, [setIsOpen]);
+  useEffect(() => {
+    if (!animation.current) {
+      setIsVisible(isOpen);
+      return;
+    }
 
-  // useEffect(() => {
-  //   // const dividerEl = divider.current;
-  //   // const detailsEl = details.current;
-  //   // const formEl = form.current;
-  //   // setIsAnimating(true);
+    if (isOpen) {
+      animation.current.play(undefined, false);
+    } else {
+      animation.current.reverse(undefined, false);
+    }
 
-  //   if (isOpen) {
-  //     isAnimatingRef.current = true;
-  //     setIsAnimating(true);
-  //     // hasStartedAnimating.current = true;
-  //     animation.current?.pause();
-  //     animation.current?.play();
-  //     animation.current?.restart();
-  //     // if (!dividerEl || !detailsEl || !formEl) return;
-  //     // const t1 = gsap.timeline();
-  //     // t1.fromTo(
-  //     //   dividerEl,
-  //     //   { scaleY: 0 },
-  //     //   { scaleY: 1, ease: 'expo.inOut', duration: 0.6, delay: 0.1 }
-  //     // );
-  //     // const t2 = gsap.timeline();
-  //     // t2.fromTo(
-  //     //   detailsEl,
-  //     //   { x: '100%' },
-  //     //   { x: 0, ease: 'expo.out', duration: 0.6 }
-  //     // );
-  //     // t2.fromTo(
-  //     //   formEl,
-  //     //   { x: '-100%' },
-  //     //   { x: 0, ease: 'expo.out', duration: 0.6 },
-  //     //   '-=0.6'
-  //     // );
-  //     // t1.add(t2, '-=0.1');
-  //     // animation.current = t1;
-  //   } else {
-  //     // animation.current?.kill();
-  //     animation.current?.pause();
-  //     animation.current?.reverse();
-  //     animation.current?.play();
-  //   }
-
-  //   // const timeline = animation.current;
-
-  //   // return () => {
-  //   //   timeline?.kill();
-  //   // };
-  // }, [isOpen, animation]);
+    setIsAnimating(true);
+    setIsVisible(isOpen);
+  }, [isOpen]);
 
   return !isMounted
     ? null
@@ -168,8 +147,8 @@ export default function ContactModal({ isOpen, setIsOpen }: ContactModalProps) {
             allowPinchZoom
             enabled={isOpen}
             className={classNames(styles.wrapper, {
-              [styles.open]: isOpen
-              // [styles.animating]: isAnimating || isAnimatingRef.current
+              [styles.open]: isVisible,
+              [styles.animating]: isAnimating || animation.current?.isActive()
             })}
           >
             <div
@@ -181,7 +160,10 @@ export default function ContactModal({ isOpen, setIsOpen }: ContactModalProps) {
               aria-describedby="contact-modal-description"
             >
               <div className={styles.detailsSpacer}>
-                <div className={styles.detailsWrapper}>
+                <div
+                  ref={detailsWrapper}
+                  className={styles.detailsWrapper}
+                >
                   <div
                     ref={details}
                     className={styles.details}
@@ -196,13 +178,16 @@ export default function ContactModal({ isOpen, setIsOpen }: ContactModalProps) {
                       </span>
                     </H2>
                   </div>
+                  <div
+                    ref={detailsBg}
+                    className={styles.detailsBg}
+                  />
                 </div>
-                <div
-                  ref={divider}
-                  className={styles.divider}
-                />
               </div>
-              <div className={styles.formWrapper}>
+              <div
+                ref={formWrapper}
+                className={styles.formWrapper}
+              >
                 <div
                   ref={form}
                   className={styles.form}
@@ -218,12 +203,15 @@ export default function ContactModal({ isOpen, setIsOpen }: ContactModalProps) {
                 </div>
               </div>
             </div>
-            <div className={styles.bg} />
+            <div
+              ref={bg}
+              className={styles.bg}
+            />
           </RemoveScroll>
         </FocusLock>,
         document.body
       );
-}
+});
 
 type ContactModalProps = {
   isOpen: boolean;

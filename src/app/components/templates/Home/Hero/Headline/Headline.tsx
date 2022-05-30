@@ -1,9 +1,9 @@
-import { useMemo, type ReactNode } from 'react';
+import { useMemo, memo, type ReactNode } from 'react';
 import styles from './Headline.module.scss';
 import BoundingBox from '../../BoundingBox';
 import classNames from 'classnames';
 
-export default function Headline({
+export default memo(function Headline({
   text,
   selectEmphasis,
   boldText,
@@ -62,7 +62,7 @@ export default function Headline({
       />
     </h1>
   );
-}
+});
 
 export type HeadlineStyleProps = {
   selectEmphasis: boolean;

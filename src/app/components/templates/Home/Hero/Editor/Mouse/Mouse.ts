@@ -92,7 +92,7 @@ export default class Mouse {
     this.show();
 
     if (this.animation) {
-      this.animation.invalidate();
+      await this.animation.play();
       this.animation = null;
     }
 

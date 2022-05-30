@@ -1,4 +1,5 @@
 import {
+  memo,
   useState,
   useCallback,
   type SetStateAction,
@@ -11,7 +12,7 @@ import Editor from './Editor';
 import { Section } from '@elements';
 import { getState } from '@helpers';
 
-export default function Hero({
+export default memo(function Hero({
   setHeaderBoundsVisible,
   setHeaderBullets,
   setAccentsVisible
@@ -25,10 +26,7 @@ export default function Hero({
     <Section className={styles.wrapper}>
       <div className={styles.top}>
         <div className={styles.content}>
-          <Title
-            hasStartedAnimation={state.hasStartedAnimation}
-            text={state.titleText}
-          />
+          <Title text={state.titleText} />
           <Headline
             text={state.headlineText}
             selectEmphasis={state.selectEmphasis}
@@ -51,10 +49,9 @@ export default function Hero({
       </div>
     </Section>
   );
-}
+});
 
 const initialState: HeroState = {
-  hasStartedAnimation: false,
   titleText: 'this.developer = new ChrisStiles();',
   headlineText: '',
   showSelectHighlight: false,
@@ -75,7 +72,6 @@ type HeroProps = {
 };
 
 export type HeroState = HeadlineStyleProps & {
-  hasStartedAnimation: boolean;
   titleText: string;
   headlineText: string;
   showSelectHighlight: boolean;

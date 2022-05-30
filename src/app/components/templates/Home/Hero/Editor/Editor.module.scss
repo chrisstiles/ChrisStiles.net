@@ -186,6 +186,7 @@ $initialMouseY: 30%;
   pointer-events: none;
   transition: opacity 0.2s;
   opacity: 0;
+  will-change: transform, opacity;
 
   .pulse {
     position: absolute;

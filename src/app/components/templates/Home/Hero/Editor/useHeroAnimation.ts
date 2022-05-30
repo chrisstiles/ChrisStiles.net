@@ -9,10 +9,17 @@ import {
   type SetStateAction
 } from 'react';
 import { flushSync } from 'react-dom';
-import useAnimationSteps, { StepType, type Step } from './useAnimationSteps';
+import useAnimationSteps, {
+  initialView,
+  StepType,
+  type Step
+} from './useAnimationSteps';
 import Mouse from './Mouse';
+import useEffectAfterMount from '@hooks/useEffectAfterMount';
+import useVariableRef from '@hooks/useVariableRef';
+import { useGlobalState } from '@templates/Home';
 import { sleep, stripHtml } from '@helpers';
-import { random } from 'lodash';
+import { random, isFunction, isNumber } from 'lodash';
 import { Language } from '@global';
 import type { SetHeroStateFunction } from '../Hero';
 import type { TabHandle } from './Editor';
@@ -38,9 +45,19 @@ export default function useHeroAnimation({
   const [isComplete, setIsComplete] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const timer = useRef<number>();
-  const queuedAnimation = useRef<(() => void) | null>(null);
+  const queuedAnimation = useRef<AnimationCallback>(null);
+  const hasStartedRef = useRef(hasStarted);
   const isPlayingRef = useRef(isPlaying);
   const isPausedRef = useRef(false);
+
+  // The user can change the current editor by clicking
+  // one of the tabs, which pauses the animation. We keep
+  // track of which editor the current animation step
+  // belongs to, and if necessary will switch back to
+  // the correct tab when the animation resumes
+  const [visibleView, setVisibleView] = useState(initialView);
+  const visibleViewRef = useVariableRef(visibleView);
+  const animatingView = useRef(initialView);
 
   // Simulated mouse
   const mouse = useMemo(() => {
@@ -51,11 +68,7 @@ export default function useHeroAnimation({
   const [autocompleteVisible, setAutocompleteVisible] = useState(false);
   const [autocompleteItems, setAutocompleteItems] = useState<string[]>([]);
   const [autocompleteText, setAutocompleteText] = useState('');
-  const autocompleteVisibleRef = useRef(false);
-
-  useEffect(() => {
-    autocompleteVisibleRef.current = autocompleteVisible;
-  }, [autocompleteVisible]);
+  const autocompleteVisibleRef = useVariableRef(autocompleteVisible);
 
   const ensureAnimatingViewIsVisible = useCallback(
     async (
@@ -79,35 +92,71 @@ export default function useHeroAnimation({
         await sleep(endDelay);
       }
     },
-    [mouse]
-  );
-
-  const play = useCallback(
-    async (onResume?: () => void) => {
-      if (isComplete) {
-        return;
-      }
-
-      isPlayingRef.current = true;
-      isPausedRef.current = false;
-
-      await ensureAnimatingViewIsVisible();
-      onResume?.();
-      setHasStarted(true);
-      setIsPlaying(true);
-    },
-    [ensureAnimatingViewIsVisible, isComplete]
+    [mouse, visibleViewRef]
   );
 
   const pause = useCallback(() => {
     isPlayingRef.current = false;
     isPausedRef.current = true;
     setIsPlaying(false);
-  }, []);
+    mouse.pause();
+  }, [mouse]);
+
+  const { modalIsOpen } = useGlobalState();
+  const modalIsOpenRef = useVariableRef(modalIsOpen);
+  const onPlayCallbacks = useRef<AnimationCallback[]>([]);
+
+  const play = useCallback(
+    async (
+      handlerOrDelay?: AnimationCallback | number,
+      delay?: Nullable<number>
+    ) => {
+      if (isComplete) return;
+
+      const callback = isFunction(handlerOrDelay) ? handlerOrDelay : null;
+
+      delay ??= isNumber(handlerOrDelay) ? handlerOrDelay : 0;
+      if (delay) await sleep(delay);
+
+      hasStartedRef.current = true;
+      isPlayingRef.current = true;
+      isPausedRef.current = false;
+
+      await ensureAnimatingViewIsVisible();
+
+      if (modalIsOpenRef.current) {
+        pause();
+
+        if (callback) {
+          onPlayCallbacks.current.push(callback);
+        }
+
+        return;
+      }
+
+      mouse.play();
+
+      if (onPlayCallbacks.current.length) {
+        onPlayCallbacks.current.forEach(fn => fn?.());
+        onPlayCallbacks.current = [];
+      }
+
+      callback?.();
+      setHasStarted(true);
+      setIsPlaying(true);
+    },
+    [isComplete, modalIsOpenRef, mouse, pause, ensureAnimatingViewIsVisible]
+  );
+
+  useEffectAfterMount(() => {
+    if (hasStartedRef.current) {
+      modalIsOpen ? pause() : play(1200);
+    }
+  }, [modalIsOpen, play, pause]);
 
   // The list of steps that runs one at a time
   // to build the entire hero animation
-  const { steps, initialView, baseText } = useAnimationSteps({
+  const { steps, baseText } = useAnimationSteps({
     setState,
     setHeaderBoundsVisible,
     setHeaderBullets,
@@ -115,19 +164,6 @@ export default function useHeroAnimation({
     setAutocompleteVisible,
     pause
   });
-
-  // The user can change the current editor by clicking
-  // one of the tabs, which pauses the animation. We keep
-  // track of which editor the current animation step
-  // belongs to, and if necessary will switch back to
-  // the correct tab when the animation resumes
-  const [visibleView, setVisibleView] = useState(initialView);
-  const visibleViewRef = useRef(initialView);
-  const animatingView = useRef(initialView);
-
-  useEffect(() => {
-    visibleViewRef.current = visibleView;
-  }, [visibleView]);
 
   // Current code
   const [typescript, setTypescript] = useState(baseText.typescript);
@@ -308,7 +344,14 @@ export default function useHeroAnimation({
         resolve();
       });
     },
-    [queue, updateViewContent, setState, minTypingDelay, maxTypingDelay]
+    [
+      queue,
+      updateViewContent,
+      setState,
+      minTypingDelay,
+      maxTypingDelay,
+      autocompleteVisibleRef
+    ]
   );
 
   // Handle updating specific step
@@ -399,12 +442,10 @@ export default function useHeroAnimation({
         !isPausedRef.current &&
         visibleViewRef.current === animatingView.current
       ) {
-        setState({ hasStartedAnimation: true });
-        setHasStarted(true);
-        setIsPlaying(true);
+        play();
       }
     }, startDelay);
-  }, [startDelay, setState]);
+  }, [visibleViewRef, startDelay, setState, play]);
 
   // If the animation pauses and plays again, play a queued animation
   useEffect(() => {
@@ -472,3 +513,5 @@ type HeroAnimationConfig = {
   setHeaderBullets: Dispatch<SetStateAction<string[]>>;
   setAccentsVisible: Dispatch<boolean>;
 };
+
+type AnimationCallback = Nullable<() => void>;

@@ -26,5 +26,4 @@ export default memo(function Title(props: TitleProps) {
 
 type TitleProps = {
   text: string;
-  hasStartedAnimation: boolean;
 };

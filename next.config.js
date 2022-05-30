@@ -2,7 +2,7 @@ const loaderUtils = require('loader-utils');
 const path = require('path');
 
 module.exports = withBundleAnalyzer({
-  reactStrictMode: true,
+  // reactStrictMode: true,
   swcMinify: true,
   productionBrowserSourceMaps: process.env.SOURCE_MAP === 'true',
   webpack(config) {
