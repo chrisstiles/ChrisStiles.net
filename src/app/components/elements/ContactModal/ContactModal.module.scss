@@ -13,6 +13,7 @@
   bottom: 0;
   display: flex;
   visibility: hidden;
+  pointer-events: none;
   padding: 40px;
   flex-direction: column;
   align-items: center;
@@ -22,6 +23,10 @@
   &.open,
   &.animating {
     visibility: visible;
+  }
+
+  &.open {
+    pointer-events: auto;
   }
 }
 
@@ -33,6 +38,7 @@
   left: 0;
   background-color: #0b0e20;
   opacity: 0;
+  will-change: opacity;
 }
 
 .modal {
@@ -44,11 +50,11 @@
   display: flex;
 }
 
-.detailsWrapper,
-.formWrapper {
-  overflow: hidden;
-  display: flex;
-}
+// .detailsWrapper,
+// .formWrapper {
+
+//   display: flex;
+// }
 
 .details,
 .form {
@@ -57,25 +63,27 @@
 
 $borderRadius: 9px;
 
-.detailsSpacer {
+.detailsWrapper {
+  position: relative;
+  display: flex;
+  z-index: 10;
   width: 450px;
   flex-grow: 0;
   flex-shrink: 0;
-  position: relative;
-  display: flex;
 }
 
-.detailsWrapper {
-  position: relative;
-  z-index: 10;
+.detailsContent {
   border-radius: $borderRadius;
   overflow: hidden;
+  position: relative;
+  z-index: 10;
+  display: flex;
 }
 
 .details {
   border-radius: $borderRadius 0 0 $borderRadius;
-  z-index: 10;
   opacity: 0;
+  will-change: opacity;
 
   h2 {
     font-size: 30px;
@@ -88,23 +96,87 @@ $borderRadius: 9px;
   }
 }
 
-.detailsBg {
+.detailsTop {
   position: absolute;
   top: 0;
+  left: 0;
   right: 0;
+  height: $borderRadius * 2;
+  transform-origin: center center;
+  z-index: 15;
+}
+
+.circle {
+  width: $borderRadius * 2;
+  height: $borderRadius * 2;
+  border-radius: 50%;
+  background-color: var(--editor-background-color);
+  position: absolute;
+  top: 0;
+  left: 50%;
+  margin-left: -$borderRadius;
+  z-index: 5;
+}
+
+.barWrapper {
+  position: absolute;
+  top: 0;
   bottom: 0;
+  width: 50%;
+  overflow: hidden;
+
+  &.leftBar {
+    left: 0;
+  }
+
+  &.rightBar {
+    right: 0;
+  }
+}
+
+$barOffset: 10px;
+
+.bar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: calc(100% + #{$barOffset});
+  background-color: var(--editor-background-color);
+  visibility: hidden;
+
+  @at-root .leftBar & {
+    left: calc(100% + #{$barOffset});
+    transform: translateX(-#{$borderRadius + $barOffset});
+    border-radius: $borderRadius 0 0 $borderRadius;
+  }
+
+  @at-root .rightBar & {
+    right: calc(100% + #{$barOffset});
+    border-radius: 0 $borderRadius $borderRadius 0;
+    transform: translateX(#{$borderRadius + $barOffset});
+  }
+}
+
+.detailsBg {
+  position: absolute;
+  top: $borderRadius + $barOffset;
+  bottom: -#{$borderRadius + $barOffset};
+  right: 0;
   left: 0;
   border-radius: $borderRadius;
   background-color: var(--editor-background-color);
   pointer-events: none;
   transform-origin: top center;
-  z-index: 5;
+  z-index: -1;
+  visibility: hidden;
 }
 
 .formWrapper {
   flex-grow: 1;
   width: 100%;
   margin-left: -$borderRadius;
+  overflow: hidden;
+  display: flex;
 }
 
 .form {
@@ -152,4 +224,18 @@ $borderRadius: 9px;
       fill: #9197a7;
     }
   }
+}
+
+.detailsWrapper,
+.detailsBg,
+.circle,
+.bar,
+.form {
+  will-change: transform;
+  transform-style: preserve-3d;
+}
+
+:export {
+  borderRadius: $borderRadius;
+  barOffset: $barOffset;
 }

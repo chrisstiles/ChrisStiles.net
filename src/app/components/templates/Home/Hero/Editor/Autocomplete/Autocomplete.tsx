@@ -9,8 +9,9 @@ import {
   useImperativeHandle,
   type Dispatch
 } from 'react';
-import { flushSync } from 'react-dom';
 import styles from './Autocomplete.module.scss';
+import { useGlobalState } from '@templates/Home';
+import useVariableRef from '@hooks/useVariableRef';
 import { sleep } from '@helpers';
 import classNames from 'classnames';
 import { random } from 'lodash';
@@ -148,31 +149,30 @@ const Autocomplete = memo(
 
       useImperativeHandle(ref, () => ({ selectItem }));
 
+      const { modalIsOpen } = useGlobalState();
+      const modalIsOpenRef = useVariableRef(modalIsOpen);
+
       useEffect(() => {
         if (isVisible && wrapper.current) {
           const caret = document.querySelector(
             '.visible-code-editor .token.caret'
           );
 
-          if (!caret) {
-            return;
-          }
+          if (!caret) return;
 
+          const rect = wrapper.current.getBoundingClientRect();
           const caretRect = caret.getBoundingClientRect();
-          const wrapperRect = wrapper.current.getBoundingClientRect();
 
           setPosition(prev => {
-            return {
-              x: caretRect.left - (wrapperRect.left - prev.x),
-              y:
-                caretRect.top +
-                caretRect.height -
-                (wrapperRect.top - prev.y) +
-                5
-            };
+            return modalIsOpenRef.current
+              ? prev
+              : {
+                  x: caretRect.left - (rect.left - prev.x),
+                  y: caretRect.top + caretRect.height - (rect.top - prev.y) + 5
+                };
           });
         }
-      }, [isVisible, typedText]);
+      }, [isVisible, typedText, modalIsOpenRef]);
 
       return !components.length ? null : (
         <ul

@@ -6,7 +6,7 @@ export default function useSize(
   ref: RefObject<Element>,
   handler?: (e: ResizeObserverEntry) => void
 ) {
-  const [size, setSize] = useState<DOMRect | null>(null);
+  const [size, setSize] = useState<Nullable<DOMRect>>(null);
   const [isMounted, setIsMounted] = useState(false);
   const callback = useRef(handler);
 

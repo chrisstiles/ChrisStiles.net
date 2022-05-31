@@ -1,19 +1,27 @@
-import { memo, useState, useEffect, useRef, type Dispatch } from 'react';
+import {
+  memo,
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  type Dispatch
+} from 'react';
 import { createPortal } from 'react-dom';
 import styles from './ContactModal.module.scss';
+import ContactDetails from './ContactDetails';
 import Close from './close.svg';
 import useClickOutside from '@hooks/useClickOutside';
 import useEventListener from '@hooks/useEventListener';
+import useVariableRef from '@hooks/useVariableRef';
 import useSize from '@hooks/useSize';
-import { H2, ContactForm } from '@elements';
+import { ContactForm } from '@elements';
 import gsap from 'gsap';
+import BezierEasing from 'bezier-easing';
 import classNames from 'classnames';
 import FocusLock from 'react-focus-lock';
 import { RemoveScroll } from 'react-remove-scroll';
 
 // TODO Add sidebar contact details
-// TODO Make this animation not suck
-// TODO Calculate correct modal position when window resizes
 
 export default memo(function ContactModal({
   isOpen,
@@ -26,6 +34,7 @@ export default memo(function ContactModal({
   }, []);
 
   const modal = useRef<HTMLDivElement>(null);
+  const isOpenRef = useVariableRef(isOpen);
   const [isVisible, setIsVisible] = useState(isOpen);
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -38,31 +47,58 @@ export default memo(function ContactModal({
 
   const animation = useRef<gsap.core.Timeline | null>(null);
   const bg = useRef<HTMLDivElement>(null);
+  const form = useRef<HTMLDivElement>(null);
   const detailsWrapper = useRef<HTMLDivElement>(null);
   const detailsBg = useRef<HTMLDivElement>(null);
   const details = useRef<HTMLDivElement>(null);
-  const formWrapper = useRef<HTMLDivElement>(null);
-  const form = useRef<HTMLDivElement>(null);
-  const { width: formWidth } = useSize(formWrapper) ?? {};
+  const circle = useRef<HTMLDivElement>(null);
+  const leftBar = useRef<HTMLDivElement>(null);
+  const rightBar = useRef<HTMLDivElement>(null);
+
+  const getDetailsOffset = useCallback((rect?: Nullable<DOMRect>) => {
+    const el = detailsWrapper.current;
+    const width = el?.offsetWidth ?? 0;
+    const wrapperWidth = rect?.width ?? 0;
+    return wrapperWidth ? Math.round(wrapperWidth / 2 - width / 2) : 0;
+  }, []);
+
+  const updateDetailsPosition = useCallback(
+    ({ contentRect }: ResizeObserverEntry) => {
+      if (
+        !animation.current?.isActive() &&
+        !isOpenRef.current &&
+        detailsWrapper.current &&
+        contentRect?.width
+      ) {
+        gsap.set(detailsWrapper.current, { x: getDetailsOffset(contentRect) });
+      }
+    },
+    [getDetailsOffset, isOpenRef]
+  );
+
+  const modalRect = useSize(modal, updateDetailsPosition);
+  const modalRectRef = useVariableRef(modalRect);
 
   useEffect(() => {
-    const bgEl = bg.current;
-    const detailsWrapperEl = detailsWrapper.current;
-    const detailsBgEl = detailsBg.current;
-    const detailsEl = details.current;
-    const formEl = form.current;
+    const hasRect = !!modalRect?.width;
+    const elements = {
+      bgEl: bg.current,
+      detailsWrapperEl: detailsWrapper.current,
+      detailsBgEl: detailsBg.current,
+      detailsEl: details.current,
+      circleEl: circle.current,
+      leftBarEl: leftBar.current,
+      rightBarEl: rightBar.current,
+      formEl: form.current
+    };
 
-    console.log('Here', formWidth);
-
-    if (
-      !formWidth ||
-      !bgEl ||
-      !detailsWrapperEl ||
-      !detailsEl ||
-      !detailsBgEl ||
-      !formEl
-    )
-      return;
+    if (animation.current || !Object.values(elements).every(el => !!el)) {
+      return () => {
+        if (hasRect) {
+          animation.current?.invalidate();
+        }
+      };
+    }
 
     animation.current = gsap.timeline({
       paused: true,
@@ -71,55 +107,78 @@ export default memo(function ContactModal({
       onReverseComplete: () => setIsAnimating(false)
     });
 
-    animation.current.fromTo(
-      detailsBgEl,
-      { y: '-100%' },
-      {
-        y: 0,
-        duration: () => (animation.current?.reversed() ? 0.4 : 0.6),
-        ease: 'expo.inOut'
-      }
-    );
+    const barHeight = borderRadius + barOffset;
+    const barEase = BezierEasing(0.18, 0.72, 0.22, 1);
+    const barEaseOut = BezierEasing(0.79, 0.02, 0.11, 1);
+    const barBounce = BezierEasing(0.3, 1.22, 0.31, 1.3);
 
-    animation.current.fromTo(
-      bgEl,
-      { opacity: 0 },
-      {
-        opacity: 0.95,
-        duration: () => (animation.current?.reversed() ? 0.35 : 0.3)
-      },
-      '<+=0.1'
-    );
-
-    animation.current.fromTo(
-      detailsEl,
-      { opacity: 0 },
-      { opacity: 1, duration: 0.35 },
-      '<+0.15'
-    );
-
-    animation.current.fromTo(
-      formEl,
-      { x: '-100%' },
-      { x: 0, ease: 'expo.out', duration: 0.3 },
-      '-=0.05'
-    );
-
-    animation.current.fromTo(
-      detailsWrapperEl,
-      { x: Math.round(formWidth / 2) },
-      {
-        x: 0,
-        duration: 0.5,
-        ease: 'expo.inOut'
-      },
-      '<-=0.2'
-    );
+    animation.current
+      .fromTo(
+        elements.bgEl,
+        { opacity: 0 },
+        {
+          opacity: 0.95,
+          duration: 0.35
+        }
+      )
+      .fromTo(
+        elements.circleEl,
+        { scale: 0 },
+        { scale: 1, duration: 0.2, ease: barBounce },
+        '<+=0.08'
+      )
+      .fromTo(
+        [elements.leftBarEl, elements.rightBarEl],
+        {
+          x: index => (index === 0 ? -barHeight : barHeight)
+        },
+        {
+          x: index => (index === 0 ? '-100%' : '100%'),
+          visibility: 'visible',
+          immediateRender: false,
+          ease: p => {
+            return animation.current?.reversed() ? barEaseOut(p) : barEase(p);
+          },
+          duration: 0.28
+        }
+      )
+      .fromTo(
+        elements.detailsBgEl,
+        { y: '-100%' },
+        {
+          y: -barHeight,
+          visibility: 'visible',
+          duration: 0.4,
+          ease: 'expo.inOut'
+        }
+      )
+      .fromTo(
+        elements.detailsEl,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.45, ease: 'sine.inOut' },
+        '>-0.2'
+      )
+      .fromTo(
+        elements.detailsWrapperEl,
+        { x: () => getDetailsOffset(modalRectRef.current) },
+        {
+          x: 0,
+          duration: 0.5,
+          ease: 'expo.inOut'
+        },
+        '<+0.05'
+      )
+      .fromTo(
+        elements.formEl,
+        { x: '-100%' },
+        { x: 0, ease: 'expo.out', duration: 0.4 },
+        '>-0.35'
+      );
 
     return () => {
-      animation.current?.kill();
+      animation.current?.invalidate();
     };
-  }, [formWidth]);
+  }, [modalRect, modalRectRef, getDetailsOffset]);
 
   useEffect(() => {
     if (!animation.current) {
@@ -160,35 +219,17 @@ export default memo(function ContactModal({
               aria-labelledby="contact-modal-title"
               aria-describedby="contact-modal-description"
             >
-              <div className={styles.detailsSpacer}>
-                <div
-                  ref={detailsWrapper}
-                  className={styles.detailsWrapper}
-                >
-                  <div
-                    ref={details}
-                    className={styles.details}
-                  >
-                    <H2
-                      className={styles.headline}
-                      eyebrow="Contact me"
-                      eyebrowId="contact-modal-title"
-                    >
-                      <span id="contact-modal-description">
-                        I&apos;m looking forward to hearing from you
-                      </span>
-                    </H2>
-                  </div>
-                  <div
-                    ref={detailsBg}
-                    className={styles.detailsBg}
-                  />
-                </div>
-              </div>
-              <div
-                ref={formWrapper}
-                className={styles.formWrapper}
-              >
+              <ContactDetails
+                headlineId="contact-modal-title"
+                descriptionId="contact-modal-description"
+                wrapperRef={detailsWrapper}
+                contentRef={details}
+                bgRef={detailsBg}
+                circleRef={circle}
+                leftBarRef={leftBar}
+                rightBarRef={rightBar}
+              />
+              <div className={styles.formWrapper}>
                 <div
                   ref={form}
                   className={styles.form}
@@ -213,6 +254,9 @@ export default memo(function ContactModal({
         document.body
       );
 });
+
+const borderRadius = parseInt(styles.borderRadius);
+const barOffset = parseInt(styles.barOffset);
 
 type ContactModalProps = {
   isOpen: boolean;
