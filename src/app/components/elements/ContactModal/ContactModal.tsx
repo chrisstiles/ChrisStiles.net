@@ -150,7 +150,8 @@ export default memo(function ContactModal({
           visibility: 'visible',
           duration: 0.4,
           ease: 'expo.inOut'
-        }
+        },
+        '>-0.1'
       )
       .fromTo(
         elements.detailsEl,
@@ -166,7 +167,8 @@ export default memo(function ContactModal({
           duration: 0.5,
           ease: 'expo.inOut'
         },
-        '<+0.05'
+        '<'
+        // '<+0.05'
       )
       .fromTo(
         elements.formEl,
@@ -186,14 +188,14 @@ export default memo(function ContactModal({
       return;
     }
 
+    setIsAnimating(true);
+    setIsVisible(isOpen);
+
     if (isOpen) {
       animation.current.play(undefined, false);
     } else {
       animation.current.reverse(undefined, false);
     }
-
-    setIsAnimating(true);
-    setIsVisible(isOpen);
   }, [isOpen]);
 
   return !isMounted
