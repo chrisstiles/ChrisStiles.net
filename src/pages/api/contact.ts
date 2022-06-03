@@ -3,7 +3,10 @@ import {
   defaultErrorMessage,
   type ContactFormData
 } from '@elements/ContactForm';
+import sendgrid, { type ResponseError } from '@sendgrid/mail';
 import type { NextApiRequest, NextApiResponse } from 'next';
+
+sendgrid.setApiKey(process.env.SENDGRID_SECRET_KEY!);
 
 export default async function handler(
   req: NextApiRequest,
@@ -13,7 +16,6 @@ export default async function handler(
     typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
 
   // TODO Add spam filter with honeypot
-  // TODO Send submission data to email
   const validationErrors: ValidationErrors = {};
 
   for (const [name, validate] of Object.entries(validations)) {
@@ -36,14 +38,41 @@ export default async function handler(
   if (Object.keys(validationErrors).length) {
     res.status(422).json({ validationErrors });
   } else {
-    res.status(200).json({
-      message: 'Thank you, your submission has been received'
-    });
+    try {
+      await sendEmailNotification(data);
+
+      res.status(200).json({
+        message: 'Thank you, your submission has been received'
+      });
+    } catch (e) {
+      const error = e as ResponseError;
+      console.error(
+        error.response?.body ?? error.message ?? 'Failed to send email'
+      );
+      res.status(error.code ?? 500).json({ error: defaultErrorMessage });
+    }
   }
+}
+
+async function sendEmailNotification(data: ContactFormData) {
+  const message = {
+    to: process.env.FORM_EMAIL_TO!,
+    from: process.env.FORM_EMAIL_FROM!,
+    subject: 'Contact form submission - chrisstiles.dev',
+    html: `
+      <strong>Name:</strong> ${data.name}<br />
+      <strong>Email:</strong> ${data.email}<br />
+      <strong>Message:</strong><br />
+      ${data.message}
+    `
+  };
+
+  await sendgrid.send(message);
 }
 
 export type ContactFormResponse = {
   message?: string;
+  error?: string;
   validationErrors?: ValidationErrors & {
     name?: string;
     email?: string;

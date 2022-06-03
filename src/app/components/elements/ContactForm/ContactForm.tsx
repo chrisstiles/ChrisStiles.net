@@ -64,7 +64,7 @@ export default function ContactForm() {
     async (e: FormEvent) => {
       e.preventDefault();
 
-      if (apiResponse?.success || isLoadingRef.current) {
+      if (apiResponse?.success || apiResponse?.error || isLoadingRef.current) {
         return;
       }
 
@@ -96,7 +96,9 @@ export default function ContactForm() {
   );
 
   const hasFormError =
-    apiResponse && !apiResponse.success && apiResponse.message;
+    apiResponse &&
+    !apiResponse.success &&
+    (apiResponse.error ?? apiResponse.message);
 
   const fieldComponents = useMemo(() => {
     return fields.map(({ name, ...field }, index) => (
@@ -140,7 +142,7 @@ export default function ContactForm() {
         {hasFormError && (
           <ErrorMessage
             id={`${id}-form-error`}
-            message={apiResponse.message}
+            message={apiResponse.error ?? apiResponse.message}
           />
         )}
         {fieldComponents}
@@ -148,7 +150,12 @@ export default function ContactForm() {
           type="submit"
           className={styles.submit}
           isLoading={isLoading}
-          disabled={!canSubmit || isLoading || apiResponse?.success}
+          disabled={
+            !canSubmit ||
+            isLoading ||
+            apiResponse?.success ||
+            !!apiResponse?.error
+          }
         >
           Send your message
         </Button>
@@ -341,7 +348,7 @@ type ErrorMessageProps = {
 };
 
 export const defaultErrorMessage =
-  'Unable to send your message, please try again later';
+  'Unable to send your message, please email me directly or try again later.';
 
 const fields: Field[] = [
   {
