@@ -12,6 +12,7 @@ sendgrid.setApiKey(process.env.SENDGRID_SECRET_KEY!);
 
 const successMessage = 'Thank you, your submission has been received';
 const minTime = 5000; // Ignore bots who submit the form too quickly
+const maxRequestsPerMinute = 5;
 
 const limiter = rateLimit({
   interval: 6000,
@@ -23,17 +24,11 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ContactFormResponse>
 ) {
-  const ip = [req.headers['x-forwarded-for'] ?? 'CONTACT_FORM_API'].flat()[0];
-  console.log('IP', ip);
-  console.log('Headers\n', req.headers);
-
   try {
-    await limiter.check(req, res, 1);
+    await limiter.check(req, res, maxRequestsPerMinute);
   } catch {
     return res.status(429).json({ error: 'Rate limit exceeded' });
   }
-
-  console.log('Not limited');
 
   try {
     const data: ContactFormRequest =
@@ -49,7 +44,6 @@ export default async function handler(
       !isValidDate(pageLoadTime) ||
       formSubmitTime.getTime() - pageLoadTime.getTime() < minTime
     ) {
-      console.log('SPAM FILTERED');
       await sleep(2500);
       return res.status(200).json({ message: successMessage });
     }

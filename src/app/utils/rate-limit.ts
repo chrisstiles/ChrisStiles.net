@@ -25,9 +25,6 @@ const rateLimit = (options: RateLimitOptions) => {
       token ??= getUserToken(req, token);
 
       return new Promise<void>((resolve, reject) => {
-        console.log('Token', tokenCache.get(token));
-        console.log('Test default token', tokenCache.get(options.defaultToken));
-
         const tokenCount: any[] = tokenCache.get(token) || [0];
 
         if (tokenCount[0] === 0) {
@@ -37,7 +34,8 @@ const rateLimit = (options: RateLimitOptions) => {
         tokenCount[0] += 1;
 
         const currentUsage = tokenCount[0];
-        const isRateLimited = currentUsage >= limit;
+        const isRateLimited = currentUsage > limit;
+
         res.setHeader('X-RateLimit-Limit', limit);
         res.setHeader(
           'X-RateLimit-Remaining',
