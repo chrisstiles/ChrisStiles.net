@@ -1,9 +1,10 @@
+import { memo } from 'react';
 import styles from './ContactModal.module.scss';
 import { H2 } from '@elements';
 import classNames from 'classnames';
 import type { RefObject } from 'react';
 
-export default function ContactDetails({
+export default memo(function ContactDetails({
   headlineId,
   descriptionId,
   wrapperRef,
@@ -58,7 +59,7 @@ export default function ContactDetails({
       </div>
     </div>
   );
-}
+});
 
 type ContactDetailsProps = {
   headlineId: string;

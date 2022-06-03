@@ -1,4 +1,5 @@
 import { isPlainObject, isFunction } from 'lodash';
+import type { NextApiRequest } from 'next';
 
 export function getState(state: any, value: any, name?: string) {
   if (!isPlainObject(state) || (!value && !name)) {
@@ -38,4 +39,9 @@ export function getElementIndex(node: Element) {
 
 export function stripHtml(text: string) {
   return text.replace(/<\/?[^> \s\n]*>?/g, '');
+}
+
+export function isValidDate(d: string | Date) {
+  const date = new Date(d);
+  return date instanceof Date && !isNaN(date.getTime());
 }

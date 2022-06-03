@@ -16,9 +16,9 @@ import * as Icon from './icons';
 import { Button } from '@elements';
 import gsap from 'gsap';
 import classNames from 'classnames';
-import type { ContactFormResponse } from '@api/contact';
+import type { ContactFormRequest, ContactFormResponse } from '@api/contact';
 
-export default function ContactForm() {
+export default memo(function ContactForm() {
   const id = useId();
   const [data, setData] = useState<ContactFormData>({
     name: '',
@@ -35,12 +35,15 @@ export default function ContactForm() {
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const isLoadingRef = useRef(isLoading);
+  const [apiResponse, setApiResponse] = useState<ApiResponseData | null>(null);
 
   useEffect(() => {
     isLoadingRef.current = isLoading;
   }, [isLoading]);
 
-  const [apiResponse, setApiResponse] = useState<ApiResponseData | null>(null);
+  // Spam filters
+  const honeypot = useRef<HTMLInputElement>(null);
+  const timestamp = useRef(new Date());
 
   const handleChange = useCallback(
     (name: keyof ContactFormData, value: string) => {
@@ -49,7 +52,7 @@ export default function ContactForm() {
       startTransition(() => {
         setIsValid(isValid => ({
           ...isValid,
-          [name]: validations[name](value.trim())
+          [name]: validations[name]?.(value.trim())
         }));
       });
     },
@@ -72,10 +75,16 @@ export default function ContactForm() {
       setIsLoading(true);
       setHasSubmitted(true);
 
+      const formData: ContactFormRequest = {
+        ...data,
+        timestamp: timestamp.current,
+        honeypot: honeypot.current?.value ?? ''
+      };
+
       try {
         const res = await fetch('/api/contact', {
           method: 'post',
-          body: JSON.stringify(data),
+          body: JSON.stringify(formData),
           headers: {
             'Content-Type': 'application/json'
           }
@@ -105,7 +114,7 @@ export default function ContactForm() {
       <Field
         key={index}
         name={name}
-        value={data[name]}
+        value={data[name] ?? ''}
         isValid={isValid[name]}
         error={apiResponse?.validationErrors?.[name]}
         hasSubmitted={hasSubmitted}
@@ -146,6 +155,21 @@ export default function ContactForm() {
           />
         )}
         {fieldComponents}
+        <label
+          htmlFor={`${id}-honeypot`}
+          aria-hidden="true"
+          className={styles.honeypot}
+        >
+          Do not fill this field out if you are a human
+          <input
+            id={`${id}-honeypot`}
+            type="text"
+            name="website"
+            tabIndex={-1}
+            required
+          />
+        </label>
+
         <Button
           type="submit"
           className={styles.submit}
@@ -163,7 +187,7 @@ export default function ContactForm() {
       {apiResponse?.success && <SuccessMessage />}
     </div>
   );
-}
+});
 
 const Field = memo(function Field({
   name,
@@ -171,6 +195,7 @@ const Field = memo(function Field({
   label,
   className,
   type = 'text',
+  autoComplete,
   icon,
   isValid: _isValid,
   error,
@@ -198,6 +223,7 @@ const Field = memo(function Field({
     id: `${id}-input`,
     name,
     value,
+    autoComplete,
     required: true,
     className: classNames(styles.input, className, {
       [styles.hasIcon]: !!icon
@@ -221,6 +247,8 @@ const Field = memo(function Field({
         [styles.showInvalidIcon]: shouldShowInvalid
       })}
     >
+      {/* <input asdf="asdf" />
+      <textarea asdf="asdf"></textarea> */}
       {label && (
         <div className={styles.labelWrapper}>
           <label
@@ -323,6 +351,7 @@ type FieldProps = {
   className?: string;
   icon?: ReactNode;
   placeholder?: string;
+  autoComplete?: string;
   type?: string;
   isValid: boolean;
   error?: string;

@@ -3,6 +3,8 @@ import styles from './Headline.module.scss';
 import BoundingBox from '../../BoundingBox';
 import classNames from 'classnames';
 
+const fullText = 'Good ideas need great developers';
+
 export default memo(function Headline({
   text,
   selectEmphasis,
@@ -38,7 +40,7 @@ export default memo(function Headline({
 
   return (
     <h1
-      aria-label="Good ideas need great developers"
+      aria-label={content ? fullText : undefined}
       className={classNames(styles.headline, {
         [styles.empty]: !content,
         [styles.selectEmphasis]: selectEmphasis,
@@ -50,6 +52,7 @@ export default memo(function Headline({
         [styles.uppercase]: uppercaseText
       })}
     >
+      {!content && <span className="sr">{fullText}</span>}
       <span
         className={styles.content}
         aria-hidden="true"
