@@ -16,6 +16,7 @@ import * as Icon from './icons';
 import { Button } from '@elements';
 import gsap from 'gsap';
 import classNames from 'classnames';
+import { upperFirst } from 'lodash';
 import type { ContactFormRequest, ContactFormResponse } from '@api/contact';
 
 export default memo(function ContactForm() {
@@ -26,10 +27,12 @@ export default memo(function ContactForm() {
     message: ''
   });
 
-  const [isValid, setIsValid] = useState({
-    name: false,
-    email: false,
-    message: false
+  const [isValid, setIsValid] = useState<{
+    [key in keyof ContactFormData]: ValidationState;
+  }>({
+    name: { value: false, message: '' },
+    email: { value: false, message: '' },
+    message: { value: false, message: '' }
   });
 
   const [hasSubmitted, setHasSubmitted] = useState(false);
@@ -52,7 +55,7 @@ export default memo(function ContactForm() {
       startTransition(() => {
         setIsValid(isValid => ({
           ...isValid,
-          [name]: validations[name]?.(value.trim())
+          [name]: validateField(name, value)
         }));
       });
     },
@@ -60,7 +63,7 @@ export default memo(function ContactForm() {
   );
 
   const canSubmit = useMemo(() => {
-    return Object.values(isValid).every(v => v);
+    return Object.values(isValid).every(v => v.value);
   }, [isValid]);
 
   const handleSubmit = useCallback(
@@ -115,7 +118,7 @@ export default memo(function ContactForm() {
         key={index}
         name={name}
         value={data[name] ?? ''}
-        isValid={isValid[name]}
+        validationState={isValid[name]}
         error={apiResponse?.validationErrors?.[name]}
         hasSubmitted={hasSubmitted}
         onChange={handleChange}
@@ -162,6 +165,7 @@ export default memo(function ContactForm() {
         >
           Do not fill this field out if you are a human
           <input
+            ref={honeypot}
             id={`${id}-honeypot`}
             type="text"
             name="website"
@@ -197,7 +201,7 @@ const Field = memo(function Field({
   type = 'text',
   autoComplete,
   icon,
-  isValid: _isValid,
+  validationState,
   error,
   hasSubmitted,
   onChange: handleChange,
@@ -207,17 +211,13 @@ const Field = memo(function Field({
   const [hasBlurred, setHasBlurred] = useState(false);
   const Component = type === 'textarea' ? 'textarea' : 'input';
   const hasServerError = !!error?.trim();
-  const isValid = _isValid && !hasServerError;
+  const isValid = validationState.value && !hasServerError;
   const shouldShowInvalid = !isValid && (hasBlurred || hasSubmitted);
   const errorMessage = useMemo(() => {
-    const word = name === 'message' ? 'a' : 'your';
-
     return isValid || (!hasBlurred && !hasSubmitted)
       ? null
-      : !value.trim() || type === 'textarea'
-      ? error ?? `Please enter ${word} ${name}`
-      : error ?? `Please enter a valid ${name}`;
-  }, [hasBlurred, hasSubmitted, isValid, error, name, type, value]);
+      : error ?? validationState.message;
+  }, [isValid, hasBlurred, hasSubmitted, error, validationState]);
 
   const props = {
     id: `${id}-input`,
@@ -231,7 +231,10 @@ const Field = memo(function Field({
     onChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       handleChange(name, e.target.value);
     },
-    onBlur: () => setHasBlurred(true),
+    onBlur: () => {
+      handleChange(name, value);
+      setHasBlurred(true);
+    },
     'aria-invalid': shouldShowInvalid,
     'aria-errormessage':
       shouldShowInvalid && errorMessage ? `${id}-error` : undefined,
@@ -247,8 +250,6 @@ const Field = memo(function Field({
         [styles.showInvalidIcon]: shouldShowInvalid
       })}
     >
-      {/* <input asdf="asdf" />
-      <textarea asdf="asdf"></textarea> */}
       {label && (
         <div className={styles.labelWrapper}>
           <label
@@ -328,53 +329,57 @@ function SuccessMessage() {
   );
 }
 
-export const validations: ValidationFunctions = {
-  name: (v: string) => v.length >= 2,
-  email: v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v),
-  message: (v: string) => v.length >= 3
+export const validations: FieldValidations = {
+  name: {
+    min: 2,
+    max: 100
+  },
+  email: {
+    min: 0,
+    max: 200,
+    check: v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)
+  },
+  message: {
+    min: 3,
+    max: 600
+  }
 };
 
-export type ContactFormData = {
-  name: string;
-  email: string;
+type ValidationState = {
+  value: boolean;
   message: string;
 };
 
-export type ValidationFunctions = {
-  [key in keyof ContactFormData]: (v: string) => boolean;
-};
+export function validateField(
+  name: keyof ContactFormData,
+  value: string = ''
+): ValidationState {
+  if (!validations[name]) {
+    return { value: true, message: '' };
+  }
 
-type FieldProps = {
-  name: keyof ContactFormData;
-  value: string;
-  label: string;
-  className?: string;
-  icon?: ReactNode;
-  placeholder?: string;
-  autoComplete?: string;
-  type?: string;
-  isValid: boolean;
-  error?: string;
-  hasSubmitted: boolean;
-  onChange: (name: keyof ContactFormData, value: string) => void;
-};
+  const { min, max, check } = validations[name];
+  const val = (value ?? '').trim();
+  const len = val.length;
+  const word = name === 'message' ? 'a' : 'your';
 
-type Field = {
-  name: keyof ContactFormData;
-  label: string;
-  placeholder: string;
-  type?: string;
-  icon?: JSX.Element;
-};
+  if (!val || (name === 'message' && len < min)) {
+    return { value: false, message: `Please enter ${word} ${name}` };
+  }
 
-type ApiResponseData = ContactFormResponse & {
-  success: boolean;
-};
+  if (len > max) {
+    return {
+      value: false,
+      message: `${upperFirst(name)} is too long (${len}/${max})`
+    };
+  }
 
-type ErrorMessageProps = {
-  id: string;
-  message?: string;
-};
+  if (len < min || (check && !check(val))) {
+    return { value: false, message: `Please enter a valid ${name}` };
+  }
+
+  return { value: true, message: '' };
+}
 
 export const defaultErrorMessage =
   'Unable to send your message, please email me directly or try again later.';
@@ -400,3 +405,49 @@ const fields: Field[] = [
     placeholder: 'How can I help you?'
   }
 ];
+
+type FieldProps = {
+  name: keyof ContactFormData;
+  value: string;
+  label: string;
+  className?: string;
+  icon?: ReactNode;
+  placeholder?: string;
+  autoComplete?: string;
+  type?: string;
+  validationState: ValidationState;
+  error?: string;
+  hasSubmitted: boolean;
+  onChange: (name: keyof ContactFormData, value: string) => void;
+};
+
+type Field = {
+  name: keyof ContactFormData;
+  label: string;
+  placeholder: string;
+  type?: string;
+  icon?: JSX.Element;
+};
+
+export type ContactFormData = {
+  name: string;
+  email: string;
+  message: string;
+};
+
+export type FieldValidations = {
+  [key in keyof ContactFormData]: {
+    min: number;
+    max: number;
+    check?: (v: string) => boolean | string;
+  };
+};
+
+type ApiResponseData = ContactFormResponse & {
+  success: boolean;
+};
+
+type ErrorMessageProps = {
+  id: string;
+  message?: string;
+};

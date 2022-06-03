@@ -1,7 +1,8 @@
 export {
   default,
   validations,
+  validateField,
   defaultErrorMessage,
   type ContactFormData,
-  type ValidationFunctions
+  type FieldValidations
 } from './ContactForm';

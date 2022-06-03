@@ -1,5 +1,6 @@
 import {
   validations,
+  validateField,
   defaultErrorMessage,
   type ContactFormData
 } from '@elements/ContactForm';
@@ -44,44 +45,39 @@ export default async function handler(
       !isValidDate(pageLoadTime) ||
       formSubmitTime.getTime() - pageLoadTime.getTime() < minTime
     ) {
-      await sleep(2500);
+      await sleep(2000);
       return res.status(200).json({ message: successMessage });
     }
 
     const validationErrors: ValidationErrors = {};
+    const keys = Object.keys(validations) as (keyof ContactFormData)[];
 
-    for (const [name, validate] of Object.entries(validations)) {
-      const key = name as keyof ContactFormData;
-      const value = String(data[key] ?? '');
-      const isValid = validate(value);
+    for (const name of keys) {
+      const value = String(data[name] ?? '');
+      const { value: isValid, message } = validateField(name, value);
 
       if (isValid) {
         continue;
       }
 
-      if (!value.trim() || key === 'message') {
-        const word = key === 'message' ? 'a' : 'your';
-        validationErrors[key] = `Please enter ${word} ${key}`;
-      } else {
-        validationErrors[key] = `Please enter a valid ${key}`;
-      }
+      validationErrors[name] = message;
     }
 
     if (Object.keys(validationErrors).length) {
-      res.status(422).json({ validationErrors });
-    } else {
-      try {
-        await sendEmailNotification(data);
-        res.status(200).json({ message: successMessage });
-      } catch (e) {
-        const error = e as ResponseError;
+      return res.status(422).json({ validationErrors });
+    }
 
-        console.error(
-          error.response?.body ?? error.message ?? 'Failed to send email'
-        );
+    try {
+      await sendEmailNotification(data);
+      res.status(200).json({ message: successMessage });
+    } catch (e) {
+      const error = e as ResponseError;
 
-        res.status(error.code ?? 500).json({ error: defaultErrorMessage });
-      }
+      console.error(
+        error.response?.body ?? error.message ?? 'Failed to send email'
+      );
+
+      res.status(error.code ?? 500).json({ error: defaultErrorMessage });
     }
   } catch {
     res.status(422).json({ error: 'Invalid form data' });
