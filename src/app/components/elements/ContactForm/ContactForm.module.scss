@@ -139,6 +139,9 @@
   svg {
     flex-grow: 0;
     flex-shrink: 0;
+    display: block;
+    width: 100%;
+    height: auto;
   }
 
   path {

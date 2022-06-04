@@ -1,5 +1,6 @@
-import { memo } from 'react';
+import { memo, type ReactNode, type FunctionComponent } from 'react';
 import styles from './ContactModal.module.scss';
+import * as Icon from './icons';
 import { H2 } from '@elements';
 import classNames from 'classnames';
 import type { RefObject } from 'react';
@@ -33,6 +34,7 @@ export default memo(function ContactDetails({
               I&apos;m looking forward to hearing from you
             </span>
           </H2>
+          <ContactLinks />
         </div>
         <div
           ref={bgRef}
@@ -61,6 +63,58 @@ export default memo(function ContactDetails({
   );
 });
 
+function ContactLinks() {
+  return (
+    <ul className={styles.linkWrapper}>
+      <ContactMethod
+        href="mailto:chris@chrisstiles.dev"
+        text="chris@chrisstiles.dev"
+        icon={Icon.Email}
+        iconLabel="Email"
+      />
+      <ContactMethod
+        href="tel:925-998-4663"
+        text="(925) 998-4663"
+        icon={Icon.Phone}
+        iconLabel="Cal"
+      />
+      <ContactMethod
+        href="https://www.linkedin.com/in/christopherstiles"
+        text="Connect on LinkedIn"
+        icon={Icon.LinkedIn}
+      />
+      <ContactMethod
+        href="https://github.com/chrisstiles"
+        text="Follow me on GitHub"
+        icon={Icon.GitHub}
+      />
+    </ul>
+  );
+}
+
+function ContactMethod({
+  icon: Icon,
+  iconLabel,
+  href,
+  text
+}: ContactMethodProps) {
+  return (
+    <li>
+      <a
+        href={href}
+        className={styles.link}
+      >
+        <Icon
+          className={styles.linkIcon}
+          aria-hidden={!iconLabel}
+          aria-label={iconLabel}
+        />
+        {text}
+      </a>
+    </li>
+  );
+}
+
 type ContactDetailsProps = {
   headlineId: string;
   descriptionId: string;
@@ -70,4 +124,11 @@ type ContactDetailsProps = {
   circleRef: RefObject<HTMLDivElement>;
   leftBarRef: RefObject<HTMLDivElement>;
   rightBarRef: RefObject<HTMLDivElement>;
+};
+
+type ContactMethodProps = {
+  icon: FunctionComponent<any>;
+  iconLabel?: string;
+  href: string;
+  text?: ReactNode;
 };

@@ -9,7 +9,7 @@ import {
 import { createPortal } from 'react-dom';
 import styles from './ContactModal.module.scss';
 import ContactDetails from './ContactDetails';
-import Close from './close.svg';
+import { Close } from './icons';
 import useClickOutside from '@hooks/useClickOutside';
 import useEventListener from '@hooks/useEventListener';
 import useVariableRef from '@hooks/useVariableRef';
@@ -20,8 +20,6 @@ import BezierEasing from 'bezier-easing';
 import classNames from 'classnames';
 import FocusLock from 'react-focus-lock';
 import { RemoveScroll } from 'react-remove-scroll';
-
-// TODO Add sidebar contact details
 
 export default memo(function ContactModal({
   isOpen,
@@ -83,14 +81,14 @@ export default memo(function ContactModal({
   useEffect(() => {
     const hasRect = !!modalRect?.width;
     const elements = {
-      bgEl: bg.current,
-      detailsWrapperEl: detailsWrapper.current,
-      detailsBgEl: detailsBg.current,
-      detailsEl: details.current,
-      circleEl: circle.current,
-      leftBarEl: leftBar.current,
-      rightBarEl: rightBar.current,
-      formEl: form.current
+      bg: bg.current,
+      detailsWrapper: detailsWrapper.current,
+      detailsBg: detailsBg.current,
+      details: details.current,
+      circle: circle.current,
+      leftBar: leftBar.current,
+      rightBar: rightBar.current,
+      form: form.current
     };
 
     if (
@@ -121,7 +119,7 @@ export default memo(function ContactModal({
 
         if (currentWidth && startWidth !== currentWidth) {
           startWidth = currentWidth;
-          gsap.set(elements.detailsWrapperEl, {
+          gsap.set(elements.detailsWrapper, {
             x: getDetailsOffset(modalRectRef.current)
           });
         }
@@ -131,11 +129,12 @@ export default memo(function ContactModal({
     const barHeight = borderRadius + barOffset;
     const barEase = BezierEasing(0.18, 0.72, 0.22, 1);
     const barEaseOut = BezierEasing(0.79, 0.02, 0.11, 1);
-    const barBounce = BezierEasing(0.3, 1.22, 0.31, 1.3);
+    const circleBounce = BezierEasing(0.3, 1.22, 0.31, 1.3);
+    const slideXEase = BezierEasing(0.59, 0.59, 0.05, 1);
 
     animation.current
       .fromTo(
-        elements.bgEl,
+        elements.bg,
         { opacity: 0 },
         {
           opacity: 0.95,
@@ -143,13 +142,13 @@ export default memo(function ContactModal({
         }
       )
       .fromTo(
-        elements.circleEl,
+        elements.circle,
         { scale: 0 },
-        { scale: 1, duration: 0.2, ease: barBounce },
+        { scale: 1, duration: 0.2, ease: circleBounce },
         '<+=0.08'
       )
       .fromTo(
-        [elements.leftBarEl, elements.rightBarEl],
+        [elements.leftBar, elements.rightBar],
         { visibility: 'hidden', x: index => (index === 0 ? '100%' : '-100%') },
         {
           visibility: 'visible',
@@ -161,38 +160,41 @@ export default memo(function ContactModal({
         }
       )
       .fromTo(
-        elements.detailsBgEl,
+        elements.detailsBg,
         { visibility: 'hidden', y: '-100%' },
         {
           y: -barHeight,
           visibility: 'visible',
-          duration: 0.4,
-          ease: 'expo.inOut'
+          duration: 0.23,
+          ease: BezierEasing(0.68, 0.15, 0.13, 0.98)
         },
         '>-0.1'
       )
+      .addLabel('slideX', '>+0.02')
       .fromTo(
-        elements.detailsEl,
+        elements.details,
         { opacity: 0 },
-        { opacity: 1, duration: 0.45, ease: 'sine.inOut' },
-        '>-0.2'
+        {
+          opacity: 1,
+          duration: 0.35
+        },
+        '<+0.3'
       )
       .fromTo(
-        elements.detailsWrapperEl,
+        elements.detailsWrapper,
         { x: () => getDetailsOffset(modalRectRef.current) },
         {
           x: 0,
-          duration: 0.5,
-          ease: 'expo.inOut',
-          repeatRefresh: true
+          duration: 0.3,
+          ease: slideXEase
         },
-        '<'
+        'slideX'
       )
       .fromTo(
-        elements.formEl,
+        elements.form,
         { x: '-100%' },
-        { x: 0, ease: 'expo.out', duration: 0.4 },
-        '>-0.35'
+        { x: 0, ease: slideXEase, duration: 0.28 },
+        'slideX'
       );
   }, [modalRect, modalRectRef, getDetailsOffset]);
 

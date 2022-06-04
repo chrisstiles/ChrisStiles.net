@@ -77,7 +77,9 @@ $borderRadius: 9px;
 .details {
   border-radius: $borderRadius 0 0 $borderRadius;
   opacity: 0;
-  will-change: opacity;
+  will-change: opacity, transform;
+  position: relative;
+  z-index: 20;
 
   h2 {
     font-size: 30px;
@@ -87,6 +89,70 @@ $borderRadius: 9px;
       font-size: 19px;
       margin-bottom: 0.85em;
     }
+  }
+}
+
+.linkWrapper {
+  padding-top: 35px;
+  border-top: 2px solid #373e59;
+  margin: 40px 0 0 0;
+  list-style: none;
+
+  li {
+    margin-bottom: 8px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  font-size: 18px;
+  color: #c9c9da;
+  line-height: 1;
+  font-weight: 400;
+  text-decoration: none;
+  padding: 5px 7px 7px 6px;
+  margin-left: -6px;
+  border-radius: 3px;
+
+  &:hover {
+    color: var(--yellow-accent-color);
+  }
+
+  &:global(.focus-visible) {
+    outline-offset: 1px;
+    outline-color: var(--yellow-accent-color);
+    color: #fff;
+
+    path {
+      fill: var(--yellow-accent-color);
+    }
+  }
+}
+
+.linkIcon {
+  width: 22px;
+  height: 22px;
+  flex-grow: 0;
+  flex-shrink: 0;
+  margin-right: 14px;
+  color: #575d75;
+  position: relative;
+  top: 1px;
+  // transition: color 0.1s ease;
+
+  @at-root .link:hover & {
+    // color: #fff;
+    color: var(--yellow-accent-color);
+  }
+
+  path {
+    fill: currentColor;
   }
 }
 

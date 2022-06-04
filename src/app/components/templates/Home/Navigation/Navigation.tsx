@@ -15,15 +15,15 @@ export default memo(function Navigation() {
           <li>
             <a
               href="https://github.com/chrisstiles"
-              className={styles.linkedIn}
+              className={styles.gitHub}
             >
               <GitHub className={styles.icon} />
             </a>
           </li>
           <li>
             <a
-              href="https://www.linkedin.com/in/christopherstiles/"
-              className={styles.gitHub}
+              href="https://www.linkedin.com/in/christopherstiles"
+              className={styles.linkedIn}
             >
               <LinkedIn className={styles.icon} />
             </a>
