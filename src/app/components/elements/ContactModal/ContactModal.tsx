@@ -65,10 +65,11 @@ export default memo(function ContactModal({
   const updateDetailsPosition = useCallback(
     ({ contentRect }: ResizeObserverEntry) => {
       if (
-        !animation.current?.isActive() &&
-        !isOpenRef.current &&
+        contentRect.width &&
+        animation.current &&
         detailsWrapper.current &&
-        contentRect?.width
+        !animation.current.isActive() &&
+        !isOpenRef.current
       ) {
         gsap.set(detailsWrapper.current, { x: getDetailsOffset(contentRect) });
       }
@@ -92,19 +93,39 @@ export default memo(function ContactModal({
       formEl: form.current
     };
 
-    if (animation.current || !Object.values(elements).every(el => !!el)) {
-      return () => {
-        if (hasRect) {
-          animation.current?.invalidate();
-        }
-      };
+    if (
+      animation.current ||
+      !hasRect ||
+      !Object.values(elements).every(el => !!el)
+    ) {
+      return;
     }
+
+    let startWidth = modalRectRef.current?.width;
 
     animation.current = gsap.timeline({
       paused: true,
-      onStart: () => setIsAnimating(true),
-      onComplete: () => setIsAnimating(false),
-      onReverseComplete: () => setIsAnimating(false)
+      onStart: () => {
+        startWidth = modalRectRef.current?.width;
+        setIsAnimating(true);
+      },
+      onComplete: () => {
+        animation.current?.invalidate();
+        setIsAnimating(false);
+      },
+      onReverseComplete: () => {
+        animation.current?.invalidate();
+        setIsAnimating(false);
+
+        const currentWidth = modalRectRef.current?.width;
+
+        if (currentWidth && startWidth !== currentWidth) {
+          startWidth = currentWidth;
+          gsap.set(elements.detailsWrapperEl, {
+            x: getDetailsOffset(modalRectRef.current)
+          });
+        }
+      }
     });
 
     const barHeight = borderRadius + barOffset;
@@ -129,22 +150,19 @@ export default memo(function ContactModal({
       )
       .fromTo(
         [elements.leftBarEl, elements.rightBarEl],
+        { visibility: 'hidden', x: index => (index === 0 ? '100%' : '-100%') },
         {
-          x: index => (index === 0 ? -barHeight : barHeight)
-        },
-        {
-          x: index => (index === 0 ? '-100%' : '100%'),
           visibility: 'visible',
-          immediateRender: false,
+          x: index => (index === 0 ? barHeight : -barHeight),
+          duration: 0.28,
           ease: p => {
             return animation.current?.reversed() ? barEaseOut(p) : barEase(p);
-          },
-          duration: 0.28
+          }
         }
       )
       .fromTo(
         elements.detailsBgEl,
-        { y: '-100%' },
+        { visibility: 'hidden', y: '-100%' },
         {
           y: -barHeight,
           visibility: 'visible',
@@ -165,10 +183,10 @@ export default memo(function ContactModal({
         {
           x: 0,
           duration: 0.5,
-          ease: 'expo.inOut'
+          ease: 'expo.inOut',
+          repeatRefresh: true
         },
         '<'
-        // '<+0.05'
       )
       .fromTo(
         elements.formEl,
@@ -176,10 +194,6 @@ export default memo(function ContactModal({
         { x: 0, ease: 'expo.out', duration: 0.4 },
         '>-0.35'
       );
-
-    return () => {
-      animation.current?.invalidate();
-    };
   }, [modalRect, modalRectRef, getDetailsOffset]);
 
   useEffect(() => {
