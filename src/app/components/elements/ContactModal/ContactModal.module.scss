@@ -77,7 +77,7 @@ $borderRadius: 9px;
 .details {
   border-radius: $borderRadius 0 0 $borderRadius;
   opacity: 0;
-  will-change: opacity, transform;
+  will-change: opacity;
   position: relative;
   z-index: 20;
 
@@ -127,7 +127,7 @@ $borderRadius: 9px;
   &:global(.focus-visible) {
     outline-offset: 1px;
     outline-color: var(--yellow-accent-color);
-    color: #fff;
+    color: var(--yellow-accent-color);
 
     path {
       fill: var(--yellow-accent-color);
@@ -266,11 +266,12 @@ $barOffset: 10px;
   &:global(.focus-visible) {
     outline-offset: 0;
     transition: none;
-    outline-color: var(--green-accent-color);
+    background-color: transparent !important;
+    outline-color: var(--yellow-accent-color);
 
     path {
       transition: none;
-      fill: #fff;
+      fill: var(--yellow-accent-color) !important;
     }
   }
 

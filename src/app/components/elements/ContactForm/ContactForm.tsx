@@ -9,7 +9,8 @@ import {
   useMemo,
   type ReactNode,
   type ChangeEvent,
-  type FormEvent
+  type FormEvent,
+  type KeyboardEvent
 } from 'react';
 import styles from './ContactForm.module.scss';
 import * as Icon from './icons';
@@ -209,15 +210,17 @@ const Field = memo(function Field({
 }: FieldProps) {
   const id = useId();
   const [hasBlurred, setHasBlurred] = useState(false);
+  const [hasInput, setHasInput] = useState(false);
   const Component = type === 'textarea' ? 'textarea' : 'input';
   const hasServerError = !!error?.trim();
   const isValid = validationState.value && !hasServerError;
-  const shouldShowInvalid = !isValid && (hasBlurred || hasSubmitted);
+  const shouldShowInvalid =
+    !isValid && ((hasBlurred && hasInput) || hasSubmitted);
   const errorMessage = useMemo(() => {
-    return isValid || (!hasBlurred && !hasSubmitted)
+    return isValid || ((!hasBlurred || !hasInput) && !hasSubmitted)
       ? null
       : error ?? validationState.message;
-  }, [isValid, hasBlurred, hasSubmitted, error, validationState]);
+  }, [isValid, hasBlurred, hasInput, hasSubmitted, error, validationState]);
 
   const props = {
     id: `${id}-input`,
@@ -240,6 +243,12 @@ const Field = memo(function Field({
       shouldShowInvalid && errorMessage ? `${id}-error` : undefined,
     ...restProps
   };
+
+  useEffect(() => {
+    if (!!value) {
+      setHasInput(true);
+    }
+  }, [value]);
 
   return (
     <div
