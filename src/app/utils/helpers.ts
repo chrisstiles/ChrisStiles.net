@@ -45,3 +45,9 @@ export function isValidDate(d: string | Date) {
   const date = new Date(d);
   return date instanceof Date && !isNaN(date.getTime());
 }
+
+export function isValidURL(url: string) {
+  return !!url.match(
+    /(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g
+  );
+}

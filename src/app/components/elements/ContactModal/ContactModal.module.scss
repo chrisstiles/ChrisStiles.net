@@ -144,10 +144,8 @@ $borderRadius: 9px;
   color: #575d75;
   position: relative;
   top: 1px;
-  // transition: color 0.1s ease;
 
   @at-root .link:hover & {
-    // color: #fff;
     color: var(--yellow-accent-color);
   }
 

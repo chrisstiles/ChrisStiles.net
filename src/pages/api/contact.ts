@@ -21,8 +21,6 @@ const limiter = rateLimit({
   defaultToken: 'CONTACT_FORM_API'
 });
 
-// TODO Ensure DKIM and other mail routing settings are configured correctly
-
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ContactFormResponse>

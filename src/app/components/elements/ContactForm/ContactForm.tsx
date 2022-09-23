@@ -7,16 +7,12 @@ import {
   useRef,
   useEffect,
   useMemo,
-  type ReactNode,
-  type ChangeEvent,
-  type FormEvent,
-  type KeyboardEvent
+  type FormEvent
 } from 'react';
 import styles from './ContactForm.module.scss';
 import * as Icon from './icons';
-import { Button } from '@elements';
+import { TextField, Button, type ValidationState } from '@elements';
 import gsap from 'gsap';
-import classNames from 'classnames';
 import { upperFirst } from 'lodash';
 import type { ContactFormRequest, ContactFormResponse } from '@api/contact';
 
@@ -29,7 +25,7 @@ export default memo(function ContactForm() {
   });
 
   const [isValid, setIsValid] = useState<{
-    [key in keyof ContactFormData]: ValidationState;
+    [key in FormFieldName]: ValidationState;
   }>({
     name: { value: false, message: '' },
     email: { value: false, message: '' },
@@ -49,19 +45,16 @@ export default memo(function ContactForm() {
   const honeypot = useRef<HTMLInputElement>(null);
   const timestamp = useRef(new Date());
 
-  const handleChange = useCallback(
-    (name: keyof ContactFormData, value: string) => {
-      setData(data => ({ ...data, [name]: value }));
+  const handleChange = useCallback((value: string, name: string) => {
+    setData(data => ({ ...data, [name]: value }));
 
-      startTransition(() => {
-        setIsValid(isValid => ({
-          ...isValid,
-          [name]: validateField(name, value)
-        }));
-      });
-    },
-    []
-  );
+    startTransition(() => {
+      setIsValid(isValid => ({
+        ...isValid,
+        [name]: validateField(name as FormFieldName, value)
+      }));
+    });
+  }, []);
 
   const canSubmit = useMemo(() => {
     return Object.values(isValid).every(v => v.value);
@@ -115,14 +108,15 @@ export default memo(function ContactForm() {
 
   const fieldComponents = useMemo(() => {
     return fields.map(({ name, ...field }, index) => (
-      <Field
+      <TextField
         key={index}
         name={name}
         value={data[name] ?? ''}
         validationState={isValid[name]}
         error={apiResponse?.validationErrors?.[name]}
-        hasSubmitted={hasSubmitted}
+        forceShowValidation={hasSubmitted}
         onChange={handleChange}
+        required
         {...field}
       />
     ));
@@ -149,6 +143,7 @@ export default memo(function ContactForm() {
       <form
         noValidate
         ref={form}
+        aria-label="Contact form"
         aria-describedby={hasFormError ? `${id}-form-error` : undefined}
         onSubmit={handleSubmit}
       >
@@ -190,109 +185,6 @@ export default memo(function ContactForm() {
         </Button>
       </form>
       {apiResponse?.success && <SuccessMessage />}
-    </div>
-  );
-});
-
-const Field = memo(function Field({
-  name,
-  value,
-  label,
-  className,
-  type = 'text',
-  autoComplete,
-  icon,
-  validationState,
-  error,
-  hasSubmitted,
-  onChange: handleChange,
-  ...restProps
-}: FieldProps) {
-  const id = useId();
-  const [hasBlurred, setHasBlurred] = useState(false);
-  const [hasInput, setHasInput] = useState(false);
-  const Component = type === 'textarea' ? 'textarea' : 'input';
-  const hasServerError = !!error?.trim();
-  const isValid = validationState.value && !hasServerError;
-  const shouldShowInvalid =
-    !isValid && ((hasBlurred && hasInput) || hasSubmitted);
-  const errorMessage = useMemo(() => {
-    return isValid || ((!hasBlurred || !hasInput) && !hasSubmitted)
-      ? null
-      : error ?? validationState.message;
-  }, [isValid, hasBlurred, hasInput, hasSubmitted, error, validationState]);
-
-  const props = {
-    id: `${id}-input`,
-    name,
-    value,
-    autoComplete,
-    required: true,
-    className: classNames(styles.input, className, {
-      [styles.hasIcon]: !!icon
-    }),
-    onChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      handleChange(name, e.target.value);
-    },
-    onBlur: () => {
-      handleChange(name, value);
-      setHasBlurred(true);
-    },
-    'aria-invalid': shouldShowInvalid,
-    'aria-errormessage':
-      shouldShowInvalid && errorMessage ? `${id}-error` : undefined,
-    ...restProps
-  };
-
-  useEffect(() => {
-    if (!!value) {
-      setHasInput(true);
-    }
-  }, [value]);
-
-  return (
-    <div
-      className={classNames(styles.field, {
-        [styles.valid]: isValid,
-        [styles.invalid]: !isValid,
-        [styles.serverError]: !!error,
-        [styles.showInvalidIcon]: shouldShowInvalid
-      })}
-    >
-      {label && (
-        <div className={styles.labelWrapper}>
-          <label
-            htmlFor={`${id}-input`}
-            className={styles.label}
-          >
-            {label}
-          </label>
-          {!!errorMessage && (
-            <span
-              id={`${id}-error`}
-              className={styles.fieldError}
-            >
-              {errorMessage}
-            </span>
-          )}
-        </div>
-      )}
-      <div className={styles.inputWrapper}>
-        <Component {...props} />
-        {icon && (
-          <div
-            className={styles.icon}
-            aria-hidden="true"
-          >
-            {icon}
-          </div>
-        )}
-        {type !== 'textarea' && (
-          <div className={styles.validityIcon}>
-            {isValid ? <Icon.Valid /> : <Icon.Invalid />}
-          </div>
-        )}
-      </div>
     </div>
   );
 });
@@ -354,13 +246,8 @@ export const validations: FieldValidations = {
   }
 };
 
-type ValidationState = {
-  value: boolean;
-  message: string;
-};
-
 export function validateField(
-  name: keyof ContactFormData,
+  name: FormFieldName,
   value: string = ''
 ): ValidationState {
   if (!validations[name]) {
@@ -415,23 +302,10 @@ const fields: Field[] = [
   }
 ];
 
-type FieldProps = {
-  name: keyof ContactFormData;
-  value: string;
-  label: string;
-  className?: string;
-  icon?: ReactNode;
-  placeholder?: string;
-  autoComplete?: string;
-  type?: string;
-  validationState: ValidationState;
-  error?: string;
-  hasSubmitted: boolean;
-  onChange: (name: keyof ContactFormData, value: string) => void;
-};
+export type FormFieldName = Extract<keyof ContactFormData, string>;
 
 type Field = {
-  name: keyof ContactFormData;
+  name: FormFieldName;
   label: string;
   placeholder: string;
   type?: string;
@@ -445,7 +319,7 @@ export type ContactFormData = {
 };
 
 export type FieldValidations = {
-  [key in keyof ContactFormData]: {
+  [key in FormFieldName]: {
     min: number;
     max: number;
     check?: (v: string) => boolean | string;

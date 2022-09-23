@@ -12,7 +12,7 @@
 }
 
 .contentWrapper {
-  background-color: #161929;
+  background-color: var(--page-background-dark-color);
   padding: 0;
   $offset: 100px;
   clip-path: polygon(0 $offset, 100% 0, 100% calc(100% - #{$offset}), 0 100%);

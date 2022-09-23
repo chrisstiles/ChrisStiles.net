@@ -1,0 +1,31 @@
+/* --------------------------- */
+/* Reddit Publish Date */
+/* --------------------------- */
+
+.wrapper {
+  background-color: var(--page-background-dark-color);
+}
+
+.contentWrapper {
+  display: flex;
+}
+
+.logo {
+  display: block;
+  width: 250px;
+  height: auto;
+  margin-bottom: 35px;
+}
+
+.col {
+  flex-grow: 1;
+  width: 50%;
+
+  &:nth-child(odd) {
+    padding-right: 20px;
+  }
+
+  &:nth-child(even) {
+    padding-left: 20px;
+  }
+}

@@ -9,6 +9,7 @@ import Header from './Header';
 import Hero from './Hero';
 import Experience from './Experience';
 import Highlights from './Highlights';
+import { RedditPublishDate } from './SideProjects';
 import { GridLines } from '@elements';
 
 export default function HomeTemplate({ iconFileNames }: HomeTemplateProps) {
@@ -39,6 +40,7 @@ export default function HomeTemplate({ iconFileNames }: HomeTemplateProps) {
           setAccentsVisible={setAccentsVisible}
         />
         <Highlights />
+        <RedditPublishDate />
       </main>
       <GridLines />
     </HomeTemplateContext.Provider>

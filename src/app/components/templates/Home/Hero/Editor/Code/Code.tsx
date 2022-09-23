@@ -5,7 +5,8 @@ import {
   useMemo,
   type SetStateAction,
   type Dispatch,
-  type CSSProperties
+  type CSSProperties,
+  type ReactNode
 } from 'react';
 import styles from './Code.module.scss';
 import useSyntaxHighlighting, { Language } from '@hooks/useSyntaxHighlighting';
@@ -115,5 +116,5 @@ type CodeProps = {
   currentIndex: number;
   numLines: number;
   setNumLines: Dispatch<SetStateAction<number>>;
-  children?: React.ReactNode;
+  children?: ReactNode;
 };

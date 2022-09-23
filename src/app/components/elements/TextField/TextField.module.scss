@@ -1,0 +1,175 @@
+/* --------------------------- */
+/* Text Field */
+/* --------------------------- */
+
+@use 'app';
+
+.field {
+  margin-bottom: 28px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.labelWrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.label {
+  font-size: 16px;
+  font-weight: 500;
+  color: #fff;
+  display: inline-block;
+  line-height: 1;
+}
+
+.fieldError {
+  color: #fb898f;
+  font-size: 14px;
+  line-height: 1.1;
+}
+
+.inputWrapper {
+  position: relative;
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: #3f465f;
+  color: #fff;
+
+  &:focus-within {
+    background-color: #4a526c;
+  }
+
+  @at-root .serverError & {
+    background-color: #594b5d;
+
+    &:focus-within {
+      background-color: #625060;
+    }
+  }
+}
+
+.input {
+  background-color: transparent !important;
+  border: none;
+  border-radius: 6px;
+  width: 100%;
+  resize: none;
+  // padding: 17px 55px 19px 24px;
+  padding: 17px 24px 19px 24px;
+  color: #fff;
+  font-weight: 400;
+  font-size: 16px;
+  font-family: var(--font);
+  line-height: 1;
+  outline: none;
+  text-overflow: ellipsis;
+
+  &:focus {
+    @include app.placeholder {
+      color: #8289a1;
+    }
+  }
+
+  &.hasIcon {
+    padding-left: 57px;
+  }
+
+  @at-root {
+    .valid &,
+    .invalid.showInvalidIcon & {
+      padding-right: 55px;
+    }
+  }
+
+  @include app.placeholder {
+    color: #737a92;
+  }
+
+  @at-root .serverError & {
+    @include app.placeholder {
+      color: #958697;
+    }
+
+    &:focus {
+      @include app.placeholder {
+        color: #a599a6;
+      }
+    }
+  }
+
+  @at-root textarea.input {
+    height: 165px;
+    padding: 23px 28px 25px 28px;
+    line-height: 1.4;
+    display: block;
+  }
+
+  &:-webkit-autofill,
+  &:-internal-autofill-selected {
+    -webkit-text-fill-color: #fff;
+  }
+
+  &:-webkit-autofill {
+    transition: background-color 4000s ease-in-out 0s;
+  }
+
+  &:-webkit-autofill,
+  &:-webkit-autofill:hover,
+  &:-webkit-autofill:focus,
+  &:-webkit-autofill:active {
+    transition: background-color 5000s ease-in-out 0s;
+  }
+}
+
+.icon,
+.validityIcon {
+  width: 22px;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  align-items: center;
+  pointer-events: none;
+}
+
+.icon {
+  left: 24px;
+  display: flex;
+
+  svg,
+  img {
+    flex-grow: 0;
+    flex-shrink: 0;
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  path {
+    fill: #6d7285;
+
+    @at-root .serverError & {
+      fill: #807382;
+    }
+
+    @at-root .input:focus + & {
+      fill: #fff;
+    }
+  }
+}
+
+.validityIcon {
+  right: 16px;
+  display: none;
+
+  @at-root {
+    .valid &,
+    .invalid.showInvalidIcon & {
+      display: flex;
+    }
+  }
+}

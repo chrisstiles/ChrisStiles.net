@@ -1,6 +1,7 @@
-import { type FunctionComponent, type HTMLAttributes } from 'react';
+import { type FunctionComponent, type HTMLAttributes, type ReactElement } from 'react';
 import styles from './Heading.module.scss';
 import classNames from 'classnames';
+import type { ReactNode } from 'react';
 
 const Heading: FunctionComponent<HeadingComponentProps> = ({
   tag: Tag,
@@ -19,7 +20,7 @@ const Heading: FunctionComponent<HeadingComponentProps> = ({
             className={classNames('eyebrow', styles.eyebrow)}
           >
             {eyebrow}
-            {eyebrowSeparator && <span className="sr">{eyebrowSeparator}</span>}
+            {typeof eyebrow === 'string' && eyebrowSeparator && <span className="sr">{eyebrowSeparator}</span>}
           </span>
         </>
       )}
@@ -37,7 +38,7 @@ export const H6 = (p: HeadingProps) => <Heading {...p} tag="h6" />;
 
 
 type HeadingProps = {
-  eyebrow?: string;
+  eyebrow?: string | ReactNode;
   eyebrowId?: string;
   eyebrowSeparator?: string | null;
 } & HTMLAttributes<HTMLInputElement>;
