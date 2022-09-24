@@ -16,6 +16,7 @@ export default memo(function TextField({
   value,
   label,
   className,
+  wrapperClassName,
   type = 'text',
   required,
   showInlineValidIndicator = true,
@@ -83,7 +84,7 @@ export default memo(function TextField({
 
   return (
     <div
-      className={classNames(styles.field, {
+      className={classNames(styles.field, wrapperClassName, {
         [styles.valid]: isValid && showInlineValidIndicator,
         [styles.invalid]: !isValid,
         [styles.serverError]: !!error,
@@ -135,6 +136,7 @@ export type FieldProps = {
   required?: boolean;
   showInlineValidIndicator?: boolean;
   className?: string;
+  wrapperClassName?: string;
   icon?: ReactNode;
   placeholder?: string;
   autoComplete?: string;

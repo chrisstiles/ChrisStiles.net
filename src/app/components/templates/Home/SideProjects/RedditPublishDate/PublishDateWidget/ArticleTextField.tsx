@@ -1,8 +1,17 @@
-import { useState, useCallback, useEffect, useRef, type Dispatch } from 'react';
-import { H3, TextField, type ValidationState } from '@elements';
+import { useState, useCallback, useRef } from 'react';
+import styles from './PublishDateWidget.module.scss';
+import { TextField, type ValidationState } from '@elements';
 import { isValidURL } from '@helpers';
+import classNames from 'classnames';
 
-export default function ArticleTextField({ setUrl }: ArticleTextFieldProps) {
+const defaultIcon = '/images/link.svg';
+
+export default function ArticleTextField({
+  setUrl,
+  favicon
+}: ArticleTextFieldProps) {
+  favicon ||= defaultIcon;
+
   const [inputValue, setInputValue] = useState('');
   const [isValid, setIsValid] = useState<ValidationState>({
     value: false,
@@ -12,24 +21,19 @@ export default function ArticleTextField({ setUrl }: ArticleTextFieldProps) {
   const validUrlTimer = useRef<number>();
   const checkUrl = useCallback(
     (value: string) => {
-      clearTimeout(validUrlTimer.current);
-
-      validUrlTimer.current = window.setTimeout(() => {
-        if (value) {
-          if (!value.startsWith('http') && isValidURL(value)) {
-            value = `https://${value}`;
-          }
-
-          try {
-            const url = new URL(value);
-            setUrl(url);
-            setIsValid({ value: true, message: '' });
-          } catch {
-            setUrl(null);
-            setIsValid({ value: false, message: 'Please enter a valid URL' });
-          }
+      if (value) {
+        if (!value.startsWith('http') && isValidURL(value)) {
+          value = `https://${value}`;
         }
-      }, 50);
+
+        try {
+          setUrl(new URL(value));
+          setIsValid({ value: true, message: '' });
+        } catch {
+          setUrl(null);
+          setIsValid({ value: false, message: 'Please enter a valid URL' });
+        }
+      }
     },
     [setUrl]
   );
@@ -52,22 +56,38 @@ export default function ArticleTextField({ setUrl }: ArticleTextFieldProps) {
   );
 
   return (
-    <>
-      <TextField
-        value={inputValue}
-        label="Article"
-        placeholder="Enter an article URL"
-        icon={
-          <img src="https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.washingtonpost.com&size=64" />
-        }
-        validationState={isValid}
-        showInlineValidIndicator={false}
-        onChange={handleChange}
+    <TextField
+      value={inputValue}
+      label="Article"
+      placeholder="Enter an article URL"
+      wrapperClassName={styles.input}
+      icon={<ArticleFavicon src={favicon} />}
+      validationState={isValid}
+      showInlineValidIndicator={false}
+      onChange={handleChange}
+    />
+  );
+}
+
+function ArticleFavicon({ src }: { src: string }) {
+  return (
+    <div
+      className={classNames(styles.inputFavicon, {
+        [styles.default]: src === defaultIcon
+      })}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        alt=""
+        src={src}
+        width={24}
+        height={24}
       />
-    </>
+    </div>
   );
 }
 
 type ArticleTextFieldProps = {
-  setUrl: Dispatch<Nullable<URL>>;
+  setUrl: (url: Nullable<URL>) => void;
+  favicon: Nullable<string>;
 };

@@ -31,7 +31,6 @@ export default async function handler(
     }
 
     const locations = getPotentialFaviconUrls(domain, size);
-    console.log(locations);
 
     for (const location of locations) {
       const response = await fetch(location);
