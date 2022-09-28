@@ -26,7 +26,11 @@ export default memo(function Hero({
     <Section className={styles.wrapper}>
       <div className={styles.top}>
         <div className={styles.content}>
-          <Title text={state.titleText} />
+          <Title
+            terminalText={state.terminalText}
+            showMessage={state.showTerminalMessage}
+            isComplete={state.terminalLoadingComplete}
+          />
           <Headline
             text={state.headlineText}
             selectEmphasis={state.selectEmphasis}
@@ -53,7 +57,10 @@ export default memo(function Hero({
 
 const initialState: HeroState = {
   titleText: 'this.developer = new ChrisStiles();',
+  terminalText: '',
   headlineText: '',
+  showTerminalMessage: false,
+  terminalLoadingComplete: false,
   showSelectHighlight: false,
   selectEmphasis: false,
   boldText: false,
@@ -73,6 +80,9 @@ type HeroProps = {
 
 export type HeroState = HeadlineStyleProps & {
   titleText: string;
+  terminalText: string;
+  showTerminalMessage: boolean;
+  terminalLoadingComplete: boolean;
   headlineText: string;
   showSelectHighlight: boolean;
   headlineBoundsVisible: boolean;

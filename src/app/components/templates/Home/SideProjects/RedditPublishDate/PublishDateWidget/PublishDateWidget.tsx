@@ -7,6 +7,15 @@ import { H3 } from '@elements';
 // TODO: Make widget accessible
 // TODO: Add checks to limit cache size
 
+/*
+
+  Add API endpoint to PublishDateBot
+  To simplify getting the method the bot used
+  to find the date (IE HTML Element or ld+json),
+  we can just add property to moment prototype object
+
+*/
+
 export default function PublishDateWidget() {
   const [article, setArticle] = useState<Nullable<Article>>(null);
   const articleRef = useVariableRef(article);
@@ -49,7 +58,7 @@ export default function PublishDateWidget() {
               return;
             }
           }
-        }, 200);
+        }, 100);
       }
     },
     [articleRef]

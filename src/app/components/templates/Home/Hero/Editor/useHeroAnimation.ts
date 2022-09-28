@@ -78,8 +78,9 @@ export default function useHeroAnimation({
       endDelay = 700
     ) => {
       if (
-        (isPlayingRef.current && visibleViewRef.current !== view) ||
-        animatingView.current !== view
+        view !== Language.Console &&
+        ((isPlayingRef.current && visibleViewRef.current !== view) ||
+          animatingView.current !== view)
       ) {
         await mouse.clickTab(view, {
           hideOnComplete,
@@ -210,11 +211,12 @@ export default function useHeroAnimation({
     const fn = {
       [Language.TypeScript]: setTypescript,
       [Language.JavaScript]: null,
+      [Language.Console]: null,
       [Language.HTML]: setHtml,
       [Language.SCSS]: setScss
     }[view];
 
-    if (fn) {
+    if (fn && view !== Language.Console) {
       fn(text);
     }
   }, []);
@@ -417,6 +419,17 @@ export default function useHeroAnimation({
 
           setState(step.completeState);
           step.onComplete?.();
+
+          if (shoudIncrement) {
+            setStepIndex(i => i + 1);
+          }
+        }, step.delay);
+      } else {
+        return queue(() => {
+          step.onStart?.();
+          setState(step.startState);
+          step.onComplete?.();
+          setState(step.completeState);
 
           if (shoudIncrement) {
             setStepIndex(i => i + 1);

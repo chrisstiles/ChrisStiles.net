@@ -1,0 +1,71 @@
+/* --------------------------- */
+/* Hero Title */
+/* --------------------------- */
+
+.titleWrapper {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  font-size: 17px;
+  font-family: var(--font-code);
+  font-weight: 400;
+  margin-bottom: 30px;
+}
+
+.dollar {
+  color: #41475d;
+  font-feature-settings: 'calt';
+  margin-right: 12px;
+  font-weight: 500;
+
+  &:before {
+    content: '$';
+  }
+}
+
+.title {
+  font-size: inherit;
+  font-family: inherit;
+  font-weight: inherit;
+  display: inline-block;
+  width: 100%;
+
+  &:after {
+    content: '';
+    display: none;
+    width: 8px;
+    height: 0.95em;
+    border: 1px solid var(--yellow-accent-color);
+    background-color: #4a4d52;
+    position: relative;
+    vertical-align: middle;
+    top: -2px;
+    animation: blink 0.7s step-end infinite;
+
+    @at-root .showCaret & {
+      display: inline-block;
+    }
+
+    @keyframes blink {
+      0% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0;
+      }
+
+      100% {
+        opacity: 1;
+      }
+    }
+  }
+
+  > span:last-child {
+    margin-right: 1px;
+  }
+
+  :global(.semicolon) {
+    margin-left: -0.16em;
+  }
+}

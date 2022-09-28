@@ -37,6 +37,24 @@ export default function useAnimationState({
 
     const steps: Step[] = [
       {
+        text: 'node ./web/app/init.ts',
+        view: Language.Console,
+        onType(terminalText) {
+          setState({ terminalText });
+        }
+      },
+      {
+        delay: 600,
+        startState: { showTerminalMessage: true }
+      },
+      {
+        delay: 1200,
+        startState: { terminalLoadingComplete: true }
+      },
+      {
+        delay: 600
+      },
+      {
         view: Language.TypeScript,
         text: `import './styles.scss';#|#`,
         isBaseText: true
@@ -545,7 +563,9 @@ export default function useAnimationState({
     // When a top level element or block of code is complete,
     // we store and automatically append it to avoid
     // having to retype the same code for every step
-    const initialView = steps.find(s => s.view)?.view ?? Language.TypeScript;
+    const initialView =
+      steps.find(s => s.view && s.view !== Language.Console)?.view ??
+      Language.TypeScript;
     let currentView = initialView;
     let shouldAddDelay = false;
 
