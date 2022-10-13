@@ -5,7 +5,10 @@ import {
   useMemo,
   useId,
   type ReactNode,
-  type ChangeEvent
+  type ChangeEvent,
+  type FocusEvent,
+  type FocusEventHandler,
+  type ClipboardEventHandler
 } from 'react';
 import styles from './TextField.module.scss';
 import * as Icon from './icons';
@@ -26,6 +29,7 @@ export default memo(function TextField({
   error,
   forceShowValidation = false,
   onChange: handleChange,
+  onBlur: handleBlur,
   ...restProps
 }: FieldProps) {
   const id = useId();
@@ -63,12 +67,10 @@ export default memo(function TextField({
     onChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       handleChange(e.target.value, name);
     },
-    onBlur: () => {
+    onBlur: (e: FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       handleChange(value, name);
-
-      if (hasInput) {
-        setHasBlurred(true);
-      }
+      if (hasInput) setHasBlurred(true);
+      handleBlur?.(e);
     },
     'aria-invalid': shouldShowInvalid,
     'aria-errormessage':
@@ -145,6 +147,9 @@ export type FieldProps = {
   error?: string;
   forceShowValidation?: boolean;
   onChange: ((value: string, name: string) => void) | ((value: string) => void);
+  onFocus?: FocusEventHandler;
+  onBlur?: FocusEventHandler;
+  onPaste?: ClipboardEventHandler;
 };
 
 export type ValidationState = {

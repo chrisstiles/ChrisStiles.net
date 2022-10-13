@@ -1,4 +1,9 @@
-import { useState, useCallback, useRef } from 'react';
+import {
+  useState,
+  useCallback,
+  useRef,
+  type ClipboardEventHandler
+} from 'react';
 import styles from './PublishDateWidget.module.scss';
 import { TextField, type ValidationState } from '@elements';
 import { isValidURL } from '@helpers';
@@ -8,11 +13,13 @@ const defaultIcon = '/images/link.svg';
 
 export default function ArticleTextField({
   setUrl,
-  favicon
+  favicon,
+  onPaste
 }: ArticleTextFieldProps) {
   favicon ||= defaultIcon;
 
   const [inputValue, setInputValue] = useState('');
+  const [isFocused, setIsFocused] = useState(false);
   const [isValid, setIsValid] = useState<ValidationState>({
     value: false,
     message: ''
@@ -55,9 +62,13 @@ export default function ArticleTextField({
     [checkUrl, setUrl]
   );
 
+  const currentValue = isFocused
+    ? inputValue
+    : inputValue.replace(/^(https?:\/\/)?(www\.)?/, '');
+
   return (
     <TextField
-      value={inputValue}
+      value={currentValue}
       label="Article"
       placeholder="Enter an article URL"
       wrapperClassName={styles.input}
@@ -65,6 +76,9 @@ export default function ArticleTextField({
       validationState={isValid}
       showInlineValidIndicator={false}
       onChange={handleChange}
+      onPaste={onPaste}
+      onFocus={() => setIsFocused(true)}
+      onBlur={() => setIsFocused(false)}
     />
   );
 }
@@ -90,4 +104,5 @@ function ArticleFavicon({ src }: { src: string }) {
 type ArticleTextFieldProps = {
   setUrl: (url: Nullable<URL>) => void;
   favicon: Nullable<string>;
+  onPaste?: ClipboardEventHandler;
 };
