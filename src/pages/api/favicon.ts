@@ -1,5 +1,7 @@
 import { isValidURL } from '@helpers';
 import cache from 'memory-cache';
+import { getAverageColor } from 'fast-average-color-node';
+import { TinyColor, readability } from '@ctrl/tinycolor';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 const cacheDuration = 1000 * 60 * 10; // 10 minutes
@@ -8,11 +10,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  let { url, fallback = '', size = 48 } = req.query;
-
-  if (!url) {
-    return res.send(fallback);
-  }
+  let { url, fallback = null, size = 48 } = req.query;
+  if (!url) return res.json({ url: fallback });
 
   if (Array.isArray(url)) url = url[0];
   if (Array.isArray(size)) size = size[0];
@@ -25,10 +24,7 @@ export default async function handler(
     const domain = new URL(url);
     const cacheKey = `${domain.hostname}-${size}`;
     const cachedUrl = cache.get(cacheKey);
-
-    if (cachedUrl) {
-      return res.send(cachedUrl);
-    }
+    if (cachedUrl) return res.send(cachedUrl);
 
     const locations = getPotentialFaviconUrls(domain, size);
 
@@ -36,14 +32,16 @@ export default async function handler(
       const response = await fetch(location);
 
       if (response.ok) {
-        cache.put(cacheKey, location, cacheDuration);
-        return res.send(location);
+        const isDark = await isDarkIcon(response);
+        const data = { url: location, isDark };
+        cache.put(cacheKey, data, cacheDuration);
+        return res.json(data);
       }
     }
 
-    return res.send(fallback);
+    return res.json({ url: fallback });
   } catch {
-    return res.send(fallback);
+    return res.json({ url: fallback });
   }
 }
 
@@ -65,3 +63,20 @@ function getPotentialFaviconUrls(url: URL, size: number | string) {
     `${domain}/favicon.ico`
   ];
 }
+
+async function isDarkIcon(response: Response) {
+  try {
+    const content = await response.arrayBuffer();
+    const color = await getAverageColor(Buffer.from(content));
+    return new TinyColor(color.hex).getBrightness() <= 100;
+  } catch (error) {
+    console.error(error);
+  }
+
+  return false;
+}
+
+export type FaviconResponse = {
+  url: string;
+  isDark?: boolean;
+};

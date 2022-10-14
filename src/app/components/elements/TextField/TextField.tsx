@@ -20,10 +20,10 @@ export default memo(function TextField({
   label,
   className,
   wrapperClassName,
+  theme,
   type = 'text',
   required,
   showInlineValidIndicator = true,
-  autoComplete,
   icon,
   validationState,
   error,
@@ -59,8 +59,8 @@ export default memo(function TextField({
     id: `${id}-input`,
     name,
     value,
-    autoComplete,
     required,
+    type: type === 'textarea' ? undefined : type,
     className: classNames(styles.input, className, {
       [styles.hasIcon]: !!icon
     }),
@@ -87,6 +87,7 @@ export default memo(function TextField({
   return (
     <div
       className={classNames(styles.field, wrapperClassName, {
+        [styles.dark]: theme === 'dark',
         [styles.valid]: isValid && showInlineValidIndicator,
         [styles.invalid]: !isValid,
         [styles.serverError]: !!error,
@@ -140,8 +141,12 @@ export type FieldProps = {
   className?: string;
   wrapperClassName?: string;
   icon?: ReactNode;
+  theme?: 'light' | 'dark';
   placeholder?: string;
-  autoComplete?: string;
+  autoComplete?: 'on' | 'off';
+  autoCorrect?: 'on' | 'off';
+  autoCapitalize?: 'on' | 'off';
+  spellCheck?: Booleanish;
   type?: string;
   validationState: ValidationState;
   error?: string;

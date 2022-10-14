@@ -51,6 +51,14 @@
       background-color: #625060;
     }
   }
+
+  @at-root .dark & {
+    background-color: #383d57;
+
+    &:focus-within {
+      background-color: #414662;
+    }
+  }
 }
 
 .input {

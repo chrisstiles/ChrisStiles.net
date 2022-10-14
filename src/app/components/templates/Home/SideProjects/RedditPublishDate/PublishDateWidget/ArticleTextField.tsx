@@ -2,16 +2,16 @@ import {
   useState,
   useCallback,
   useRef,
+  memo,
   type ClipboardEventHandler
 } from 'react';
 import styles from './PublishDateWidget.module.scss';
 import { TextField, type ValidationState } from '@elements';
 import { isValidURL } from '@helpers';
 import classNames from 'classnames';
+import type { FaviconResponse } from '@api/favicon';
 
-const defaultIcon = '/images/link.svg';
-
-export default function ArticleTextField({
+export default memo(function ArticleTextField({
   setUrl,
   favicon,
   onPaste
@@ -69,10 +69,15 @@ export default function ArticleTextField({
   return (
     <TextField
       value={currentValue}
-      label="Article"
-      placeholder="Enter an article URL"
+      type="url"
+      label="News article"
+      placeholder="Paste an article URL"
       wrapperClassName={styles.input}
-      icon={<ArticleFavicon src={favicon} />}
+      icon={<ArticleFavicon icon={favicon} />}
+      theme="dark"
+      autoComplete="off"
+      autoCapitalize="off"
+      spellCheck={false}
       validationState={isValid}
       showInlineValidIndicator={false}
       onChange={handleChange}
@@ -81,19 +86,20 @@ export default function ArticleTextField({
       onBlur={() => setIsFocused(false)}
     />
   );
-}
+});
 
-function ArticleFavicon({ src }: { src: string }) {
+function ArticleFavicon({ icon }: { icon: FaviconResponse }) {
   return (
     <div
       className={classNames(styles.inputFavicon, {
-        [styles.default]: src === defaultIcon
+        [styles.default]: icon.url === defaultIcon.url,
+        [styles.dark]: icon.isDark
       })}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         alt=""
-        src={src}
+        src={icon.url}
         width={24}
         height={24}
       />
@@ -101,8 +107,13 @@ function ArticleFavicon({ src }: { src: string }) {
   );
 }
 
+const defaultIcon = {
+  url: '/images/link.svg',
+  isDark: false
+};
+
 type ArticleTextFieldProps = {
   setUrl: (url: Nullable<URL>) => void;
-  favicon: Nullable<string>;
+  favicon: Nullable<FaviconResponse>;
   onPaste?: ClipboardEventHandler;
 };

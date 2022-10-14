@@ -1,19 +1,20 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useCallback, memo } from 'react';
 import styles from './PublishDateWidget.module.scss';
 import ArticleTextField from './ArticleTextField';
 import useVariableRef from '@hooks/useVariableRef';
 import useIsMounted from '@hooks/useIsMounted';
 import { H3 } from '@elements';
+import type { FaviconResponse } from '@api/favicon';
 
 // TODO: Make widget accessible
 // TODO: Add checks to limit cache size
 
-export default function PublishDateWidget() {
+export default memo(function PublishDateWidget() {
   const [article, _setArticle] = useState<Nullable<Article>>(null);
   const articleRef = useVariableRef(article);
   const cachedArticles = useRef<{ [key: string]: Article }>({});
-  const [favicon, _setFavicon] = useState<Nullable<string>>(null);
-  const cachedFavicons = useRef<{ [key: string]: string }>({});
+  const [favicon, _setFavicon] = useState<Nullable<FaviconResponse>>(null);
+  const cachedFavicons = useRef<{ [key: string]: FaviconResponse }>({});
   const fetchFaviconTimer = useRef<number>();
   const shouldDelayFetchingFavicon = useRef(true);
   const isMounted = useIsMounted();
@@ -40,6 +41,8 @@ export default function PublishDateWidget() {
 
   const setFavicon = useCallback(
     async (url: Nullable<URL>) => {
+      clearTimeout(fetchFaviconTimer.current);
+
       // Althout techincally valid URLs, we do not attempt to fetch
       // favicons for URLs like "www.mydomain" while the user types
       if (!url || url.hostname.match(/www\.[^.]*$/)) {
@@ -52,13 +55,12 @@ export default function PublishDateWidget() {
       if (cachedFavicons.current.hasOwnProperty(cacheKey)) {
         _setFavicon(cachedFavicons.current[cacheKey]);
       } else {
-        clearTimeout(fetchFaviconTimer.current);
-
         const fetchFavicon = async () => {
           try {
             const apiUrl = `/api/favicon?url=${url.hostname}`;
             const res = await fetch(apiUrl);
-            const favicon = await res.text();
+            let favicon = await res.json();
+            if (!favicon?.url) favicon = null;
 
             if (articleRef.current?.url.href === url.href) {
               _setFavicon(favicon);
@@ -148,7 +150,7 @@ export default function PublishDateWidget() {
       />
     </article>
   );
-}
+});
 
 function getEndpoint(url: string) {
   return `https://www.redditpublishdate.com/api/get-date?url=${url}`;
