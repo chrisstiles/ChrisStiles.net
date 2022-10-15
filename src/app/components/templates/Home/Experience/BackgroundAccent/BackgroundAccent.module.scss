@@ -5,8 +5,7 @@
 .wrapper {
   position: relative;
   width: 100%;
-  flex-grow: 0;
-  flex-shrink: 0;
+  flex: none;
 
   &.hidden {
     visibility: hidden;

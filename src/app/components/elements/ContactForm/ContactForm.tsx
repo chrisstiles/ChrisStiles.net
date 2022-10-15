@@ -7,7 +7,8 @@ import {
   useRef,
   useEffect,
   useMemo,
-  type FormEvent
+  type FormEvent,
+  type ReactNode
 } from 'react';
 import styles from './ContactForm.module.scss';
 import * as Icon from './icons';
@@ -309,7 +310,7 @@ type Field = {
   label: string;
   placeholder: string;
   type?: string;
-  icon?: JSX.Element;
+  icon?: ReactNode;
 };
 
 export type ContactFormData = {

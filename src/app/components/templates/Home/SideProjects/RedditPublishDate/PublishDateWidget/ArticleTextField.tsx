@@ -88,8 +88,8 @@ export default memo(function ArticleTextField({
   );
 });
 
-function ArticleFavicon({ icon }: { icon: FaviconResponse }) {
-  return (
+function ArticleFavicon({ icon }: { icon: Nullable<FaviconResponse> }) {
+  return !icon?.url ? null : (
     <div
       className={classNames(styles.inputFavicon, {
         [styles.default]: icon.url === defaultIcon.url,
@@ -100,8 +100,8 @@ function ArticleFavicon({ icon }: { icon: FaviconResponse }) {
       <img
         alt=""
         src={icon.url}
-        width={24}
-        height={24}
+        width={20}
+        height={20}
       />
     </div>
   );

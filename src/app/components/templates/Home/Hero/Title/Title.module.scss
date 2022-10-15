@@ -16,11 +16,10 @@
 .photo {
   width: 58px;
   height: 58px;
-  flex-grow: 0;
-  flex-shrink: 0;
+  flex: none;
   background-color: #dedede;
   margin-right: 18px;
-  clip-path: url(#hero-icon-clip);
+  clip-path: url(#squircle-clip);
 }
 
 .content {
@@ -43,8 +42,7 @@
     margin-right: 10px;
     top: 1px;
     position: relative;
-    flex-grow: 0;
-    flex-shrink: 0;
+    flex: none;
     background-color: var(--green-accent-color);
     border-radius: 50%;
   }

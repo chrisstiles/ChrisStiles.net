@@ -10,7 +10,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  let { url, fallback = null, size = 48 } = req.query;
+  let { url, fallback = null, size = 96 } = req.query;
   if (!url) return res.json({ url: fallback });
 
   if (Array.isArray(url)) url = url[0];

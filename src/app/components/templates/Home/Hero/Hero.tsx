@@ -56,7 +56,6 @@ export default memo(function Hero({
 });
 
 const initialState: HeroState = {
-  titleText: 'this.developer = new ChrisStiles();',
   terminalText: '',
   headlineText: '',
   showTerminalMessage: false,
@@ -79,7 +78,6 @@ type HeroProps = {
 };
 
 export type HeroState = HeadlineStyleProps & {
-  titleText: string;
   terminalText: string;
   showTerminalMessage: boolean;
   terminalLoadingComplete: boolean;

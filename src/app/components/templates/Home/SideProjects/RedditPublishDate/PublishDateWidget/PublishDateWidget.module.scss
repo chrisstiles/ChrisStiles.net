@@ -9,28 +9,36 @@
 }
 
 .input {
-  margin-top: 50px;
+  margin-top: 45px;
 }
 
 .inputFavicon {
   width: 20px;
   height: 20px;
+  clip-path: url(#squircle-clip);
+  overflow: hidden;
+  margin-top: 1px;
 
   &.default {
     width: 22px;
     height: 22px;
+    clip-path: none;
+    margin-top: 0;
   }
 
   &.dark {
     $darkIconBg: #e8ebf5;
     background-color: $darkIconBg;
     box-shadow: 0 0 0 0.5px $darkIconBg;
-    border-radius: 3px;
-    overflow: hidden;
     padding: 2px;
 
     @media (-webkit-device-pixel-ratio: 1) {
       box-shadow: 0 0 0 1px $darkIconBg;
     }
+  }
+
+  img,
+  svg {
+    display: block;
   }
 }

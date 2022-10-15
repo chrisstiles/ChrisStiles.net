@@ -41,7 +41,8 @@ export function stripHtml(text: string) {
   return text.replace(/<\/?[^> \s\n]*>?/g, '');
 }
 
-export function isValidDate(d: string | Date) {
+export function isValidDate(d?: Nullable<string | Date>) {
+  if (!d) return false;
   const date = new Date(d);
   return date instanceof Date && !isNaN(date.getTime());
 }
@@ -50,4 +51,8 @@ export function isValidURL(url: string) {
   return !!url.match(
     /(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g
   );
+}
+
+export function preventOrphanedWord(str: string) {
+  return str?.replace(/ ([^<> ]*)$/, '\u00A0$1') ?? str;
 }

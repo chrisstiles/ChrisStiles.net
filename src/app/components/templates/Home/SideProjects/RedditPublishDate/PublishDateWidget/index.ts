@@ -1,1 +1,5 @@
-export { default } from './PublishDateWidget';
+export {
+  default,
+  type Article,
+  type PublishDateApiResponse
+} from './PublishDateWidget';

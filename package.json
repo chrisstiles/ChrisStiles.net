@@ -17,6 +17,7 @@
     "@sendgrid/mail": "^7.7.0",
     "bezier-easing": "^2.1.0",
     "classnames": "^2.3.1",
+    "dateformat": "^5.0.3",
     "dedent": "^0.7.0",
     "fast-average-color-node": "^2.4.0",
     "focus-visible": "^5.2.0",
@@ -37,6 +38,7 @@
   "devDependencies": {
     "@next/bundle-analyzer": "^12.1.5",
     "@svgr/webpack": "^6.2.1",
+    "@types/dateformat": "^5.0.0",
     "@types/dedent": "^0.7.0",
     "@types/lodash": "^4.14.179",
     "@types/memory-cache": "^0.2.2",

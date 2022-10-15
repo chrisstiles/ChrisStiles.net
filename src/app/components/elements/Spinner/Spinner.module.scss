@@ -8,8 +8,7 @@ $thickness: 6.8;
 .wrapper {
   width: 1.0625em;
   height: 1.0625em;
-  flex-grow: 0;
-  flex-shrink: 0;
+  flex: none;
   color: currentColor;
   animation: wrapperRotate 1.4s linear infinite;
   display: inline-block;

@@ -150,8 +150,7 @@
 
   svg,
   img {
-    flex-grow: 0;
-    flex-shrink: 0;
+    flex: none;
     display: block;
     width: 100%;
     height: auto;

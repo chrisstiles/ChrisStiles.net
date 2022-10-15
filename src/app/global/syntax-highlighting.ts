@@ -1,7 +1,8 @@
 export enum Language {
+  Console = 'console',
   HTML = 'html',
-  SCSS = 'scss',
   JavaScript = 'javascript',
-  TypeScript = 'typescript',
-  Console = 'console'
+  JSON = 'json',
+  SCSS = 'scss',
+  TypeScript = 'typescript'
 }

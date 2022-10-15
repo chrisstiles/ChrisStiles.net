@@ -127,3 +127,37 @@
     top: -0.06em;
   }
 }
+
+/* --------------------------- */
+/* JSON */
+
+.code-json {
+  color: #a6accd;
+
+  .punctuation {
+    color: #ffd700;
+
+    &.comma {
+      color: #89ddff;
+    }
+  }
+
+  .property {
+    color: #c792ea;
+  }
+
+  .string {
+    color: #c3e88d;
+  }
+
+  .quote,
+  .operator {
+    color: #89ddff;
+  }
+
+  .number,
+  .boolean,
+  .null {
+    color: #f78c6c;
+  }
+}

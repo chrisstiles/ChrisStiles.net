@@ -1,0 +1,119 @@
+import styles from './ArticleData.module.scss';
+import * as Icon from './icons';
+import { isValidDate } from '@helpers';
+import dateFormat from 'dateformat';
+import type { ArticleDataProps } from './ArticleData';
+import type { ReactNode, FC } from 'react';
+
+export default function ArticleDetails({ article }: ArticleDataProps) {
+  const data = article?.data ?? {};
+  const { publishDate, modifyDate, location, organization: org } = data;
+  const publisher = org && org.length <= 35 ? org : article?.url.hostname;
+  const hasModifyDate = shouldShowModifyDate(publishDate, modifyDate);
+
+  return !article || !isValidDate(publishDate) ? null : (
+    <div className={styles.content}>
+      <table className={styles.table}>
+        <tbody>
+          <DetailRow
+            label="Publisher"
+            value={publisher}
+            valueIcon={Icon.Publisher}
+          />
+          <DetailRow
+            label={hasModifyDate ? 'First published' : 'Published on'}
+            value={publishDate}
+            valueIcon={Icon.PublishDate}
+            isDate
+          />
+          <DetailRow
+            label="Last updated"
+            value={modifyDate}
+            valueIcon={Icon.ModifyDate}
+            isHidden={!hasModifyDate}
+            isDate
+          />
+          <DetailRow
+            label={`${modifyDate ? 'Dates' : 'Date'} found in`}
+            value={location}
+            valueIcon={Icon.Location}
+          />
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function DetailRow({
+  label,
+  value,
+  labelIcon: LabelIcon,
+  valueIcon: ValueIcon,
+  isDate,
+  isHidden
+}: DetailRowProps) {
+  const labelIcon = typeof LabelIcon === 'function' ? <LabelIcon /> : LabelIcon;
+  const valueIcon = typeof ValueIcon === 'function' ? <ValueIcon /> : ValueIcon;
+
+  if ((isDate && typeof value === 'string') || value instanceof Date) {
+    if (isValidDate(value)) {
+      value = dateFormat(value, 'mmmm dS, yyyy');
+    } else {
+      isHidden = true;
+    }
+  }
+
+  return !value || isHidden ? null : (
+    <tr>
+      <th scope="row">
+        <span className={styles.detail}>
+          {labelIcon} {label}
+        </span>
+      </th>
+      <td>
+        <span className={styles.detail}>
+          <>
+            {valueIcon} {value}
+          </>
+        </span>
+      </td>
+    </tr>
+  );
+}
+
+function shouldShowModifyDate(
+  publishDate?: Nullable<string | Date>,
+  modifyDate?: Nullable<string | Date>
+) {
+  if (
+    !publishDate ||
+    !modifyDate ||
+    !isValidDate(publishDate) ||
+    !isValidDate(modifyDate)
+  ) {
+    return false;
+  }
+
+  publishDate = new Date(publishDate);
+  modifyDate = new Date(modifyDate);
+
+  if (
+    dateFormat(publishDate, 'mmmm dS, yyyy') ===
+    dateFormat(modifyDate, 'mmmm dS, yyyy')
+  ) {
+    return false;
+  }
+
+  const diffTime = Math.abs(modifyDate.getTime() - publishDate.getTime());
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays >= 1;
+}
+
+type DetailRowProps = {
+  label: ReactNode;
+  labelIcon?: ReactNode | FC;
+  value?: ReactNode | Date;
+  valueIcon?: ReactNode | FC;
+  isDate?: boolean;
+  isHidden?: boolean;
+};

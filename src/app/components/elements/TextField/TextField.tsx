@@ -140,7 +140,7 @@ export type FieldProps = {
   showInlineValidIndicator?: boolean;
   className?: string;
   wrapperClassName?: string;
-  icon?: ReactNode;
+  icon?: Nullable<ReactNode>;
   theme?: 'light' | 'dark';
   placeholder?: string;
   autoComplete?: 'on' | 'off';

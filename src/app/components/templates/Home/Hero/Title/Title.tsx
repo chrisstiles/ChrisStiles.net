@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import styles from './Title.module.scss';
-import PhotoMask from './photo-mask.svg';
 import classNames from 'classnames';
 
 export default function Title({
@@ -22,9 +21,7 @@ export default function Title({
 
   return (
     <div className={styles.wrapper}>
-      <div className={styles.photo}>
-        <PhotoMask />
-      </div>
+      <div className={styles.photo}>{/* <PhotoMask /> */}</div>
       <div className={styles.content}>
         <strong className={styles.name}>Chris Stiles</strong>
         <code

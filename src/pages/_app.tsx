@@ -1,4 +1,5 @@
 import '@styles/main.scss';
+import SquircleMask from '@images/squircle-mask.svg';
 import 'focus-visible';
 import Head from 'next/head';
 import type { ReactElement, ReactNode } from 'react';
@@ -26,6 +27,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
         />
       </Head>
       <Component {...pageProps} />
+      <SquircleMask />
     </>
   );
 }

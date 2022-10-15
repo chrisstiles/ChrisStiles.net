@@ -62,8 +62,7 @@ $borderRadius: 9px;
   display: flex;
   z-index: 10;
   width: 450px;
-  flex-grow: 0;
-  flex-shrink: 0;
+  flex: none;
 }
 
 .detailsContent {
@@ -138,8 +137,7 @@ $borderRadius: 9px;
 .linkIcon {
   width: 22px;
   height: 22px;
-  flex-grow: 0;
-  flex-shrink: 0;
+  flex: none;
   margin-right: 14px;
   color: #575d75;
   position: relative;

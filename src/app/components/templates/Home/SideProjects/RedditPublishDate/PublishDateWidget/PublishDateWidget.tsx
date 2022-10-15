@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, memo } from 'react';
 import styles from './PublishDateWidget.module.scss';
 import ArticleTextField from './ArticleTextField';
+import ArticleData from './ArticleData';
 import useVariableRef from '@hooks/useVariableRef';
 import useIsMounted from '@hooks/useIsMounted';
 import { H3 } from '@elements';
@@ -148,6 +149,10 @@ export default memo(function PublishDateWidget() {
         favicon={favicon}
         onPaste={() => (shouldDelayFetchingFavicon.current = false)}
       />
+      <ArticleData
+        article={article}
+        favicon={favicon}
+      />
     </article>
   );
 });
@@ -160,13 +165,13 @@ function getCacheKey(url: URL) {
   return url.hostname + url.pathname;
 }
 
-type Article = {
+export type Article = {
   url: URL;
   isLoading?: boolean;
   data: Nullable<PublishDateApiResponse>;
 };
 
-type PublishDateApiResponse = {
+export type PublishDateApiResponse = {
   organization?: Nullable<string>;
   title?: Nullable<string>;
   description?: Nullable<string>;

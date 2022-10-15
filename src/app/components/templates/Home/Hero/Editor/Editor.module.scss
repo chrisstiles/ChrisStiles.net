@@ -12,8 +12,7 @@ $borderRadius: 8px;
   $offsetY: 200px;
   padding-bottom: $offsetY;
   margin: -90px -13px #{-$offsetY / 2} 0;
-  flex-grow: 0;
-  flex-shrink: 0;
+  flex: none;
   position: relative;
   background-color: var(--editor-background-color);
   border-radius: $borderRadius;
@@ -49,8 +48,7 @@ $borderRadius: 8px;
   background-color: currentColor;
   color: #525976;
   position: relative;
-  flex-grow: 0;
-  flex-shrink: 0;
+  flex: none;
   margin-left: 10px;
 
   &:before,
@@ -134,8 +132,7 @@ $borderRadius: 8px;
   svg {
     width: 1.15em;
     height: 1.15em;
-    flex-grow: 0;
-    flex-shrink: 0;
+    flex: none;
     margin-right: 5px;
     mix-blend-mode: luminosity;
     opacity: 0.6;

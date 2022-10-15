@@ -1,9 +1,75 @@
 import { useMemo, useRef } from 'react';
-import Prism, { type Grammar } from 'prismjs';
+import Prism, { type Grammar, type GrammarValue } from 'prismjs';
 import dedent from 'dedent';
 import 'prismjs/components/prism-scss';
 import 'prismjs/components/prism-typescript';
+import 'prismjs/components/prism-json';
 import { Language } from '@global';
+
+export default function useSyntaxHighlighting(
+  type: Language,
+  text: string,
+  stripIndentation: boolean = true
+) {
+  const prevLineIndex = useRef(0);
+
+  const [code, lines, currentLineIndex] = useMemo((): [
+    string,
+    string[],
+    number
+  ] => {
+    const trailingLines = text.match(/\n+$/) ?? [''];
+    const code = (stripIndentation ? dedent(text) : text) + trailingLines[0];
+    const lines = code.split('\n');
+    const language = languages[type] ?? null;
+
+    let highlighted = language ? Prism.highlight(code, language, type) : code;
+
+    Object.keys(sharedTokens).forEach((key: keyof Tokens) => {
+      const value = sharedTokens[key];
+      const pattern = value instanceof RegExp ? value : value.pattern;
+      const match = highlighted.match(pattern);
+
+      if (match) {
+        if (match.length === 1 || pattern.flags.includes('g')) {
+          // Replace contents with empty string
+          highlighted = highlighted.replace(pattern, '');
+        } else {
+          // Replace with matched content
+          for (let i = 1; i < match.length; i++) {
+            highlighted = highlighted.replace(pattern, match[i]);
+          }
+        }
+      }
+    });
+
+    let currentLineIndex = lines.findIndex(l => l.includes('#|#'));
+
+    if (currentLineIndex < 0) {
+      currentLineIndex = prevLineIndex.current;
+    }
+
+    prevLineIndex.current = currentLineIndex;
+
+    return [
+      highlighted.replace('#|#', '<span class="token caret"></span>'),
+      lines,
+      currentLineIndex
+    ];
+  }, [type, text, stripIndentation]);
+
+  return { code, lines, currentLineIndex };
+}
+
+export { Language };
+
+type Tokens = Grammar & {
+  [key: string]: RegExp | { pattern: RegExp };
+};
+
+const sharedTokens: Tokens = {
+  select: /\(-(.*)-\)/
+};
 
 Prism.languages.insertBefore(Language.JavaScript, 'keyword', {
   this: {
@@ -20,69 +86,15 @@ Prism.languages.insertBefore(Language.TypeScript, 'punctuation', {
   parentheses: /[()]/
 });
 
-export default function useSyntaxHighlighting(
-  language: Language,
-  text: string,
-  stripIndentation: boolean = true
-) {
-  const prevLineIndex = useRef(0);
-
-  const [code, lines, currentLineIndex] = useMemo((): [
-    string,
-    string[],
-    number
-  ] => {
-    const trailingLines = text.match(/\n+$/) ?? [''];
-    const code = (stripIndentation ? dedent(text) : text) + trailingLines[0];
-    const lines = code.split('\n');
-
-    let highlightedCode = Prism.highlight(code, languages[language], language);
-
-    Object.keys(sharedTokens).forEach((key: keyof Tokens) => {
-      const value = sharedTokens[key];
-      const pattern = value instanceof RegExp ? value : value.pattern;
-      const match = highlightedCode.match(pattern);
-
-      if (match) {
-        if (match.length === 1 || pattern.flags.includes('g')) {
-          // Replace contents with empty string
-          highlightedCode = highlightedCode.replace(pattern, '');
-        } else {
-          // Replace with matched content
-          for (let i = 1; i < match.length; i++) {
-            highlightedCode = highlightedCode.replace(pattern, match[i]);
-          }
-        }
-      }
-    });
-
-    let currentLineIndex = lines.findIndex(l => l.includes('#|#'));
-
-    if (currentLineIndex < 0) {
-      currentLineIndex = prevLineIndex.current;
-    }
-
-    prevLineIndex.current = currentLineIndex;
-
-    return [
-      highlightedCode.replace('#|#', '<span class="token caret"></span>'),
-      lines,
-      currentLineIndex
-    ];
-  }, [language, text, stripIndentation]);
-
-  return { code, lines, currentLineIndex };
-}
-
-export { Language };
-
-type Tokens = Grammar & {
-  [key: string]: RegExp | { pattern: RegExp };
-};
-
-const sharedTokens: Tokens = {
-  select: /\(-(.*)-\)/
-};
+Prism.hooks.add('wrap', env => {
+  if (
+    env.type === 'punctuation' &&
+    env.content === ',' &&
+    !env.classes.includes('comma')
+  ) {
+    env.classes.push('comma');
+  }
+});
 
 const javascriptGrammar = {
   punctuation: {
@@ -113,7 +125,7 @@ const javascriptGrammar = {
   ...sharedTokens
 };
 
-const languages: { [key in Language]: Grammar } = {
+const languages: { [key in Language]?: Grammar } = {
   [Language.JavaScript]: Prism.languages.extend(Language.JavaScript, {
     punctuation: {
       pattern: Prism.languages.javascript.punctuation as RegExp,
@@ -178,5 +190,21 @@ const languages: { [key in Language]: Grammar } = {
       }
     },
     ...sharedTokens
+  }),
+  [Language.JSON]: Prism.languages.extend(Language.JSON, {
+    property: {
+      ...(Prism.languages.json.property as GrammarValue),
+      inside: {
+        quote: /^["']|["']$/
+      }
+    },
+    string: {
+      ...(Prism.languages.json.string as GrammarValue),
+      inside: {
+        quote: /^["']|["']$/
+      }
+    }
   })
 };
+
+Prism.manual = true;

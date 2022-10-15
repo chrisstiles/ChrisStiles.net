@@ -208,17 +208,13 @@ export default function useHeroAnimation({
   );
 
   const updateViewContent = useCallback((view: Language, text: string) => {
-    const fn = {
+    const handlers: { [key in Language]?: any } = {
       [Language.TypeScript]: setTypescript,
-      [Language.JavaScript]: null,
-      [Language.Console]: null,
       [Language.HTML]: setHtml,
       [Language.SCSS]: setScss
-    }[view];
+    };
 
-    if (fn && view !== Language.Console) {
-      fn(text);
-    }
+    handlers[view]?.(text);
   }, []);
 
   const type = useCallback(
