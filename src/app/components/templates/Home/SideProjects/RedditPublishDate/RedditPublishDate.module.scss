@@ -22,10 +22,16 @@
   width: 50%;
 
   &:nth-child(odd) {
-    padding-right: 20px;
+    padding-right: 40px;
   }
 
   &:nth-child(even) {
     padding-left: 20px;
+  }
+}
+
+.content {
+  p {
+    max-width: 530px;
   }
 }

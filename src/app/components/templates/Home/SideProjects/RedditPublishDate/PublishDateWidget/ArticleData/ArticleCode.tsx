@@ -2,18 +2,23 @@ import { memo } from 'react';
 import styles from './ArticleData.module.scss';
 import useSyntaxHighlighting, { Language } from '@hooks/useSyntaxHighlighting';
 import classNames from 'classnames';
+import type { ArticleDataProps } from './ArticleData';
 
-export default memo(function ArticleCode({ code, location }: ArticleCodeProps) {
-  code = code?.trim() ?? '';
+export default memo(function ArticleCode({ article }: ArticleDataProps) {
+  const code = article?.data?.html?.trim() ?? '';
 
   const language =
-    location?.toLowerCase().includes('structured') ||
+    article?.data?.location?.toLowerCase().includes('structured') ||
     code.startsWith('{') ||
     code.match(/": ?(["])/)
       ? Language.JSON
       : Language.HTML;
 
-  const { code: highlightedCode } = useSyntaxHighlighting(language, code);
+  const { code: highlightedCode } = useSyntaxHighlighting(
+    language,
+    code,
+    false
+  );
 
   return !highlightedCode ? null : (
     <pre
@@ -27,8 +32,3 @@ export default memo(function ArticleCode({ code, location }: ArticleCodeProps) {
     </pre>
   );
 });
-
-type ArticleCodeProps = {
-  code?: Nullable<string>;
-  location?: Nullable<string>;
-};

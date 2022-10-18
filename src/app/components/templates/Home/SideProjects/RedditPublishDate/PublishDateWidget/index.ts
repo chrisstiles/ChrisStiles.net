@@ -1,5 +1,6 @@
 export {
   default,
   type Article,
-  type PublishDateApiResponse
+  type ArticleData,
+  type Favicon
 } from './PublishDateWidget';

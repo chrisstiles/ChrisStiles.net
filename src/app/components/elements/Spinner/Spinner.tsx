@@ -11,7 +11,8 @@ export default function Spinner({
   className,
   svgClassName,
   color,
-  thickness = baseThickness
+  thickness = baseThickness,
+  isVisible = true
 }: SpinnerProps) {
   const wrapperStyle: CSSProperties = { color };
 
@@ -20,7 +21,7 @@ export default function Spinner({
     wrapperStyle.height = size;
   }
 
-  return (
+  return !isVisible ? null : (
     <span
       className={classNames(styles.wrapper, className)}
       style={wrapperStyle}
@@ -47,4 +48,5 @@ type SpinnerProps = ComponentProps<'div'> & {
   size?: number;
   svgClassName?: string;
   thickness?: number;
+  isVisible?: boolean;
 };

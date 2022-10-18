@@ -69,9 +69,7 @@ async function isDarkIcon(response: Response) {
     const content = await response.arrayBuffer();
     const color = await getAverageColor(Buffer.from(content));
     return new TinyColor(color.hex).getBrightness() <= 100;
-  } catch (error) {
-    console.error(error);
-  }
+  } catch {}
 
   return false;
 }

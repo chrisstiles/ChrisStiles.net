@@ -9,7 +9,7 @@ import styles from './PublishDateWidget.module.scss';
 import { TextField, type ValidationState } from '@elements';
 import { isValidURL } from '@helpers';
 import classNames from 'classnames';
-import type { FaviconResponse } from '@api/favicon';
+import type { Favicon } from '@api/favicon';
 
 export default memo(function ArticleTextField({
   setUrl,
@@ -19,7 +19,6 @@ export default memo(function ArticleTextField({
   favicon ||= defaultIcon;
 
   const [inputValue, setInputValue] = useState('');
-  const [isFocused, setIsFocused] = useState(false);
   const [isValid, setIsValid] = useState<ValidationState>({
     value: false,
     message: ''
@@ -62,13 +61,9 @@ export default memo(function ArticleTextField({
     [checkUrl, setUrl]
   );
 
-  const currentValue = isFocused
-    ? inputValue
-    : inputValue.replace(/^(https?:\/\/)?(www\.)?/, '');
-
   return (
     <TextField
-      value={currentValue}
+      value={inputValue}
       type="url"
       label="News article"
       placeholder="Paste an article URL"
@@ -82,13 +77,11 @@ export default memo(function ArticleTextField({
       showInlineValidIndicator={false}
       onChange={handleChange}
       onPaste={onPaste}
-      onFocus={() => setIsFocused(true)}
-      onBlur={() => setIsFocused(false)}
     />
   );
 });
 
-function ArticleFavicon({ icon }: { icon: Nullable<FaviconResponse> }) {
+function ArticleFavicon({ icon }: { icon: Nullable<Favicon> }) {
   return !icon?.url ? null : (
     <div
       className={classNames(styles.inputFavicon, {
@@ -114,6 +107,6 @@ const defaultIcon = {
 
 type ArticleTextFieldProps = {
   setUrl: (url: Nullable<URL>) => void;
-  favicon: Nullable<FaviconResponse>;
+  favicon: Nullable<Favicon>;
   onPaste?: ClipboardEventHandler;
 };

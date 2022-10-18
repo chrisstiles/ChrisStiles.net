@@ -2,8 +2,8 @@ import styles from './ArticleData.module.scss';
 import * as Icon from './icons';
 import { isValidDate } from '@helpers';
 import dateFormat from 'dateformat';
-import type { ArticleDataProps } from './ArticleData';
 import type { ReactNode, FC } from 'react';
+import type { ArticleDataProps } from './ArticleData';
 
 export default function ArticleDetails({ article }: ArticleDataProps) {
   const data = article?.data ?? {};
@@ -21,7 +21,7 @@ export default function ArticleDetails({ article }: ArticleDataProps) {
             valueIcon={Icon.Publisher}
           />
           <DetailRow
-            label={hasModifyDate ? 'First published' : 'Published on'}
+            label={hasModifyDate ? 'First posted' : 'Posted on'}
             value={publishDate}
             valueIcon={Icon.PublishDate}
             isDate

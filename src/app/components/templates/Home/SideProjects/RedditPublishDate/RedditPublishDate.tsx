@@ -11,7 +11,7 @@ export default function RedditPublishDate() {
       className={styles.wrapper}
       contentClassName={styles.contentWrapper}
     >
-      <Column>
+      <Column className={styles.content}>
         <H2 eyebrow={<Logo className={styles.logo} />}>
           What have I been up to lately?
         </H2>
