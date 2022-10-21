@@ -1,4 +1,5 @@
 import '@styles/main.scss';
+import '@utils/polyfills';
 import SquircleMask from '@images/squircle-mask.svg';
 import 'focus-visible';
 import Head from 'next/head';

@@ -30,8 +30,27 @@ export default memo(function LogoAnimation({
   const [icons, setIcons] = useState<string[][]>([]);
 
   useEffect(() => {
-    const columnLength = Math.ceil(iconFileNames.length / 3);
-    setIcons(chunk(shuffle(iconFileNames), columnLength));
+    const columnLength = Math.ceil(iconFileNames.length / 4);
+    const icons = chunk(shuffle(iconFileNames), columnLength);
+    if (!icons.length) return;
+
+    const firstColumn = icons[0];
+    const lastColumn = icons.at(-1);
+
+    if (lastColumn && lastColumn.length < firstColumn.length) {
+      const diff = firstColumn.length - lastColumn.length;
+      icons[icons.length - 1] = lastColumn.concat(
+        shuffle(firstColumn.slice(0, diff))
+      );
+    }
+
+    setIcons(
+      icons.map((column, index) => {
+        const column2 =
+          icons.at(index - Math.floor(columnLength - 1 / 2))?.slice() ?? [];
+        return column.concat(shuffle(column2).slice(0, column2.length / 1.5));
+      })
+    );
   }, [iconFileNames]);
 
   const [isVisible, setIsVisible] = useState(false);
@@ -53,7 +72,7 @@ export default memo(function LogoAnimation({
       if (!modalIsOpen && entry.intersectionRatio >= showAccentsThreshold) {
         showAccentsTimer = window.setTimeout(() => {
           setAccentsVisible(true);
-        }, 500);
+        }, 1300);
       }
     }
 
@@ -271,7 +290,8 @@ const LogoColumn = memo(function LogoColumn({
       gsap.set(wrapper.current, { y: Math.round(translate) });
       setHasInitialPosition(true);
 
-      const multiplier = direction === 'up' ? 1.3 : 1.1;
+      // const multiplier = direction === 'up' ? 1.3 : 1.1;
+      const multiplier = direction === 'up' ? 1.5 : 1.6;
       const getValue = gsap.getProperty(wrapper.current);
       const getPosition = () => {
         return {
@@ -303,10 +323,10 @@ const LogoColumn = memo(function LogoColumn({
           direction === 'down'
             ? 0
             : Math.round(-height + wrapperSize + (logoSize + logoOffset) * 2),
-        duration: 3.5,
+        duration: 3.2,
         ease: columnEase,
         paused: !isVisible,
-        delay: 0.3 + index * 0.25,
+        delay: 0.25 + index * 0.25,
         onStart() {
           hasStartedLogoAnimation.current = true;
           isPlayingRef.current = true;
@@ -329,8 +349,8 @@ const LogoColumn = memo(function LogoColumn({
           }
 
           const deltaRatio = gsap.ticker.deltaRatio();
-          const dx = Math.abs(x - prevPosition.x);
-          const dy = Math.abs(y - prevPosition.y);
+          const dx = Math.ceil(Math.abs(x - prevPosition.x));
+          const dy = Math.ceil(Math.abs(y - prevPosition.y));
           const bx = Math.max(dx / deltaRatio - logoVelocity, 0) * multiplier;
           const by = Math.max(dy / deltaRatio - logoVelocity, 0) * multiplier;
 
@@ -372,7 +392,11 @@ const LogoColumn = memo(function LogoColumn({
       >
         {components}
       </div>
-      <svg className={styles.blur}>
+      <svg
+        className={styles.blur}
+        width="0"
+        height="0"
+      >
         <defs>
           <filter
             id={filterId}
@@ -381,6 +405,7 @@ const LogoColumn = memo(function LogoColumn({
             width="200%"
             height="200%"
             colorInterpolationFilters="sRGB"
+            // primitiveUnits="objectBoundingBox"
           >
             <feGaussianBlur
               ref={blurFilter}

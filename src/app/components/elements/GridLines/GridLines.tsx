@@ -8,7 +8,7 @@ export default memo(function GridLines({
   dashColor = '#2d334a',
   solidColor = '#2d334a'
 }: GridLinesProps) {
-  const lines = Array.from({ length: 6 }, (_, index) => (
+  const lines = Array.from({ length: 12 }, (_, index) => (
     <div
       key={index}
       className={classNames('grid-line', styles.line)}

@@ -3,7 +3,7 @@
 /* --------------------------- */
 
 .wrapper {
-  max-width: 1460px;
+  max-width: var(--content-width);
   width: 100%;
   padding-left: 50px;
   padding-right: 50px;
