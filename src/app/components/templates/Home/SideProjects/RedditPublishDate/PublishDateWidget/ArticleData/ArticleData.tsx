@@ -46,13 +46,13 @@ export default memo(function ArticleData({
       const cloneEl = clone.current;
       const contentEl = content.current;
 
-      if (!animation.current) {
-        gsap.set(wrapperEl, { height: prevHeight, visibility: 'visible' });
-        gsap.set(cloneEl, { opacity: 1 });
-        gsap.set(contentEl, { opacity: 0 });
-      }
-
       requestAnimationFrame(() => {
+        if (!animation.current) {
+          gsap.set(wrapperEl, { height: prevHeight, visibility: 'visible' });
+          gsap.set(cloneEl, { opacity: 1 });
+          gsap.set(contentEl, { opacity: 0 });
+        }
+
         animation.current ??= gsap.timeline({
           onComplete() {
             animation.current = null;
