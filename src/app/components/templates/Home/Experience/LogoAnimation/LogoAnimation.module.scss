@@ -3,8 +3,8 @@
 /* --------------------------- */
 
 .wrapper {
-  width: calc(50% + 20px);
-  margin-right: -20px;
+  width: calc((100% + 2 * 20px) / 12 * 4 + 1px);
+  margin-right: calc((100% + 2 * 20px) / 12 - 20px);
   flex: none;
   text-align: center;
   position: relative;
@@ -13,6 +13,7 @@
 
   &:before,
   &:after {
+    pointer-events: none;
     content: '';
     position: absolute;
     left: 3px;
@@ -79,9 +80,9 @@
 }
 
 .columnWrapper {
-  margin-right: 45px;
   position: relative;
   height: 100%;
+  flex-grow: 1;
 
   &:last-child {
     margin-right: 0;
@@ -95,20 +96,17 @@
   transform-style: preserve-3d;
 }
 
-$baseLogoSize: 120px;
-$baseLogoOffset: 25px;
+$baseLogoSize: 80px;
+$baseLogoOffset: 35px;
 
 @mixin position-logos($size, $offset) {
   @at-root {
-    .column {
-      width: $size;
-    }
-
     .logo {
       width: $size;
       height: $size;
       margin-top: -$size - $offset;
       margin-bottom: $offset;
+      left: calc(50% - $size / 2 + 1px);
     }
 
     .blur {
@@ -122,6 +120,7 @@ $baseLogoOffset: 25px;
 
 .column {
   height: 100%;
+  width: 100%;
   position: relative;
   opacity: 0;
   will-change: transform;
@@ -134,7 +133,6 @@ $baseLogoOffset: 25px;
 .logo {
   position: absolute;
   top: 0;
-  left: 0;
   will-change: transform, filter;
 
   &:last-child {
