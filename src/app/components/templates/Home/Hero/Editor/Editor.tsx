@@ -15,10 +15,12 @@ import styles from './Editor.module.scss';
 import useHeroAnimation from './useHeroAnimation';
 import Code from './Code';
 import Autocomplete, { type AutocompleteHandle } from './Autocomplete';
+import useVariableRef from '@hooks/useVariableRef';
 import classNames from 'classnames';
 import { Language } from '@global';
 
 export default memo(function Editor({
+  inView = true,
   showSelectHighlight = false,
   setState,
   setHeaderBoundsVisible,
@@ -89,6 +91,16 @@ export default memo(function Editor({
     ];
   }, []);
 
+  const inViewRef = useVariableRef(inView);
+
+  useEffect(() => {
+    if (!inView) {
+      pause();
+    } else if (!userInitiatedPause.current) {
+      play();
+    }
+  }, [inView, pause, play]);
+
   const mouseLeaveTimer = useRef<number>();
   const showCaretTimer = useRef<number>();
 
@@ -106,7 +118,12 @@ export default memo(function Editor({
     clearTimeout(mouseLeaveTimer.current);
     clearTimeout(mouseLeaveTimer.current);
 
-    if (!isPlaying && !isComplete && userInitiatedPause.current) {
+    if (
+      inViewRef.current &&
+      !isPlaying &&
+      !isComplete &&
+      userInitiatedPause.current
+    ) {
       const resumeDelay = 1000;
 
       showCaretTimer.current = window.setTimeout(() => {
@@ -115,10 +132,10 @@ export default memo(function Editor({
 
       mouseLeaveTimer.current = window.setTimeout(() => {
         userInitiatedPause.current = false;
-        play(() => setForceCaretVisible(false));
+        if (inViewRef.current) play(() => setForceCaretVisible(false));
       }, resumeDelay);
     }
-  }, [isPlaying, isComplete, play]);
+  }, [isPlaying, inViewRef, isComplete, play]);
 
   const [numLines, setNumLines] = useState(1);
 
@@ -239,6 +256,7 @@ const Tab = forwardRef<TabHandle, TabProps>(function Tab(
 });
 
 type EditorProps = {
+  inView: boolean;
   showSelectHighlight: boolean;
   setState: (value: any, name?: any) => void;
   setHeaderBoundsVisible: Dispatch<SetStateAction<boolean>>;

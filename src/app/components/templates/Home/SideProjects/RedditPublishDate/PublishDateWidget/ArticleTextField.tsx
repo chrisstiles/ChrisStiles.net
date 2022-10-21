@@ -9,7 +9,7 @@ import styles from './PublishDateWidget.module.scss';
 import { TextField, type ValidationState } from '@elements';
 import { isValidURL } from '@helpers';
 import classNames from 'classnames';
-import type { Favicon } from '@api/favicon';
+import type { FaviconResponse } from '@api/favicon';
 
 export default memo(function ArticleTextField({
   setUrl,
@@ -81,7 +81,7 @@ export default memo(function ArticleTextField({
   );
 });
 
-function ArticleFavicon({ icon }: { icon: Nullable<Favicon> }) {
+function ArticleFavicon({ icon }: { icon: Nullable<FaviconResponse> }) {
   return !icon?.url ? null : (
     <div
       className={classNames(styles.inputFavicon, {
@@ -107,6 +107,6 @@ const defaultIcon = {
 
 type ArticleTextFieldProps = {
   setUrl: (url: Nullable<URL>) => void;
-  favicon: Nullable<Favicon>;
+  favicon: Nullable<FaviconResponse>;
   onPaste?: ClipboardEventHandler;
 };

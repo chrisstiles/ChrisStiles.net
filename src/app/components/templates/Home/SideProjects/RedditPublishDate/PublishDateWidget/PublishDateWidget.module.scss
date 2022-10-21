@@ -3,10 +3,27 @@
 /* --------------------------- */
 
 .wrapper {
+  position: relative;
   background-color: #25293f;
   border-radius: 6px;
   padding: 60px;
 }
+
+@mixin padding($num) {
+  .top {
+    padding: $num $num 0 $num;
+
+    &:last-child {
+      padding-bottom: $num;
+    }
+  }
+
+  .content {
+    padding: 0 $num $num $num;
+  }
+}
+
+@include padding(60px);
 
 .input {
   margin-top: 45px;

@@ -1,7 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
 import styles from './ArticleData.module.scss';
 import { DefaultFavicon } from './icons';
-import useVariableRef from '@hooks/useVariableRef';
 import { Spinner } from '@elements';
 import { preventOrphanedWord } from '@helpers';
 import classNames from 'classnames';
@@ -13,58 +11,11 @@ export default function ArticleMetadataWrapper({ article }: ArticleDataProps) {
 }
 
 function MetaData({ article }: { article: ArticleWithData }) {
-  const articleRef = useVariableRef(article);
   const { url, data, favicon } = article;
-
-  // Favicons have to first be loaded from API
-  // and then the image has to be loaded by the browser
-  const [hasImgError, setHasImgError] = useState(false);
-  const [isLoadingImg, setIsLoadingImg] = useState(false);
-  const isLoadingIcon = !hasImgError && !!(isLoadingImg || favicon?.isLoading);
-  const hasFavicon = !!favicon?.url && !isLoadingIcon;
-
   const headline = data.title ?? data.organization ?? url.hostname;
   const subheadline =
-    data.description ?? headline !== url.hostname
-      ? url.origin
-      : url.origin + url.pathname;
-
-  useEffect(() => {
-    if (!article.favicon?.url) {
-      setIsLoadingImg(false);
-      setHasImgError(false);
-      return;
-    }
-
-    let loadingTimer: number;
-
-    // Instantiate img to ensure load event fires
-    const faviconUrl = article.favicon.url;
-    const img = new Image();
-    const handler = (event: Event) => {
-      const currentFaviconUrl = articleRef.current?.favicon?.url;
-      if (currentFaviconUrl && faviconUrl === currentFaviconUrl) {
-        clearTimeout(loadingTimer);
-        setIsLoadingImg(false);
-        setHasImgError(event.type === 'error');
-      }
-    };
-
-    if (!article.favicon?.url) {
-      setIsLoadingImg(false);
-    } else {
-      img.addEventListener('load', handler);
-      img.addEventListener('error', handler);
-      img.src = faviconUrl;
-      loadingTimer = window.setTimeout(() => setIsLoadingImg(true), 50);
-    }
-
-    return () => {
-      clearTimeout(loadingTimer);
-      img.removeEventListener('load', handler);
-      img.removeEventListener('error', handler);
-    };
-  }, [article.favicon, articleRef]);
+    data.description ??
+    (headline !== url.hostname ? url.origin : url.origin + url.pathname);
 
   return !headline ? null : (
     <a
@@ -73,19 +24,17 @@ function MetaData({ article }: { article: ArticleWithData }) {
     >
       <div
         className={classNames(styles.faviconWrapper, {
-          [styles.dark]: hasFavicon && favicon?.isDark,
-          [styles.loading]: isLoadingIcon,
-          [styles.default]: !hasFavicon
+          [styles.dark]: favicon?.isDark,
+          [styles.loading]: favicon?.isLoading,
+          [styles.default]: favicon && !favicon.isLoading && favicon?.isFallback
         })}
       >
-        {favicon?.url && !isLoadingIcon && !hasImgError && (
+        {favicon?.url && !favicon?.isFallback && (
           <div className={styles.favicon}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               alt=""
               src={favicon.url}
-              width={24}
-              height={24}
               aria-hidden="true"
             />
           </div>
@@ -94,7 +43,7 @@ function MetaData({ article }: { article: ArticleWithData }) {
           <DefaultFavicon />
         </div>
         <Spinner
-          isVisible={isLoadingIcon}
+          isVisible={!!favicon?.isLoading}
           size={15}
         />
       </div>

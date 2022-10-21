@@ -5,12 +5,14 @@ import ArticleData from './ArticleData';
 import useVariableRef from '@hooks/useVariableRef';
 import useIsMounted from '@hooks/useIsMounted';
 import { H3 } from '@elements';
+import { isSameUrl } from '@helpers';
 import type { FaviconResponse } from '@api/favicon';
 
 // TODO: Check when article visible => clear text => add another
 // TODO: Make widget accessible
 // TODO: Add checks to limit cache size
 // TODO: Add handling for both success/failure when searching root URLs
+// TODO: Add button to choose random article
 
 export default memo(function PublishDateWidget() {
   const isMounted = useIsMounted();
@@ -30,8 +32,9 @@ export default memo(function PublishDateWidget() {
     (article: Nullable<Article>, forceUpdateState: boolean = true) => {
       // If the current article changed while a previous one's
       // data was being fetched, we only update the cached data
-      const isCurrent = articleRef.current?.url.href === article?.url.href;
-      const shouldUpdateState = isMounted() && (forceUpdateState || isCurrent);
+      const shouldUpdateState =
+        isMounted() &&
+        (forceUpdateState || isSameUrl(articleRef.current, article));
 
       if (!article?.url) {
         if (shouldUpdateState) _setArticle(null);
@@ -43,11 +46,7 @@ export default memo(function PublishDateWidget() {
         ? cachedFavicons.current[faviconCacheKey]
         : { isLoading: true, url: '' };
 
-      article = {
-        favicon,
-        ...article
-      };
-
+      article = { favicon, ...article };
       if (shouldUpdateState) _setArticle(article);
       cachedArticles.current[getArticleCacheKey(article.url)] = article;
     },
@@ -72,7 +71,9 @@ export default memo(function PublishDateWidget() {
         favicon: Nullable<Favicon>,
         forceUpdate?: boolean
       ) => {
-        if (forceUpdate || articleRef.current?.url.href === url.href) {
+        favicon = favicon ? { ...favicon } : favicon;
+
+        if (forceUpdate || isSameUrl(articleRef.current, url)) {
           _setFavicon(favicon);
         }
 
@@ -99,14 +100,10 @@ export default memo(function PublishDateWidget() {
             const apiUrl = `/api/favicon?url=${url.hostname}`;
             const res = await fetch(apiUrl);
             let favicon = await res.json();
-            if (!favicon?.url) favicon = null;
 
             updateFavicon(favicon);
           } catch {
-            if (
-              !articleRef.current ||
-              articleRef.current.url.href === url.href
-            ) {
+            if (!articleRef.current || isSameUrl(articleRef.current, url)) {
               updateFavicon(null);
               return;
             }
@@ -172,7 +169,7 @@ export default memo(function PublishDateWidget() {
         return;
       }
 
-      if (url.href === articleRef.current?.url.href) return;
+      if (isSameUrl(url, articleRef.current)) return;
 
       const cachedArticle = cachedArticles.current[getArticleCacheKey(url)];
 
@@ -198,13 +195,14 @@ export default memo(function PublishDateWidget() {
           shouldDebounceFavicon.current = false;
         }}
       />
+
       <ArticleData article={article} />
     </article>
   );
 });
 
 function getEndpoint(url: string) {
-  // return `http://localhost:8000/api/get-date?url=${url}&mode=fetch`;
+  // return `http://localhost:8000/api/get-date?url=${url}`;
   return `https://www.redditpublishdate.com/api/get-date?url=${url}`;
 }
 

@@ -12,35 +12,33 @@ export default function ArticleDetails({ article }: ArticleDataProps) {
   const hasModifyDate = shouldShowModifyDate(publishDate, modifyDate);
 
   return !article || !isValidDate(publishDate) ? null : (
-    <div className={styles.content}>
-      <table className={styles.table}>
-        <tbody>
-          <DetailRow
-            label="Publisher"
-            value={publisher}
-            valueIcon={Icon.Publisher}
-          />
-          <DetailRow
-            label={hasModifyDate ? 'First posted' : 'Posted on'}
-            value={publishDate}
-            valueIcon={Icon.PublishDate}
-            isDate
-          />
-          <DetailRow
-            label="Last updated"
-            value={modifyDate}
-            valueIcon={Icon.ModifyDate}
-            isHidden={!hasModifyDate}
-            isDate
-          />
-          <DetailRow
-            label={`${modifyDate ? 'Dates' : 'Date'} found in`}
-            value={location}
-            valueIcon={Icon.Location}
-          />
-        </tbody>
-      </table>
-    </div>
+    <table className={styles.table}>
+      <tbody>
+        <DetailRow
+          label="Publisher"
+          value={publisher}
+          valueIcon={Icon.Publisher}
+        />
+        <DetailRow
+          label={hasModifyDate ? 'First posted' : 'Posted on'}
+          value={publishDate}
+          valueIcon={Icon.PublishDate}
+          isDate
+        />
+        <DetailRow
+          label="Last updated"
+          value={modifyDate}
+          valueIcon={Icon.ModifyDate}
+          isHidden={!hasModifyDate}
+          isDate
+        />
+        <DetailRow
+          label={`${modifyDate ? 'Dates' : 'Date'} found in`}
+          value={location}
+          valueIcon={Icon.Location}
+        />
+      </tbody>
+    </table>
   );
 }
 

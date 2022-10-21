@@ -2,6 +2,7 @@ import {
   memo,
   useState,
   useCallback,
+  useEffect,
   type SetStateAction,
   type Dispatch
 } from 'react';
@@ -11,6 +12,7 @@ import Headline, { type HeadlineStyleProps } from './Headline';
 import Editor from './Editor';
 import { Section } from '@elements';
 import { getState } from '@helpers';
+import { useInView } from 'react-intersection-observer';
 
 export default memo(function Hero({
   setHeaderBoundsVisible,
@@ -22,8 +24,13 @@ export default memo(function Hero({
     !!value && _setState(state => getState(state, value, name));
   }, []);
 
+  const { ref, inView } = useInView({ fallbackInView: true });
+
   return (
-    <Section className={styles.wrapper}>
+    <Section
+      ref={ref}
+      className={styles.wrapper}
+    >
       <div className={styles.top}>
         <div className={styles.content}>
           <Title
@@ -44,6 +51,7 @@ export default memo(function Hero({
           />
         </div>
         <Editor
+          inView={inView}
           showSelectHighlight={state.showSelectHighlight}
           setState={setState}
           setHeaderBoundsVisible={setHeaderBoundsVisible}

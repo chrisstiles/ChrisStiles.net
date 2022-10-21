@@ -127,11 +127,7 @@ export default function useHeroAnimation({
 
       if (modalIsOpenRef.current) {
         pause();
-
-        if (callback) {
-          onPlayCallbacks.current.push(callback);
-        }
-
+        if (callback) onPlayCallbacks.current.push(callback);
         return;
       }
 

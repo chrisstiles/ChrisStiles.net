@@ -3,12 +3,41 @@
 /* --------------------------- */
 
 .wrapper {
-  margin-top: 40px;
+  position: relative;
+  will-change: height;
+  visibility: hidden;
+}
 
-  &.loading {
-    .contentWrapper {
-      opacity: 0.5;
-    }
+.contentWrapper {
+  position: relative;
+}
+
+.data {
+  opacity: 0;
+}
+
+.clone {
+  pointer-events: none;
+  opacity: 0;
+}
+
+.content {
+  padding-top: 40px;
+
+  &.entering {
+    position: absolute;
+    inset: 0 0 auto;
+    opacity: 0;
+  }
+
+  &.hidden {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  @at-root .clone & {
+    position: absolute;
+    inset: 0 0 auto;
   }
 }
 
@@ -46,7 +75,8 @@
   }
 
   &.loading {
-    color: #60637f;
+    color: #676a87;
+    background-color: #3c4158 !important;
   }
 
   &.dark {
@@ -80,6 +110,10 @@
   height: 100%;
   position: relative;
   z-index: 10;
+
+  @at-root .faviconError & {
+    visibility: hidden;
+  }
 
   img,
   svg {
@@ -129,14 +163,11 @@
   color: var(--yellow-accent-color);
 }
 
-.content {
-  font-size: 14px;
-}
-
 .table {
   width: 100%;
   text-align: left;
   border-collapse: collapse;
+  font-size: 14px;
 
   th,
   td {

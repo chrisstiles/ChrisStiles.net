@@ -12,6 +12,8 @@ $borderRadius: 8px;
   $offsetY: 200px;
   padding-bottom: $offsetY;
   margin: -90px -13px #{-$offsetY / 2} 0;
+  // padding-bottom: 220px;
+  // margin: -90px -13px 0 0;
   flex: none;
   position: relative;
   background-color: var(--editor-background-color);

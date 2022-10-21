@@ -55,3 +55,26 @@ export function isValidURL(url: string) {
 export function preventOrphanedWord(str: string) {
   return str?.replace(/ ([^<> ]*)$/, '\u00A0$1') ?? str;
 }
+
+export function isSameUrl<
+  A extends { url: URL } | URL | string | null,
+  B extends { url: URL } | URL | string | null
+>(a?: A, b?: B) {
+  if (!a && !b) return true;
+
+  const u1 =
+    a instanceof URL
+      ? a.href
+      : typeof a === 'string'
+      ? new URL(a).href
+      : a?.url;
+
+  const u2 =
+    b instanceof URL
+      ? b.href
+      : typeof b === 'string'
+      ? new URL(b).href
+      : b?.url;
+
+  return u1 === u2;
+}
