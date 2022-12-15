@@ -61,6 +61,7 @@ export function isSameUrl<
   B extends { url: URL } | URL | string | null
 >(a?: A, b?: B) {
   if (!a && !b) return true;
+  if ((a && !b) || (!a && b)) return false;
 
   const u1 =
     a instanceof URL

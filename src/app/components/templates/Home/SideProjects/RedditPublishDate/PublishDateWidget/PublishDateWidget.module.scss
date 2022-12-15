@@ -28,6 +28,10 @@
 .input {
   margin-top: 45px;
   margin-bottom: 0 !important;
+
+  input {
+    font-size: 15px;
+  }
 }
 
 .inputFavicon {
@@ -59,4 +63,11 @@
   svg {
     display: block;
   }
+}
+
+.random {
+  margin: 10px;
+  border-radius: 3px;
+  padding: 0.85em 1.3em 0.95em 1.3em;
+  font-size: 14px;
 }

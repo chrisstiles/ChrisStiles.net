@@ -16,7 +16,7 @@ import { useInView } from 'react-intersection-observer';
 import ResizeObserver from 'resize-observer-polyfill';
 import { round, shuffle, chunk } from 'lodash';
 
-const columnEase = BezierEasing(0.06, 0.49, 0.04, 1);
+const columnEase = BezierEasing(0.11, 0.98, 0.32, 1);
 const baseLogoSize = parseInt(styles.logoSize);
 const baseLogoOffset = parseInt(styles.logoOffset);
 const startThreshold = 0.45;
@@ -290,8 +290,7 @@ const LogoColumn = memo(function LogoColumn({
       gsap.set(wrapper.current, { y: Math.round(translate) });
       setHasInitialPosition(true);
 
-      // const multiplier = direction === 'up' ? 1.3 : 1.1;
-      const multiplier = direction === 'up' ? 1.5 : 1.6;
+      const multiplier = direction === 'up' ? 1.7 : 1.5;
       const getValue = gsap.getProperty(wrapper.current);
       const getPosition = () => {
         return {
@@ -349,8 +348,8 @@ const LogoColumn = memo(function LogoColumn({
           }
 
           const deltaRatio = gsap.ticker.deltaRatio();
-          const dx = Math.ceil(Math.abs(x - prevPosition.x));
-          const dy = Math.ceil(Math.abs(y - prevPosition.y));
+          const dx = Math.floor(Math.abs(x - prevPosition.x));
+          const dy = Math.floor(Math.abs(y - prevPosition.y));
           const bx = Math.max(dx / deltaRatio - logoVelocity, 0) * multiplier;
           const by = Math.max(dy / deltaRatio - logoVelocity, 0) * multiplier;
 
@@ -405,7 +404,6 @@ const LogoColumn = memo(function LogoColumn({
             width="200%"
             height="200%"
             colorInterpolationFilters="sRGB"
-            // primitiveUnits="objectBoundingBox"
           >
             <feGaussianBlur
               ref={blurFilter}

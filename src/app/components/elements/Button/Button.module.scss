@@ -37,6 +37,18 @@
   }
 }
 
+.secondary {
+  background-color: #dfdfeb;
+
+  &:hover {
+    background-color: #fcfcff;
+  }
+
+  &[disabled] {
+    background-color: #585e79;
+  }
+}
+
 .text {
   display: inline-flex;
   align-items: center;

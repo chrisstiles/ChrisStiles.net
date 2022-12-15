@@ -6,6 +6,8 @@
   position: relative;
   width: 100%;
   flex: none;
+  contain: layout;
+  z-index: -1;
 
   &.hidden {
     visibility: hidden;

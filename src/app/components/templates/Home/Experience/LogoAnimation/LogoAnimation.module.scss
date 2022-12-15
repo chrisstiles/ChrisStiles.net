@@ -83,6 +83,7 @@
   position: relative;
   height: 100%;
   flex-grow: 1;
+  contain: strict;
 
   &:last-child {
     margin-right: 0;

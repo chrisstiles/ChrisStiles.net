@@ -2,29 +2,33 @@ import { useState, useRef, useCallback, memo } from 'react';
 import styles from './PublishDateWidget.module.scss';
 import ArticleTextField from './ArticleTextField';
 import ArticleData from './ArticleData';
+import exampleArticlesData from './example-articles.json';
 import useVariableRef from '@hooks/useVariableRef';
 import useIsMounted from '@hooks/useIsMounted';
 import { H3 } from '@elements';
 import { isSameUrl } from '@helpers';
+import { shuffle } from 'lodash';
 import type { FaviconResponse } from '@api/favicon';
 
-// TODO: Check when article visible => clear text => add another
+const exampleArticles = shuffle(exampleArticlesData);
+const maxCacheSize = 30;
+
 // TODO: Make widget accessible
-// TODO: Add checks to limit cache size
 // TODO: Add handling for both success/failure when searching root URLs
-// TODO: Add button to choose random article
+// TODO: Add error messages
+// TODO: Finalize text
 
 export default memo(function PublishDateWidget() {
   const isMounted = useIsMounted();
 
   const [article, _setArticle] = useState<Nullable<Article>>(null);
   const articleRef = useVariableRef(article);
-  const cachedArticles = useRef<{ [key: string]: Article }>({});
+  const cachedArticles = useRef<Map<string, Nullable<Article>>>(new Map());
   const shouldDebounceArticle = useRef(true);
   const articleTimer = useRef<number>();
 
   const [favicon, _setFavicon] = useState<Nullable<Favicon>>(null);
-  const cachedFavicons = useRef<{ [key: string]: Nullable<Favicon> }>({});
+  const cachedFavicons = useRef<Map<string, Nullable<Favicon>>>(new Map());
   const shouldDebounceFavicon = useRef(true);
   const faviconTimer = useRef<number>();
 
@@ -42,13 +46,21 @@ export default memo(function PublishDateWidget() {
       }
 
       const faviconCacheKey = getFaviconCacheKey(article.url);
-      const favicon = cachedFavicons.current.hasOwnProperty(faviconCacheKey)
-        ? cachedFavicons.current[faviconCacheKey]
+      const favicon = cachedFavicons.current.has(faviconCacheKey)
+        ? cachedFavicons.current.get(faviconCacheKey)
         : { isLoading: true, url: '' };
 
       article = { favicon, ...article };
+
       if (shouldUpdateState) _setArticle(article);
-      cachedArticles.current[getArticleCacheKey(article.url)] = article;
+
+      if (cachedArticles.current.size >= maxCacheSize) {
+        Array.from(cachedArticles.current.keys())
+          .slice(0, Math.floor(maxCacheSize / 2))
+          .forEach(k => cachedArticles.current.delete(k));
+      }
+
+      cachedArticles.current.set(getArticleCacheKey(article.url), article);
     },
     [articleRef, isMounted]
   );
@@ -57,7 +69,7 @@ export default memo(function PublishDateWidget() {
     async (url: Nullable<URL>) => {
       clearTimeout(faviconTimer.current);
 
-      // Althout techincally valid URLs, we do not attempt to fetch
+      // Although techincally valid URLs, we do not attempt to fetch
       // favicons for URLs like "www.mydomain" while the user types
       if (!url || url.hostname.match(/www\.[^.]*$/)) {
         _setFavicon(null);
@@ -73,25 +85,31 @@ export default memo(function PublishDateWidget() {
       ) => {
         favicon = favicon ? { ...favicon } : favicon;
 
-        if (forceUpdate || isSameUrl(articleRef.current, url)) {
+        if (forceUpdate || isSameUrl(articleRef.current?.url, url)) {
           _setFavicon(favicon);
         }
 
-        cachedFavicons.current[faviconCacheKey] = favicon;
+        if (cachedFavicons.current.size >= maxCacheSize) {
+          Array.from(cachedFavicons.current.keys())
+            .slice(0, Math.floor(maxCacheSize / 2))
+            .forEach(k => cachedFavicons.current.delete(k));
+        }
 
-        if (cachedArticles.current[articleCacheKey]) {
-          const article = {
-            ...cachedArticles.current[articleCacheKey],
-            favicon
-          };
+        cachedFavicons.current.set(faviconCacheKey, favicon);
 
-          cachedArticles.current[articleCacheKey] = article;
+        const cachedArticle = cachedArticles.current.get(articleCacheKey);
+
+        if (cachedArticle) {
+          const article = { ...cachedArticle, favicon };
+          cachedArticles.current.set(articleCacheKey, article);
           setArticle(article);
         }
       };
 
-      if (cachedFavicons.current.hasOwnProperty(faviconCacheKey)) {
-        updateFavicon(cachedFavicons.current[faviconCacheKey], true);
+      const cachedFavicon = cachedFavicons.current.get(faviconCacheKey);
+
+      if (cachedFavicon) {
+        updateFavicon(cachedFavicon, true);
       } else {
         const fetchFavicon = async () => {
           updateFavicon({ isLoading: true, url: '' });
@@ -121,6 +139,14 @@ export default memo(function PublishDateWidget() {
     },
     [articleRef, setArticle]
   );
+
+  if (typeof window !== 'undefined') {
+    (window as any).test = () =>
+      console.log({
+        articles: cachedArticles.current,
+        favicons: cachedFavicons.current
+      });
+  }
 
   const fetchArticleData = useCallback(
     async (article: Article) => {
@@ -162,16 +188,21 @@ export default memo(function PublishDateWidget() {
   );
 
   const setUrl = useCallback(
-    (url: Nullable<URL>) => {
+    (url: Nullable<URL>, immediate?: boolean) => {
       if (!url) {
         setArticle(null);
         setFavicon(null);
         return;
       }
 
+      if (immediate) {
+        shouldDebounceArticle.current = false;
+        shouldDebounceFavicon.current = false;
+      }
+
       if (isSameUrl(url, articleRef.current)) return;
 
-      const cachedArticle = cachedArticles.current[getArticleCacheKey(url)];
+      const cachedArticle = cachedArticles.current.get(getArticleCacheKey(url));
 
       if (cachedArticle) {
         setArticle(cachedArticle);
@@ -184,26 +215,41 @@ export default memo(function PublishDateWidget() {
     [articleRef, setFavicon, setArticle, fetchArticleData]
   );
 
+  const randomArticles = useRef(exampleArticles.slice());
+
+  const setRandomArticle = useCallback(() => {
+    if (!randomArticles.current.length) {
+      randomArticles.current = exampleArticles.slice();
+    }
+
+    setUrl(new URL(randomArticles.current.pop()!), true);
+  }, [setUrl]);
+
   return (
     <article className={styles.wrapper}>
       <H3 eyebrow="Publish date service">Try out my publish date API</H3>
       <ArticleTextField
-        setUrl={setUrl}
+        article={article}
         favicon={favicon}
+        setUrl={setUrl}
+        setRandomArticle={setRandomArticle}
         onPaste={() => {
           shouldDebounceArticle.current = false;
           shouldDebounceFavicon.current = false;
         }}
       />
 
-      <ArticleData article={article} />
+      <ArticleData
+        article={article}
+        setRandomArticle={setRandomArticle}
+      />
     </article>
   );
 });
 
 function getEndpoint(url: string) {
-  // return `http://localhost:8000/api/get-date?url=${url}`;
-  return `https://www.redditpublishdate.com/api/get-date?url=${url}`;
+  return `http://localhost:8000/api/get-date?url=${url}`;
+  // return `https://www.redditpublishdate.com/api/get-date?url=${url}`;
 }
 
 function getArticleCacheKey(url: URL) {

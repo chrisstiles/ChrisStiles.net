@@ -25,6 +25,7 @@ export default memo(function TextField({
   required,
   showInlineValidIndicator = true,
   icon,
+  controlEl,
   validationState,
   error,
   forceShowValidation = false,
@@ -84,6 +85,15 @@ export default memo(function TextField({
     }
   }, [value]);
 
+  const errorComponent = !errorMessage ? null : (
+    <span
+      id={`${id}-error`}
+      className={styles.fieldError}
+    >
+      {errorMessage}
+    </span>
+  );
+
   return (
     <div
       className={classNames(styles.field, wrapperClassName, {
@@ -113,20 +123,23 @@ export default memo(function TextField({
         </div>
       )}
       <div className={styles.inputWrapper}>
-        <Component {...props} />
-        {icon && (
-          <div
-            className={styles.icon}
-            aria-hidden="true"
-          >
-            {icon}
-          </div>
-        )}
-        {showInlineValidIndicator && type !== 'textarea' && (
-          <div className={styles.validityIcon}>
-            {isValid ? <Icon.Valid /> : <Icon.Invalid />}
-          </div>
-        )}
+        <div className={styles.inputContent}>
+          <Component {...props} />
+          {icon && (
+            <div
+              className={styles.icon}
+              aria-hidden="true"
+            >
+              {icon}
+            </div>
+          )}
+          {showInlineValidIndicator && type !== 'textarea' && (
+            <div className={styles.validityIcon}>
+              {isValid ? <Icon.Valid /> : <Icon.Invalid />}
+            </div>
+          )}
+        </div>
+        {controlEl}
       </div>
     </div>
   );
@@ -135,12 +148,13 @@ export default memo(function TextField({
 export type FieldProps = {
   name?: string;
   value: string;
-  label: string;
+  label?: string;
   required?: boolean;
   showInlineValidIndicator?: boolean;
   className?: string;
   wrapperClassName?: string;
   icon?: Nullable<ReactNode>;
+  controlEl?: Nullable<ReactNode>;
   theme?: 'light' | 'dark';
   placeholder?: string;
   autoComplete?: 'on' | 'off';

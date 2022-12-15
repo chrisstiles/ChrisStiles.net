@@ -11,6 +11,7 @@ export function Button({
   disabled,
   children,
   isLoading,
+  theme,
   ...props
 }: ButtonProps) {
   const [disableTransition, setDisableTransition] = useState(!!disabled);
@@ -24,18 +25,17 @@ export function Button({
       setDisableTransition(true);
     } else {
       disableTransitionTimer.current = window.setTimeout(() => {
-        if (isMounted()) {
-          setDisableTransition(false);
-        }
+        if (isMounted()) setDisableTransition(false);
       }, 200);
     }
   }, [disabled, isMounted]);
 
   return (
     <button
-      className={classNames(styles.button, className, {
+      className={classNames('button', styles.button, className, {
         [styles.noTransition]: disabled || disableTransition,
-        [styles.loading]: isLoading
+        [styles.loading]: isLoading,
+        [styles.secondary]: theme === 'secondary'
       })}
       disabled={disabled}
       {...props}
@@ -52,19 +52,36 @@ export function Button({
 
 export default Button;
 
-export function LinkButton({ className, children, ...props }: LinkButtonProps) {
+export function LinkButton({
+  className,
+  children,
+  theme,
+  ...props
+}: LinkButtonProps) {
   return (
     <Link {...props}>
-      <a className={classNames(styles.button, className)}>{children}</a>
+      <a
+        className={classNames('button', styles.button, className, {
+          [styles.secondary]: theme === 'secondary'
+        })}
+      >
+        {children}
+      </a>
     </Link>
   );
 }
 
-type ButtonProps = ComponentProps<'button'> & {
-  isLoading?: boolean;
+type ButtonPropsShared = {
+  theme?: 'primary' | 'secondary';
 };
 
-type LinkButtonProps = LinkProps & {
-  className?: string;
-  children: ReactNode;
-};
+type ButtonProps = ButtonPropsShared &
+  ComponentProps<'button'> & {
+    isLoading?: boolean;
+  };
+
+type LinkButtonProps = ButtonPropsShared &
+  LinkProps & {
+    className?: string;
+    children: ReactNode;
+  };

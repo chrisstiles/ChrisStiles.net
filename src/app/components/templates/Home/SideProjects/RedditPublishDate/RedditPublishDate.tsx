@@ -11,6 +11,9 @@ export default function RedditPublishDate() {
       className={styles.wrapper}
       contentClassName={styles.contentWrapper}
     >
+      <Column>
+        <PublishDateWidget />
+      </Column>
       <Column className={styles.content}>
         <H2 eyebrow={<Logo className={styles.logo} />}>
           What have I been up to lately?
@@ -20,9 +23,6 @@ export default function RedditPublishDate() {
           guam in, ultrices massa. Lorem dolor sit amet, consectetur adipiscing
           elit.
         </p>
-      </Column>
-      <Column>
-        <PublishDateWidget />
       </Column>
     </Section>
   );

@@ -174,7 +174,7 @@ export default memo(function ContactForm() {
         <Button
           type="submit"
           className={styles.submit}
-          isLoading={isLoading}
+          isLoading={isLoading || apiResponse?.success}
           disabled={
             !canSubmit ||
             isLoading ||
