@@ -248,8 +248,8 @@ export default memo(function PublishDateWidget() {
 });
 
 function getEndpoint(url: string) {
-  return `http://localhost:8000/api/get-date?url=${url}`;
-  // return `https://www.redditpublishdate.com/api/get-date?url=${url}`;
+  // return `http://localhost:8000/api/get-date?url=${url}`;
+  return `https://www.redditpublishdate.com/api/get-date?url=${url}`;
 }
 
 function getArticleCacheKey(url: URL) {
