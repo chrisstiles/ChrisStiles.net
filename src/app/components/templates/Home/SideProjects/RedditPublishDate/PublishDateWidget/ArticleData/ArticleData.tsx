@@ -235,7 +235,7 @@ const ArticlePlaceholder = forwardRef<HTMLDivElement, ArticlePlaceholderProps>(
       >
         <p>
           The API will parse the article and attempt to determine when it was
-          first published, and when it was last&dbsp;modified.
+          first published, and when it was last&nbsp;modified.
         </p>
         <Button
           isLoading={showLoading}

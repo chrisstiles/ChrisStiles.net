@@ -124,18 +124,47 @@ function RandomArticleButton({
   setRandomArticle
 }: RandomArticleButtonProps) {
   const [showLoading, setShowLoading] = useState(!!isLoading);
-  const loadingTimer = useRef<number>();
+  const loadingStartTimer = useRef<number>();
+  const loadingEndTimer = useRef<number>();
+  const loadingStart = useRef<Nullable<Date>>(null);
   const isMounted = useIsMounted();
+  const hasLoaded = useRef(false);
 
   useEffect(() => {
-    clearTimeout(loadingTimer.current);
+    clearTimeout(loadingStartTimer.current);
+    clearTimeout(loadingEndTimer.current);
 
+    // Prevent quick flashes when loading finishes
+    // very quickly by slightly delaying when the
+    // spinner appears, and forcing a minimum
+    // amount of time the spinner is visible
     if (isLoading) {
-      loadingTimer.current = window.setTimeout(() => {
-        if (isMounted()) setShowLoading(true);
-      }, 20);
+      if (!hasLoaded.current) {
+        hasLoaded.current = true;
+        loadingStart.current = new Date();
+        setShowLoading(true);
+      } else {
+        loadingStartTimer.current = window.setTimeout(() => {
+          if (isMounted()) {
+            loadingStart.current = new Date();
+            setShowLoading(true);
+          }
+        }, 30);
+      }
     } else {
-      setShowLoading(false);
+      const minTime = 300;
+      const start = loadingStart.current?.getTime();
+      const end = new Date().getTime();
+
+      if (start && end - start < minTime) {
+        loadingEndTimer.current = window.setTimeout(() => {
+          if (isMounted()) setShowLoading(false);
+        }, minTime - (end - start));
+      } else {
+        setShowLoading(false);
+      }
+
+      loadingStart.current = null;
     }
   }, [isLoading, isMounted]);
 

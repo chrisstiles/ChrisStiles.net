@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, memo } from 'react';
+import { useState, useRef, useCallback, useEffect, memo } from 'react';
 import styles from './PublishDateWidget.module.scss';
 import ArticleTextField from './ArticleTextField';
 import ArticleData from './ArticleData';
@@ -66,8 +66,12 @@ export default memo(function PublishDateWidget() {
   );
 
   const setFavicon = useCallback(
-    async (url: Nullable<URL>) => {
-      clearTimeout(faviconTimer.current);
+    async (
+      url: Nullable<URL>,
+      isPreload?: boolean,
+      callback?: (favicon: Nullable<Favicon>) => void
+    ) => {
+      if (!isPreload) clearTimeout(faviconTimer.current);
 
       // Although techincally valid URLs, we do not attempt to fetch
       // favicons for URLs like "www.mydomain" while the user types
@@ -85,7 +89,9 @@ export default memo(function PublishDateWidget() {
       ) => {
         favicon = favicon ? { ...favicon } : favicon;
 
-        if (forceUpdate || isSameUrl(articleRef.current?.url, url)) {
+        const isCurrent = isSameUrl(articleRef.current?.url, url);
+
+        if (!isPreload && (forceUpdate || isCurrent)) {
           _setFavicon(favicon);
         }
 
@@ -110,8 +116,9 @@ export default memo(function PublishDateWidget() {
 
       if (cachedFavicon) {
         updateFavicon(cachedFavicon, true);
+        callback?.(cachedFavicon);
       } else {
-        const fetchFavicon = async () => {
+        const getFavicon = async () => {
           updateFavicon({ isLoading: true, url: '' });
 
           try {
@@ -120,18 +127,19 @@ export default memo(function PublishDateWidget() {
             let favicon = await res.json();
 
             updateFavicon(favicon);
+            callback?.(favicon);
           } catch {
             if (!articleRef.current || isSameUrl(articleRef.current, url)) {
               updateFavicon(null);
-              return;
+              callback?.(null);
             }
           }
         };
 
         if (!shouldDebounceFavicon.current) {
-          fetchFavicon();
+          getFavicon();
         } else {
-          faviconTimer.current = window.setTimeout(fetchFavicon, 100);
+          faviconTimer.current = window.setTimeout(getFavicon, 100);
         }
 
         shouldDebounceFavicon.current = true;
@@ -139,14 +147,6 @@ export default memo(function PublishDateWidget() {
     },
     [articleRef, setArticle]
   );
-
-  if (typeof window !== 'undefined') {
-    (window as any).test = () =>
-      console.log({
-        articles: cachedArticles.current,
-        favicons: cachedFavicons.current
-      });
-  }
 
   const fetchArticleData = useCallback(
     async (article: Article) => {
@@ -216,14 +216,41 @@ export default memo(function PublishDateWidget() {
   );
 
   const randomArticles = useRef(exampleArticles.slice());
+  const shouldPreloadFavicon = useRef(true);
+
+  const preloadFavicon = useCallback(
+    async (url?: string) => {
+      if (!url || !shouldPreloadFavicon.current) return;
+
+      setFavicon(new URL(url), true, favicon => {
+        if (!favicon) return;
+        const img = new Image();
+        img.src = favicon.url;
+      });
+    },
+    [setFavicon]
+  );
+
+  useEffect(() => {
+    preloadFavicon(randomArticles.current[randomArticles.current.length - 1]);
+  }, [preloadFavicon]);
 
   const setRandomArticle = useCallback(() => {
+    if (shouldPreloadFavicon.current && randomArticles.current.length <= 1) {
+      shouldPreloadFavicon.current = false;
+    }
+
     if (!randomArticles.current.length) {
       randomArticles.current = exampleArticles.slice();
     }
 
     setUrl(new URL(randomArticles.current.pop()!), true);
-  }, [setUrl]);
+
+    if (shouldPreloadFavicon.current) {
+      const url = randomArticles.current[randomArticles.current.length - 1];
+      preloadFavicon(url);
+    }
+  }, [setUrl, preloadFavicon]);
 
   return (
     <article className={styles.wrapper}>
@@ -250,6 +277,7 @@ export default memo(function PublishDateWidget() {
 function getEndpoint(url: string) {
   // return `http://localhost:8000/api/get-date?url=${url}`;
   return `https://www.redditpublishdate.com/api/get-date?url=${url}`;
+  // return `https://www.redditpublishdate.com/api/get-date?cache=false&url=${url}`;
 }
 
 function getArticleCacheKey(url: URL) {
