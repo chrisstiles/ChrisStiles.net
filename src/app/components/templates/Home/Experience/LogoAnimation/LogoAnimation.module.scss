@@ -107,7 +107,7 @@ $baseLogoOffset: 34px;
     }
 
     .divider {
-      bottom: math.floor(-$offset / 2) - 1px;
+      bottom: math.floor(-$offset / 2) + 1px;
     }
   }
 }
