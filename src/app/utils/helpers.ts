@@ -79,3 +79,14 @@ export function isSameUrl<
 
   return u1 === u2;
 }
+
+let cachedIsSafari: Nullable<boolean> = null;
+
+export function isSafari() {
+  if (isSSR()) return false;
+
+  cachedIsSafari ??=
+    !window.hasOwnProperty('chrome') && /Safari/i.test(navigator.userAgent);
+
+  return cachedIsSafari;
+}

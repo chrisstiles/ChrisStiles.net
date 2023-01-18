@@ -40,14 +40,14 @@ export default memo(function Experience({
         </Content>
         <GridLines
           className={styles.grid}
-          solidColor="#262B3F"
-          dashColor="#262B3F"
+          solidColor="var(--grid-line-dark-color)"
+          dashColor="var(--grid-line-dark-color)"
         />
       </div>
       <BackgroundAccent
         position="right"
         isVisible={accentsVisible}
-        delay={0.4}
+        delay={0.8}
       />
     </Section>
   );

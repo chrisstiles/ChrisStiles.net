@@ -1,7 +1,7 @@
 import styles from './RedditPublishDate.module.scss';
 import PublishDateWidget from './PublishDateWidget';
 import Logo from './rpd.svg';
-import { Section, H2 } from '@elements';
+import { Section, H2, GridDivider } from '@elements';
 import classNames from 'classnames';
 import type { ReactNode } from 'react';
 
@@ -11,9 +11,6 @@ export default function RedditPublishDate() {
       className={styles.wrapper}
       contentClassName={styles.contentWrapper}
     >
-      <Column>
-        <PublishDateWidget />
-      </Column>
       <Column className={styles.content}>
         <H2 eyebrow={<Logo className={styles.logo} />}>
           What have I been up to lately?
@@ -23,6 +20,10 @@ export default function RedditPublishDate() {
           guam in, ultrices massa. Lorem dolor sit amet, consectetur adipiscing
           elit.
         </p>
+        <GridDivider outlineColor="var(--page-background-dark-color)" />
+      </Column>
+      <Column>
+        <PublishDateWidget />
       </Column>
     </Section>
   );

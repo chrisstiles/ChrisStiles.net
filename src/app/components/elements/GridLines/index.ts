@@ -1,1 +1,1 @@
-export { default, Grid } from './GridLines';
+export { default, Grid, GridDivider } from './GridLines';

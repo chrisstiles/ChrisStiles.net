@@ -3,12 +3,14 @@ import styles from './GridLines.module.scss';
 import { Content } from '@elements';
 import classNames from 'classnames';
 
+const numColumns = 12;
+
 export default memo(function GridLines({
   className,
-  dashColor = '#2d334a',
-  solidColor = '#2d334a'
+  dashColor = 'var(--grid-line-color)',
+  solidColor = 'var(--grid-line-color)'
 }: GridLinesProps) {
-  const lines = Array.from({ length: 12 }, (_, index) => (
+  const lines = Array.from({ length: numColumns }, (_, index) => (
     <div
       key={index}
       className={classNames('grid-line', styles.line)}
@@ -75,8 +77,46 @@ export function Grid({
   );
 }
 
+export function GridDivider({
+  className,
+  barColor,
+  outlineColor,
+  offsetLeft,
+  offsetRight
+}: GridDividerProps) {
+  const circleStyle = {
+    backgroundColor: barColor,
+    boxShadow: outlineColor ? `0 0 0 3px ${outlineColor}` : undefined
+  };
+
+  return (
+    <div className={classNames(styles.divider, className)}>
+      <div
+        className={classNames('bar', styles.bar)}
+        style={{
+          // backgroundColor: barColor,
+          color: barColor,
+          left: offsetLeft,
+          right: offsetRight
+        }}
+      >
+        <span style={circleStyle} />
+        <span style={circleStyle} />
+      </div>
+    </div>
+  );
+}
+
 type GridLinesProps = {
   className?: string;
   dashColor?: string;
   solidColor?: string;
+};
+
+type GridDividerProps = {
+  className?: string;
+  barColor?: string;
+  outlineColor?: string;
+  offsetLeft?: string | number;
+  offsetRight?: string | number;
 };

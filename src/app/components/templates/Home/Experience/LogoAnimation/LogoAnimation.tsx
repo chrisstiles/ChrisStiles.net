@@ -9,6 +9,8 @@ import {
 } from 'react';
 import styles from './LogoAnimation.module.scss';
 import { useGlobalState } from '@templates/Home';
+import { GridDivider } from '@elements';
+import { isSafari } from '@helpers';
 import gsap from 'gsap';
 import BezierEasing from 'bezier-easing';
 import classNames from 'classnames';
@@ -16,6 +18,7 @@ import { useInView } from 'react-intersection-observer';
 import ResizeObserver from 'resize-observer-polyfill';
 import { round, shuffle, chunk } from 'lodash';
 
+const columnCount = 4;
 const columnEase = BezierEasing(0.11, 0.98, 0.32, 1);
 const baseLogoSize = parseInt(styles.logoSize);
 const baseLogoOffset = parseInt(styles.logoOffset);
@@ -30,7 +33,7 @@ export default memo(function LogoAnimation({
   const [icons, setIcons] = useState<string[][]>([]);
 
   useEffect(() => {
-    const columnLength = Math.ceil(iconFileNames.length / 4);
+    const columnLength = Math.ceil(iconFileNames.length / columnCount);
     const icons = chunk(shuffle(iconFileNames), columnLength);
     if (!icons.length) return;
 
@@ -128,6 +131,7 @@ export default memo(function LogoAnimation({
       ref={ref}
       role="presentation"
       aria-hidden="true"
+      style={{ width: `calc((100% + 40px) / 12 * ${columnCount})` }}
       className={styles.wrapper}
     >
       <div
@@ -172,11 +176,18 @@ const LogoColumn = memo(function LogoColumn({
           <div
             key={index}
             className={styles.logo}
-            style={{ filter: `url('#${filterId}')` }}
+            style={{ filter: isSafari() ? `url('#${filterId}')` : undefined }}
           >
-            <svg>
-              <use href={`#icon-${logo}`}></use>
+            <svg className={styles.icon}>
+              <use href={`#icon-${logo}`} />
             </svg>
+
+            <GridDivider
+              offsetLeft={0}
+              offsetRight={0}
+              className={styles.divider}
+              barColor="var(--grid-line-dark-color)"
+            />
           </div>
         ));
   }, [logoCount, logos, filterId]);
@@ -290,7 +301,7 @@ const LogoColumn = memo(function LogoColumn({
       gsap.set(wrapper.current, { y: Math.round(translate) });
       setHasInitialPosition(true);
 
-      const multiplier = direction === 'up' ? 1.7 : 1.5;
+      const multiplier = getMultiplier(direction);
       const getValue = gsap.getProperty(wrapper.current);
       const getPosition = () => {
         return {
@@ -301,16 +312,8 @@ const LogoColumn = memo(function LogoColumn({
 
       const prevPosition = getPosition();
 
-      let blurX = blurFilter.current?.stdDeviationX ?? {
-        baseVal: 0,
-        animVal: 0
-      };
-
-      let blurY = blurFilter.current?.stdDeviationY ?? {
-        baseVal: 0,
-        animVal: 0
-      };
-
+      let blurX = 0;
+      let blurY = 0;
       let hasInitialPosition = false;
       let hasBlurX = false;
       let hasBlurY = false;
@@ -325,7 +328,7 @@ const LogoColumn = memo(function LogoColumn({
         duration: 3.2,
         ease: columnEase,
         paused: !isVisible,
-        delay: 0.25 + index * 0.25,
+        delay: 0.25 + index * 0.32,
         onStart() {
           hasStartedLogoAnimation.current = true;
           isPlayingRef.current = true;
@@ -350,24 +353,31 @@ const LogoColumn = memo(function LogoColumn({
           const deltaRatio = gsap.ticker.deltaRatio();
           const dx = Math.floor(Math.abs(x - prevPosition.x));
           const dy = Math.floor(Math.abs(y - prevPosition.y));
-          const bx = Math.max(dx / deltaRatio - logoVelocity, 0) * multiplier;
-          const by = Math.max(dy / deltaRatio - logoVelocity, 0) * multiplier;
+
+          const bx = Math.floor(
+            Math.max(dx / deltaRatio - logoVelocity, 0) * multiplier
+          );
+
+          const by = Math.floor(
+            Math.max(dy / deltaRatio - logoVelocity, 0) * multiplier
+          );
 
           if (hasBlurX && bx === 0) hasCompleteBlurX = true;
           if (hasBlurY && by === 0) hasCompleteBlurY = true;
 
-          if (!hasBlurX && bx !== blurX.baseVal) hasBlurX = true;
-          if (!hasBlurY && by !== blurY.baseVal) hasBlurY = true;
+          if (!hasBlurX && bx !== blurX) hasBlurX = true;
+          if (!hasBlurY && by !== blurY) hasBlurY = true;
 
-          blurX.baseVal = Math.max(bx, 0);
-          blurY.baseVal = Math.max(by, 0);
+          blurX = bx;
+          blurY = by;
+
+          blurFilter.current.setAttribute('stdDeviation', `${bx},${by}`);
 
           prevPosition.x = x;
           prevPosition.y = y;
         },
         onComplete() {
-          blurX.baseVal = 0;
-          blurY.baseVal = 0;
+          blurFilter.current?.setAttribute('stdDeviation', '0,0');
         }
       });
     }
@@ -381,16 +391,8 @@ const LogoColumn = memo(function LogoColumn({
     wrapperSize
   ]);
 
-  return !logoCount ? null : (
-    <div className={styles.columnWrapper}>
-      <div
-        ref={wrapper}
-        className={classNames(styles.column, direction, {
-          [styles.visible]: isVisible && hasInitialPosition
-        })}
-      >
-        {components}
-      </div>
+  const blurElement = useMemo(() => {
+    return (
       <svg
         className={styles.blur}
         width="0"
@@ -403,19 +405,45 @@ const LogoColumn = memo(function LogoColumn({
             y="-50%"
             width="200%"
             height="200%"
-            colorInterpolationFilters="sRGB"
+            colorInterpolation="sRGB"
           >
             <feGaussianBlur
               ref={blurFilter}
+              className="test"
               in="SourceGraphic"
-              stdDeviation="0"
+              stdDeviation="0,0"
+              colorInterpolationFilters="sRGB"
             />
           </filter>
         </defs>
       </svg>
-    </div>
+    );
+  }, [filterId]);
+
+  return (
+    <>
+      <div
+        className={styles.columnWrapper}
+        style={{ filter: !isSafari() ? `url('#${filterId}')` : undefined }}
+      >
+        <div
+          ref={wrapper}
+          className={classNames(styles.column, direction, {
+            [styles.visible]: isVisible && hasInitialPosition
+          })}
+        >
+          {components}
+        </div>
+        {blurElement}
+      </div>
+    </>
   );
 });
+
+function getMultiplier(direction: 'up' | 'down') {
+  const multiplier = direction === 'up' ? 1.7 : 1.5;
+  return !isSafari() ? multiplier : multiplier - 0.3;
+}
 
 type LogoAnimationProps = {
   iconFileNames: string[];

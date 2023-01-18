@@ -3,7 +3,15 @@
 /* --------------------------- */
 
 .wrapper {
-  background-color: var(--page-background-dark-color);
+  // background-color: var(--page-background-dark-color);
+
+  &:before {
+    content: '';
+    position: absolute;
+    inset: 0 0 0 0;
+    background-color: var(--page-background-dark-color);
+    z-index: -3;
+  }
 }
 
 .contentWrapper {

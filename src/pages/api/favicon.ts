@@ -1,4 +1,4 @@
-import { isValidURL, sleep } from '@helpers';
+import { isValidURL } from '@helpers';
 import cache from 'memory-cache';
 import { getAverageColor } from 'fast-average-color-node';
 import { TinyColor } from '@ctrl/tinycolor';
@@ -53,8 +53,8 @@ function getPotentialFaviconUrls(url: URL, size: number | string) {
     ? domain.replace('www.', '')
     : `${url.protocol}www.${url.hostname}`;
 
-  const g1 = `https://www.google.com/s2/favicons?sz=${size}&domain=`;
-  const g2 = `https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&size=${size}&url=`;
+  const g1 = `https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&size=${size}&url=`;
+  const g2 = `https://www.google.com/s2/favicons?sz=${size}&domain=`;
 
   return [
     `${g1}${domain}`,

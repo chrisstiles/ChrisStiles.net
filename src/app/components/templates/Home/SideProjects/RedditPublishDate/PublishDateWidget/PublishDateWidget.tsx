@@ -89,9 +89,7 @@ export default memo(function PublishDateWidget() {
       ) => {
         favicon = favicon ? { ...favicon } : favicon;
 
-        const isCurrent = isSameUrl(articleRef.current?.url, url);
-
-        if (!isPreload && (forceUpdate || isCurrent)) {
+        if (forceUpdate || isSameUrl(articleRef.current?.url, url)) {
           _setFavicon(favicon);
         }
 
@@ -115,7 +113,7 @@ export default memo(function PublishDateWidget() {
       const cachedFavicon = cachedFavicons.current.get(faviconCacheKey);
 
       if (cachedFavicon) {
-        updateFavicon(cachedFavicon, true);
+        updateFavicon(cachedFavicon, !isPreload);
         callback?.(cachedFavicon);
       } else {
         const getFavicon = async () => {
