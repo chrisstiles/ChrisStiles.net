@@ -50,13 +50,25 @@ $offset: 20px;
   position: relative;
   height: 2.5px;
   width: 100%;
+  pointer-events: none;
+}
+
+.barWrapper {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: calc(min(var(--content-width), 100vw) - var(--content-padding) * 2);
+}
+
+.barSpacer {
+  position: absolute;
+  inset: 0 #{-$offset};
 }
 
 .bar {
   position: absolute;
   color: var(--grid-line-color);
   display: block;
-  inset: 0 #{-$offset};
+  inset: 0;
   padding: 0 7px;
   height: 2.5px;
 

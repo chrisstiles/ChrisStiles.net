@@ -78,6 +78,7 @@ export function Grid({
 }
 
 export function GridDivider({
+  columns,
   className,
   barColor,
   outlineColor,
@@ -91,17 +92,22 @@ export function GridDivider({
 
   return (
     <div className={classNames(styles.divider, className)}>
-      <div
-        className={classNames('bar', styles.bar)}
-        style={{
-          // backgroundColor: barColor,
-          color: barColor,
-          left: offsetLeft,
-          right: offsetRight
-        }}
-      >
-        <span style={circleStyle} />
-        <span style={circleStyle} />
+      <div className={styles.barWrapper}>
+        <div
+          className={styles.barSpacer}
+          style={{ left: offsetLeft, right: offsetRight }}
+        >
+          <div
+            className={classNames('bar', styles.bar)}
+            style={{
+              width: columns ? `${(100 / numColumns) * columns}%` : undefined,
+              color: barColor
+            }}
+          >
+            <span style={circleStyle} />
+            <span style={circleStyle} />
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -114,6 +120,7 @@ type GridLinesProps = {
 };
 
 type GridDividerProps = {
+  columns?: number;
   className?: string;
   barColor?: string;
   outlineColor?: string;

@@ -20,7 +20,11 @@ export default function RedditPublishDate() {
           guam in, ultrices massa. Lorem dolor sit amet, consectetur adipiscing
           elit.
         </p>
-        <GridDivider outlineColor="var(--page-background-dark-color)" />
+        <GridDivider
+          columns={6}
+          className={styles.divider}
+          outlineColor="var(--page-background-dark-color)"
+        />
       </Column>
       <Column>
         <PublishDateWidget />

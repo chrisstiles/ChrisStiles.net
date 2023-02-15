@@ -92,7 +92,7 @@
 }
 
 $baseLogoSize: 80px;
-$baseLogoOffset: 34px;
+$baseLogoOffset: 28px;
 
 @mixin position-logos($size, $offset) {
   @at-root {
@@ -104,10 +104,6 @@ $baseLogoOffset: 34px;
     .icon {
       width: $size;
       height: $size;
-    }
-
-    .divider {
-      bottom: math.floor(-$offset / 2) + 1px;
     }
   }
 }
@@ -139,22 +135,6 @@ $baseLogoOffset: 34px;
 
 .iconWrapper {
   width: 100%;
-}
-
-.divider {
-  position: absolute;
-  left: 0;
-  width: 100%;
-
-  :global(.bar) {
-    height: 1px;
-    padding: 0 6px;
-
-    span {
-      width: 6px;
-      height: 6px;
-    }
-  }
 }
 
 .blur {

@@ -3,10 +3,10 @@
 /* --------------------------- */
 
 .wrapper {
-  max-width: var(--content-width);
   width: 100%;
-  padding-left: 50px;
-  padding-right: 50px;
+  max-width: var(--content-width);
+  padding-left: var(--content-padding);
+  padding-right: var(--content-padding);
   margin-left: auto;
   margin-right: auto;
 }

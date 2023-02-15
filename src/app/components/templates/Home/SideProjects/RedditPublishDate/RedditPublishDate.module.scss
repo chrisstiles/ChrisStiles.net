@@ -3,8 +3,6 @@
 /* --------------------------- */
 
 .wrapper {
-  // background-color: var(--page-background-dark-color);
-
   &:before {
     content: '';
     position: absolute;
@@ -42,4 +40,8 @@
   p {
     max-width: 530px;
   }
+}
+
+.divider {
+  margin: 35px 0;
 }

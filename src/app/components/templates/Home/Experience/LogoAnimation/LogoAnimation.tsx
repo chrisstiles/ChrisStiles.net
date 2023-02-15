@@ -9,7 +9,6 @@ import {
 } from 'react';
 import styles from './LogoAnimation.module.scss';
 import { useGlobalState } from '@templates/Home';
-import { GridDivider } from '@elements';
 import { isSafari } from '@helpers';
 import gsap from 'gsap';
 import BezierEasing from 'bezier-easing';
@@ -181,13 +180,6 @@ const LogoColumn = memo(function LogoColumn({
             <svg className={styles.icon}>
               <use href={`#icon-${logo}`} />
             </svg>
-
-            <GridDivider
-              offsetLeft={0}
-              offsetRight={0}
-              className={styles.divider}
-              barColor="var(--grid-line-dark-color)"
-            />
           </div>
         ));
   }, [logoCount, logos, filterId]);
