@@ -1,9 +1,9 @@
 import { memo, type HTMLProps } from 'react';
-import styles from './GridLines.module.scss';
+import styles, { gridNumColumns } from './GridLines.module.scss';
 import { Content } from '@elements';
 import classNames from 'classnames';
 
-const numColumns = 12;
+export const numColumns = parseInt(gridNumColumns);
 
 export default memo(function GridLines({
   className,

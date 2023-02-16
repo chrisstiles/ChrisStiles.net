@@ -12,15 +12,15 @@
   }
 }
 
-.contentWrapper {
-  display: flex;
+.logo {
+  display: inline-block;
+  width: 240px;
+  height: auto;
+  margin-bottom: 5px;
 }
 
-.logo {
-  display: block;
-  width: 250px;
-  height: auto;
-  margin-bottom: 35px;
+.contentWrapper {
+  display: flex;
 }
 
 .col {

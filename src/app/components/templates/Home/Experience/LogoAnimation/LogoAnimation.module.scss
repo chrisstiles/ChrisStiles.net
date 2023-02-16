@@ -6,7 +6,7 @@
 
 .wrapper {
   width: calc((100% + 40px) / 12 * 4);
-  margin-right: calc((100% + 2 * 20px) / 12 - 20px);
+  margin-right: calc((100% + 2 * var(--grid-offset)) / 12 - var(--grid-offset));
   flex: none;
   text-align: center;
   position: relative;

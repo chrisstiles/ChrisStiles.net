@@ -5,6 +5,8 @@
 @use 'colors';
 
 $font: 'brother-1816', sans-serif;
-$font-code: 'source-code-pro', monospace;
-$content-width: 1460px;
-$content-padding: 50px;
+$fontCode: 'source-code-pro', monospace;
+$contentWidth: 1460px;
+$contentPadding: 50px;
+$gridNumColumns: 12;
+$gridOffset: 20px;

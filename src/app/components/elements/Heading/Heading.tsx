@@ -4,6 +4,8 @@ import classNames from 'classnames';
 import type { ReactNode } from 'react';
 
 const Heading: FunctionComponent<HeadingComponentProps> = ({
+  align,
+  className,
   tag: Tag,
   eyebrow,
   eyebrowId,
@@ -12,7 +14,9 @@ const Heading: FunctionComponent<HeadingComponentProps> = ({
   ...rest
 }) => {
   return !children ? null : (
-    <Tag {...rest}>
+    <Tag className={classNames(className, {
+      [styles.center]: align === 'center'
+    })} {...rest}>
       {eyebrow && (
         <>
           <span
@@ -38,6 +42,7 @@ export const H6 = (p: HeadingProps) => <Heading {...p} tag="h6" />;
 
 
 type HeadingProps = {
+  align?: 'left' | 'center';
   eyebrow?: string | ReactNode;
   eyebrowId?: string;
   eyebrowSeparator?: string | null;
