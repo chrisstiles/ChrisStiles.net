@@ -11,6 +11,8 @@
   position: relative;
   overflow: hidden;
   height: 83px;
+  contain: strict;
+  content-visibility: auto;
 
   &:before,
   &:after {
@@ -54,6 +56,10 @@
 
 .scrollWrapper {
   position: relative;
+
+  &.hidden {
+    visibility: hidden;
+  }
 }
 
 .highlightWrapper {
@@ -67,13 +73,12 @@
   --squircle-radius: 16px;
   --squircle-smooth: 0.8;
   mask: paint(squircle);
-  border-radius: var(--squircle-radius); // Fallback
+  border-radius: var(--squircle-radius);
   background-color: #090b1e;
   font-size: 13px;
   padding: 20px 22px;
   display: flex;
   line-height: 1.4;
-  transform: translateX(-100%);
 
   p {
     line-height: inherit;
