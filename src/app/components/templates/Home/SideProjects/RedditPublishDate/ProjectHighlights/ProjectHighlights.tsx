@@ -1,4 +1,11 @@
-import { useRef, useState, useEffect, useCallback, memo } from 'react';
+import {
+  useRef,
+  useState,
+  useEffect,
+  useCallback,
+  memo,
+  type MouseEventHandler
+} from 'react';
 import styles from './ProjectHighlights.module.scss';
 import { useGlobalState } from '@templates/Home';
 import squircleModule from 'css-houdini-squircle/squircle.min.js';
@@ -101,6 +108,26 @@ export default memo(function ProjectHighlights() {
     }
   }, [modalIsOpen, inView, hasStarted]);
 
+  let hoverTimer = useRef<number>();
+
+  const handleMouseEvent: MouseEventHandler<HTMLDivElement> = e => {
+    clearTimeout(hoverTimer.current);
+
+    const isHovered = e.type === 'mouseenter';
+    const delay = isHovered ? 50 : 0;
+    const timeScale = isHovered ? 0 : 1;
+
+    hoverTimer.current = window.setTimeout(() => {
+      if (!animation.current) return;
+
+      gsap.to(animation.current, {
+        timeScale,
+        duration: 0.8,
+        overwrite: true
+      });
+    }, delay);
+  };
+
   return (
     <div
       ref={setRefs}
@@ -111,6 +138,8 @@ export default memo(function ProjectHighlights() {
         className={classNames(styles.scrollWrapper, {
           [styles.hidden]: !hasStarted
         })}
+        onMouseEnter={handleMouseEvent}
+        onMouseLeave={handleMouseEvent}
       >
         <Highlight
           title="1 Highlight box title"
