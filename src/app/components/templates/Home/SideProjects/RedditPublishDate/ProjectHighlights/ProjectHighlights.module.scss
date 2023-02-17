@@ -10,9 +10,7 @@
   margin: 60px 0 70px #{-$offset};
   position: relative;
   overflow: hidden;
-  height: 83px;
-  contain: strict;
-  content-visibility: auto;
+  contain: content;
 
   &:before,
   &:after {
@@ -56,6 +54,9 @@
 
 .scrollWrapper {
   position: relative;
+  display: inline-flex;
+  width: max-content;
+  cursor: default;
 
   &.hidden {
     visibility: hidden;
@@ -64,9 +65,7 @@
 
 .highlightWrapper {
   padding: 0 8px;
-  position: absolute;
-  top: 0;
-  left: 0;
+  position: relative;
 }
 
 .highlight {
@@ -96,6 +95,7 @@
 .icon {
   width: 40px;
   height: 40px;
+  flex: none;
   border-radius: 50%;
   margin: 1px 20px 0 0;
   background-color: #ff4500;

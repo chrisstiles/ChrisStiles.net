@@ -3,6 +3,7 @@ import styles from './ProjectHighlights.module.scss';
 import { useGlobalState } from '@templates/Home';
 import squircleModule from 'css-houdini-squircle/squircle.min.js';
 import gsap from 'gsap';
+import ResizeObserver from 'resize-observer-polyfill';
 import { useInView } from 'react-intersection-observer';
 import { round } from 'lodash';
 import classNames from 'classnames';
@@ -26,6 +27,8 @@ export default memo(function ProjectHighlights() {
   );
 
   useEffect(() => {
+    let observer: Nullable<ResizeObserver> = null;
+
     const init = async () => {
       await import('css-paint-polyfill');
       CSS.paintWorklet.addModule(squircleModule);
@@ -39,9 +42,15 @@ export default memo(function ProjectHighlights() {
         const elements = Array.from(scroller.current.children);
         let maxChildWidth = 0;
 
+        const isRunning = animation.current?.isActive();
+        if (isRunning) animation.current?.kill();
+
         let distance = elements.reduce((offset, el) => {
           const width = el.clientWidth;
-          gsap.set(el, { x: offset });
+          gsap.set(el, {
+            x: offset,
+            left: -offset
+          });
 
           if (width > maxChildWidth) {
             maxChildWidth = width;
@@ -55,7 +64,7 @@ export default memo(function ProjectHighlights() {
         animation.current = gsap.to(elements, {
           x: `+=${distance}`,
           runBackwards: true,
-          paused: true,
+          paused: !isRunning,
           ease: 'none',
           repeat: -1,
           duration: round(distance / velocity, 5),
@@ -67,10 +76,21 @@ export default memo(function ProjectHighlights() {
         setHasStarted(true);
       };
 
+      if (scroller.current) {
+        observer = new ResizeObserver(() => {
+          if (!animation.current) return;
+          animate();
+        });
+
+        observer.observe(scroller.current);
+      }
+
       setTimeout(animate, 50);
     };
 
     init();
+
+    return () => observer?.disconnect();
   }, []);
 
   useEffect(() => {
