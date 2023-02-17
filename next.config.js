@@ -13,6 +13,11 @@ module.exports = withBundleAnalyzer({
       use: ['@svgr/webpack', 'svgo-loader']
     });
 
+    config.module.rules.push({
+      test: /css-houdini-squircle/,
+      type: 'asset'
+    });
+
     return config;
   },
   experimental: {

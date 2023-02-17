@@ -246,7 +246,7 @@ const LogoColumn = memo(function LogoColumn({
       const distance = logoCount * size;
 
       logoTween.current = gsap.to(wrapperEl.children, {
-        y: () => `+=${distance}`,
+        y: `+=${distance}`,
         duration: round(size / logoVelocity, 5),
         ease: 'none',
         repeat: -1,
