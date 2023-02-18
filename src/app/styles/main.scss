@@ -6,6 +6,7 @@
 @use 'app';
 @use 'abstracts/colors';
 @use 'abstracts/variables';
+@use 'layout';
 @use 'syntax-highlighting';
 
 /* --------------------------- */
@@ -37,7 +38,7 @@ html {
   -webkit-font-smoothing: antialiased;
   -webkit-text-size-adjust: 100%;
   -moz-osx-font-smoothing: grayscale;
-  font-size: 18px;
+  font-size: 19px;
   font-feature-settings: 'ss01', 'calt';
 }
 
@@ -47,7 +48,7 @@ body {
   font-weight: 400;
   font-family: var(--font);
   background-color: var(--page-background-color);
-  color: #cacadb;
+  color: var(--body-text-color);
   position: relative;
 }
 
@@ -65,7 +66,11 @@ h2,
 h3 {
   line-height: 1.2;
   color: #fff;
-  margin-bottom: 0.9em;
+}
+
+h1,
+h2 {
+  margin-bottom: 0.88em;
 }
 
 h1 {
@@ -74,11 +79,13 @@ h1 {
 }
 
 h2 {
-  font-size: 35px;
+  font-size: 37px;
 }
 
 h3 {
-  font-size: 31px;
+  font-size: 25px;
+  font-weight: 500;
+  margin-bottom: 0.68em;
 }
 
 p {

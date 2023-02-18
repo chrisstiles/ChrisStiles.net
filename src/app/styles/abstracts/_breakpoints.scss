@@ -1,0 +1,29 @@
+/* --------------------------- */
+/* Breakpoints */
+/* --------------------------- */
+
+@use 'sass:map';
+
+$breakpoint-xs: 0;
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 992px;
+$breakpoint-xl: 1200px;
+$breakpoint-xs: 1400px;
+
+$breakpoints: (
+  xs: $breakpoint-xs,
+  sm: $breakpoint-sm,
+  md: $breakpoint-md,
+  lg: $breakpoint-lg,
+  xl: $breakpoint-xl,
+  xxl: $breakpoint-xs
+);
+
+@function bp($size) {
+  @if map.has-key($breakpoints, $size) {
+    @return map.get($breakpoints, $size);
+  }
+
+  @return $size;
+}

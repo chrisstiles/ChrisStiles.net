@@ -1,0 +1,16 @@
+/* --------------------------- */
+/* Layout */
+/* --------------------------- */
+
+@use 'app';
+
+:root {
+  --content-width: 1460px;
+  --content-padding: 50px;
+}
+
+@media (width <= app.bp(xl)) {
+  :root {
+    --content-padding: 40px;
+  }
+}

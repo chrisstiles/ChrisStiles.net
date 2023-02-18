@@ -2,6 +2,8 @@
 /* Reddit Publish Date */
 /* --------------------------- */
 
+@use 'app';
+
 .wrapper {
   &:before {
     content: '';
@@ -9,6 +11,19 @@
     inset: 0 0 0 0;
     background-color: var(--page-background-dark-color);
     z-index: -3;
+  }
+}
+
+.top {
+  @media (width > app.bp(md)) {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  p {
+    max-width: 720px;
   }
 }
 

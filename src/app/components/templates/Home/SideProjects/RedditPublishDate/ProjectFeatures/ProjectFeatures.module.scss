@@ -1,0 +1,102 @@
+/* --------------------------- */
+/* Project Features */
+/* --------------------------- */
+
+@use 'app';
+
+.wrapper {
+  $offset: app.$gridOffset - 1px;
+  width: calc(100% + #{$offset * 2});
+  margin: 60px 0 70px #{-$offset};
+  position: relative;
+  overflow: hidden;
+  contain: content;
+
+  &:before,
+  &:after {
+    content: '';
+    position: absolute;
+    width: 360px;
+    pointer-events: none;
+    z-index: 10;
+    top: 0;
+    bottom: 0;
+    background: linear-gradient(
+      90deg,
+      #171929 7.96%,
+      rgba(23, 25, 41, 0.991353) 14.1%,
+      rgba(23, 25, 41, 0.96449) 20.23%,
+      rgba(23, 25, 41, 0.91834) 26.37%,
+      rgba(23, 25, 41, 0.852589) 32.5%,
+      rgba(23, 25, 41, 0.768225) 38.64%,
+      rgba(23, 25, 41, 0.668116) 44.78%,
+      rgba(23, 25, 41, 0.557309) 50.91%,
+      rgba(23, 25, 41, 0.442691) 57.05%,
+      rgba(23, 25, 41, 0.331884) 63.18%,
+      rgba(23, 25, 41, 0.231775) 69.32%,
+      rgba(23, 25, 41, 0.147411) 75.46%,
+      rgba(23, 25, 41, 0.0816599) 81.59%,
+      rgba(23, 25, 41, 0.03551) 87.73%,
+      rgba(23, 25, 41, 0.0086472) 93.86%,
+      rgba(23, 25, 41, 0) 100%
+    );
+  }
+
+  &:before {
+    left: -9px;
+  }
+
+  &:after {
+    right: -9px;
+    transform: rotate(180deg);
+  }
+}
+
+.scrollWrapper {
+  position: relative;
+  display: inline-flex;
+  width: max-content;
+  cursor: default;
+
+  &.hidden {
+    visibility: hidden;
+  }
+}
+
+.featureWrapper {
+  padding: 0 8px;
+  position: relative;
+}
+
+.feature {
+  --squircle-radius: 16px;
+  --squircle-smooth: 0.8;
+  mask: paint(squircle);
+  border-radius: var(--squircle-radius);
+  background-color: #090b1e;
+  font-size: 13px;
+  padding: 20px 26px 20px 22px;
+  display: flex;
+  line-height: 1.4;
+
+  p {
+    line-height: inherit;
+  }
+}
+
+.title {
+  display: block;
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.icon {
+  width: 40px;
+  height: 40px;
+  flex: none;
+  border-radius: 50%;
+  margin: 1px 20px 0 0;
+  background-color: #ff4500;
+}
