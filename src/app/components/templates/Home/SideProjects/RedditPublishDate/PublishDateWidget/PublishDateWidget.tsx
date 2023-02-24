@@ -15,7 +15,7 @@ const maxCacheSize = 30;
 
 // TODO: Make widget accessible
 // TODO: Add handling for both success/failure when searching root URLs
-// TODO: Add error messages
+// TODO: Add custom text for each type of error
 // TODO: Finalize text
 
 export default memo(function PublishDateWidget() {
@@ -263,7 +263,6 @@ export default memo(function PublishDateWidget() {
           shouldDebounceFavicon.current = false;
         }}
       />
-
       <ArticleData
         article={article}
         setRandomArticle={setRandomArticle}
@@ -273,9 +272,10 @@ export default memo(function PublishDateWidget() {
 });
 
 function getEndpoint(url: string) {
-  // return `http://localhost:8000/api/get-date?url=${url}`;
   return `https://www.redditpublishdate.com/api/get-date?url=${url}`;
   // return `https://www.redditpublishdate.com/api/get-date?cache=false&url=${url}`;
+  // return `http://localhost:8000/api/get-date?url=${url}`;
+  // return `http://localhost:8000/api/get-date?cache=false&url=${url}`;
 }
 
 function getArticleCacheKey(url: URL) {

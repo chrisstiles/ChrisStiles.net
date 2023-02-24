@@ -1,5 +1,6 @@
 import styles from './ArticleData.module.scss';
 import * as Icon from './icons';
+import ArticleError from './ArticleError';
 import { isValidDate } from '@helpers';
 import dateFormat from 'dateformat';
 import type { ReactNode, FC } from 'react';
@@ -43,9 +44,7 @@ export default function ArticleDetails({ article }: ArticleDataProps) {
           </tbody>
         </table>
       ) : (
-        <div>
-          <h2>No date found :(</h2>
-        </div>
+        <ArticleError article={article} />
       )}
     </>
   );

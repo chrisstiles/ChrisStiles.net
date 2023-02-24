@@ -6,7 +6,7 @@
   margin-top: 50px;
   position: relative;
   font-size: 15px;
-  padding-left: 15px;
+  padding-left: 20px;
 
   &:first-child {
     margin-top: 0;
@@ -23,7 +23,7 @@
   top: 12px;
   left: calc(var(--grid-offset) * -1 - #{$size / 2});
   box-shadow: 0 0 0 2px currentColor,
-    0 0 0 8px var(--page-background-dark-color);
+    0 0 0 7px var(--page-background-dark-color);
 
   &:before {
     content: '';
@@ -32,7 +32,7 @@
     left: 100%;
     top: 50%;
     margin-top: -1px;
-    width: 18px;
+    width: 20px;
     background-color: currentColor;
     border-radius: 0 1px 1px 0;
   }

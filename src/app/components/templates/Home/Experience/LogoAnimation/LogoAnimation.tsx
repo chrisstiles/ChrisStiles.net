@@ -345,14 +345,8 @@ const LogoColumn = memo(function LogoColumn({
           const deltaRatio = gsap.ticker.deltaRatio();
           const dx = Math.floor(Math.abs(x - prevPosition.x));
           const dy = Math.floor(Math.abs(y - prevPosition.y));
-
-          const bx = Math.floor(
-            Math.max(dx / deltaRatio - logoVelocity, 0) * multiplier
-          );
-
-          const by = Math.floor(
-            Math.max(dy / deltaRatio - logoVelocity, 0) * multiplier
-          );
+          const bx = Math.max(dx / deltaRatio - logoVelocity, 0) * multiplier;
+          const by = Math.max(dy / deltaRatio - logoVelocity, 0) * multiplier;
 
           if (hasBlurX && bx === 0) hasCompleteBlurX = true;
           if (hasBlurY && by === 0) hasCompleteBlurY = true;

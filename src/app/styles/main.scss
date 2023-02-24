@@ -63,7 +63,8 @@ p {
 
 h1,
 h2,
-h3 {
+h3,
+h4 {
   line-height: 1.2;
   color: #fff;
 }
@@ -83,9 +84,14 @@ h2 {
 }
 
 h3 {
-  font-size: 25px;
+  font-size: 24px;
   font-weight: 500;
   margin-bottom: 0.68em;
+}
+
+h4 {
+  font-weight: 500;
+  font-size: 18px;
 }
 
 p {

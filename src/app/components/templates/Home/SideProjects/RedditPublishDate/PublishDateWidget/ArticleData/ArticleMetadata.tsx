@@ -13,9 +13,17 @@ export default function ArticleMetadataWrapper({ article }: ArticleDataProps) {
 function MetaData({ article }: { article: ArticleWithData }) {
   const { url, data, favicon } = article;
   const headline = data.title ?? data.organization ?? url.hostname;
+
+  const description =
+    !data.errorType || !data.description?.toLowerCase().includes('error')
+      ? data.description
+      : null;
+
   const subheadline =
-    data.description ??
+    description ??
     (headline !== url.hostname ? url.origin : url.origin + url.pathname);
+
+  console.log(article);
 
   return !headline ? null : (
     <a

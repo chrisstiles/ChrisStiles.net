@@ -23,22 +23,22 @@
     bottom: 0;
     background: linear-gradient(
       90deg,
-      #171929 7.96%,
-      rgba(23, 25, 41, 0.991353) 14.1%,
-      rgba(23, 25, 41, 0.96449) 20.23%,
-      rgba(23, 25, 41, 0.91834) 26.37%,
-      rgba(23, 25, 41, 0.852589) 32.5%,
-      rgba(23, 25, 41, 0.768225) 38.64%,
-      rgba(23, 25, 41, 0.668116) 44.78%,
-      rgba(23, 25, 41, 0.557309) 50.91%,
-      rgba(23, 25, 41, 0.442691) 57.05%,
-      rgba(23, 25, 41, 0.331884) 63.18%,
-      rgba(23, 25, 41, 0.231775) 69.32%,
-      rgba(23, 25, 41, 0.147411) 75.46%,
-      rgba(23, 25, 41, 0.0816599) 81.59%,
-      rgba(23, 25, 41, 0.03551) 87.73%,
-      rgba(23, 25, 41, 0.0086472) 93.86%,
-      rgba(23, 25, 41, 0) 100%
+      app.$pageBackgroundDark 7.96%,
+      rgba(app.$pageBackgroundDark, 0.991353) 14.1%,
+      rgba(app.$pageBackgroundDark, 0.96449) 20.23%,
+      rgba(app.$pageBackgroundDark, 0.91834) 26.37%,
+      rgba(app.$pageBackgroundDark, 0.852589) 32.5%,
+      rgba(app.$pageBackgroundDark, 0.768225) 38.64%,
+      rgba(app.$pageBackgroundDark, 0.668116) 44.78%,
+      rgba(app.$pageBackgroundDark, 0.557309) 50.91%,
+      rgba(app.$pageBackgroundDark, 0.442691) 57.05%,
+      rgba(app.$pageBackgroundDark, 0.331884) 63.18%,
+      rgba(app.$pageBackgroundDark, 0.231775) 69.32%,
+      rgba(app.$pageBackgroundDark, 0.147411) 75.46%,
+      rgba(app.$pageBackgroundDark, 0.0816599) 81.59%,
+      rgba(app.$pageBackgroundDark, 0.03551) 87.73%,
+      rgba(app.$pageBackgroundDark, 0.0086472) 93.86%,
+      rgba(app.$pageBackgroundDark, 0) 100%
     );
   }
 

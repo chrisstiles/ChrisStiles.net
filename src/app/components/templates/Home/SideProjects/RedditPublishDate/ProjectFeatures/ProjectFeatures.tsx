@@ -108,7 +108,7 @@ export default memo(function ProjectFeatures() {
     }
   }, [modalIsOpen, inView, hasStarted]);
 
-  let hoverTimer = useRef<number>();
+  const hoverTimer = useRef<number>();
 
   const handleMouseEvent: MouseEventHandler<HTMLDivElement> = e => {
     clearTimeout(hoverTimer.current);
