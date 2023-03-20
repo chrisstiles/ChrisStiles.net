@@ -583,7 +583,9 @@ export default function useAnimationState({
 
     const newSteps: Step[] = [];
 
-    steps.forEach((step, index) => {
+    for (let i = 0; i < steps.length; i++) {
+      const step = steps[i];
+
       if (shouldAddDelay && currentView === step.view) {
         step.delay = (step.delay ?? 0) + 300;
       }
@@ -654,7 +656,7 @@ export default function useAnimationState({
           delay: 300
         });
 
-        const nextStep = steps[index + 1];
+        const nextStep = steps[i + 1];
 
         if (nextStep?.text && !nextStep.text.match(/\n|[([]-/)) {
           nextStep.text = `[-${nextStep.text}-]`;
@@ -662,7 +664,7 @@ export default function useAnimationState({
       } else {
         shouldAddDelay = false;
       }
-    });
+    }
 
     return { steps: newSteps, initialView, baseText };
   }, [setAccentsVisible, setHeaderBoundsVisible, setHeaderBullets, setState]);

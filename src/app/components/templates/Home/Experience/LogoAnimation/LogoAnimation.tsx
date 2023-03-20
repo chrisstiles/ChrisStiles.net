@@ -130,7 +130,7 @@ export default memo(function LogoAnimation({
       ref={ref}
       role="presentation"
       aria-hidden="true"
-      style={{ width: `calc((100% + 40px) / 12 * ${columnCount})` }}
+      style={{ '--column-count': columnCount }}
       className={styles.wrapper}
     >
       <div
@@ -171,17 +171,21 @@ const LogoColumn = memo(function LogoColumn({
   const components = useMemo(() => {
     return !logoCount
       ? null
-      : logos.map((logo, index) => (
-          <div
-            key={index}
-            className={styles.logo}
-            style={{ filter: isSafari() ? `url('#${filterId}')` : undefined }}
-          >
-            <svg className={styles.icon}>
-              <use href={`#icon-${logo}`} />
-            </svg>
-          </div>
-        ));
+      : logos.map((logo, index) => {
+          return (
+            <div
+              key={index}
+              className={styles.logo}
+            >
+              <svg
+                className={styles.icon}
+                style={{ filter: `url('#${filterId}')` }}
+              >
+                <use href={`#icon-${logo}`} />
+              </svg>
+            </div>
+          );
+        });
   }, [logoCount, logos, filterId]);
 
   // The distance each logo must animate before wrapping
@@ -320,7 +324,7 @@ const LogoColumn = memo(function LogoColumn({
         duration: 3.2,
         ease: columnEase,
         paused: !isVisible,
-        delay: 0.25 + index * 0.32,
+        delay: 0.5 + index * 0.32,
         onStart() {
           hasStartedLogoAnimation.current = true;
           isPlayingRef.current = true;
@@ -410,7 +414,7 @@ const LogoColumn = memo(function LogoColumn({
     <>
       <div
         className={styles.columnWrapper}
-        style={{ filter: !isSafari() ? `url('#${filterId}')` : undefined }}
+        // style={{ filter: !isSafari() ? `url('#${filterId}')` : undefined }}
       >
         <div
           ref={wrapper}
@@ -428,7 +432,7 @@ const LogoColumn = memo(function LogoColumn({
 
 function getMultiplier(direction: 'up' | 'down') {
   const multiplier = direction === 'up' ? 1.7 : 1.5;
-  return !isSafari() ? multiplier : multiplier - 0.3;
+  return !isSafari() ? multiplier : multiplier - 0.5;
 }
 
 type LogoAnimationProps = {

@@ -137,6 +137,10 @@ $borderRadius: 8px;
     mix-blend-mode: luminosity;
     opacity: 0.6;
     transition: all 0.2s;
+
+    @at-root .safari .tabWrapper:not(.active) svg {
+      transition: none;
+    }
   }
 }
 

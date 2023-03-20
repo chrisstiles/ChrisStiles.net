@@ -1,0 +1,33 @@
+/* --------------------------- */
+/* Colors */
+/* --------------------------- */
+
+$pageBackground: #1e2236;
+$pageBackgroundDark: #171929;
+$bodyText: #cacadb;
+$gridLine: #2d334a;
+$gridLineDark: #262b3f;
+$lightGrey: #9ab5d2;
+$greenAccent: #33edc0;
+$greenAccentDark: #33e6b9;
+$yellowAccent: #ffe25a;
+$redAccent: #ff2964;
+$highlightLight: #ffd901;
+$highlightDark: #077bff;
+$editorBackground: #2a3046;
+
+:export {
+  pageBackground: $pageBackground;
+  pageBackgroundDark: $pageBackgroundDark;
+  bodyText: $bodyText;
+  gridLine: $gridLine;
+  gridLineDark: $gridLineDark;
+  lightGrey: $lightGrey;
+  greenAccent: $greenAccent;
+  greenAccentDark: $greenAccentDark;
+  yellowAccent: $yellowAccent;
+  redAccent: $redAccent;
+  highlightLight: $highlightLight;
+  highlightDark: $highlightDark;
+  editorBackground: $editorBackground;
+}

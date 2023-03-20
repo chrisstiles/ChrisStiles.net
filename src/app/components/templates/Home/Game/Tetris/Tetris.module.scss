@@ -1,0 +1,24 @@
+/* --------------------------- */
+/* Tetris */
+/* --------------------------- */
+
+.wrapper {
+  width: calc(100% + var(--grid-offset) * 2);
+  margin-left: calc(var(--grid-offset) * -1);
+  // width: calc((100% + var(--grid-offset) * 2) / 2);
+  // width: calc(50% );
+  // margin: 0 auto;
+  // opacity: 0.1;
+  // left: calc(var(--grid-offset) * -1);
+  // background: blue;
+  // position: relative;
+
+  margin-top: 100px;
+  overflow: hidden;
+}
+
+.canvas {
+  width: 100%;
+  // opacity: 0.5;
+  // width: auto;
+}

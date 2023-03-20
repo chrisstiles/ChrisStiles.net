@@ -16,8 +16,13 @@ import useHeroAnimation from './useHeroAnimation';
 import Code from './Code';
 import Autocomplete, { type AutocompleteHandle } from './Autocomplete';
 import useVariableRef from '@hooks/useVariableRef';
+import { isSafari as _isSafari } from '@helpers';
 import classNames from 'classnames';
 import { Language } from '@global';
+
+// Hack for weird Safari behavior when animating
+// opacity with mix-blend-mode on icons
+// const isSafari = _isSafari();
 
 export default memo(function Editor({
   inView = true,
@@ -32,6 +37,10 @@ export default memo(function Editor({
   const scssTab = useRef<TabHandle>(null);
   const mouse = useRef<HTMLDivElement>(null);
   const autocomplete = useRef<AutocompleteHandle>(null);
+
+  // const isSafari = useMemo(() => _isSafari(), []);
+  const [isSafari, setIsSafari] = useState(false);
+  useEffect(() => setIsSafari(_isSafari()), []);
 
   const {
     typescript,
@@ -187,6 +196,7 @@ export default memo(function Editor({
       role="presentation"
       aria-hidden="true"
       className={classNames('editor', styles.wrapper, {
+        [styles.safari]: isSafari,
         playing: isPlaying && !isComplete,
         paused: hasStarted && !isPlaying && !isComplete,
         complete: !isPlaying && isComplete,

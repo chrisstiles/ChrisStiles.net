@@ -21,7 +21,7 @@
       // Shared paths
       "@api/*": ["src/pages/api/*"],
       "@button": ["src/app/components/elements/Button"],
-      "@colors": ["src/app/styles/abstracts/_colors.scss"],
+      "@colors": ["src/app/styles/abstracts/_colors.module.scss"],
       "@elements": ["src/app/components/elements"],
       "@elements/*": ["src/app/components/elements/*"],
       "@global": ["src/app/global"],

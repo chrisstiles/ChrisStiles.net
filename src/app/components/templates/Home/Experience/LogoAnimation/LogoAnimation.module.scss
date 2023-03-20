@@ -5,7 +5,7 @@
 @use 'sass:math';
 
 .wrapper {
-  width: calc((100% + 40px) / 12 * 4);
+  width: calc((100% + var(--grid-offset) * 2) / 12 * var(--column-count, 4));
   margin-right: calc((100% + 2 * var(--grid-offset)) / 12 - var(--grid-offset));
   flex: none;
   text-align: center;
@@ -81,7 +81,7 @@
   height: 100%;
   flex-grow: 1;
   contain: layout size style;
-  will-change: filter;
+  // will-change: filter;
 }
 
 .column,
@@ -127,6 +127,7 @@ $baseLogoOffset: 28px;
   top: 0;
   left: 0;
   right: 0;
+  // content-visibility: auto;
 
   &:last-child {
     margin-bottom: 0;
