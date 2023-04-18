@@ -18,8 +18,11 @@ export default function Tetris() {
 
   useEffect(() => {
     board.init();
-    board.play();
-    board.piece = new Tetromino(board);
+
+    setTimeout(() => {
+      board.play();
+    }, 1000);
+    // board.piece = new Tetromino(board);
 
     return () => board.destroy();
   }, [board]);

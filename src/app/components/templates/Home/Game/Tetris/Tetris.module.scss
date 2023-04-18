@@ -18,7 +18,17 @@
 }
 
 .canvas {
+  --grid-num-rows: 10;
+  // --column-multiplier: 2;
+  --grid-num-columns: 24;
   width: 100%;
+  display: block;
+  height: calc(100% / var(--grid-num-columns) * var(--grid-num-rows));
+  // height: calc(
+  //   (100% / (var(--grid-num-columns, 12) * var(--column-multiplier, 1))) *
+  //     var(--grid-num-rows)
+  // );
+  // background: red;
   // opacity: 0.5;
   // width: auto;
 }

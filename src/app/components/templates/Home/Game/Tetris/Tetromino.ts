@@ -1,12 +1,14 @@
 import TetrisBoard from './TetrisBoard';
-import * as colors from '@colors';
+import * as colorVars from '@colors';
 import gsap from 'gsap';
 import BezierEasing from 'bezier-easing';
+import { random } from 'lodash';
 
-const moveEase = BezierEasing(0.16, 0.89, 0.27, 0.99);
+const moveEase = BezierEasing(0.16, 0.89, 0.27, 1);
 
 export default class Tetromino {
   board: TetrisBoard;
+  shapeIndex: number;
   color: string;
   shape: string[][];
   x: number;
@@ -14,19 +16,40 @@ export default class Tetromino {
   currentX: number;
   currentY: number;
 
-  constructor(board: TetrisBoard) {
-    this.board = board;
-    this.color = colors.greenAccent;
-    this.shape = [
-      ['', '', ''],
-      ['■', '■', '■'],
-      ['■', '', '']
-    ];
+  // static blockIndex = 0;
 
-    this.x = 0;
-    this.y = 0;
+  constructor(board: TetrisBoard, x: number = 0, y: number = 0) {
+    this.board = board;
+    // this.shapeIndex = Math.floor(Math.random() * shapes.length - 1) + 1;
+    this.shapeIndex = random(1, shapes.length - 1);
+    console.log(this.shapeIndex);
+    // this.color = colors.greenAccent;
+    // this.color =
+    //   blockIndex % 2 === 0 ? colors.yellowAccent : colors.greenAccent;
+    // this.color = blockColors[Tetromino.blockIndex];
+    // console.log(this.color, Tetromino.blockIndex);
+
+    // Tetromino.blockIndex =
+    //   Tetromino.blockIndex === blockColors.length - 1
+    //     ? 0
+    //     : Tetromino.blockIndex + 1;
+
+    // Tetromino.blockIndex++;
+    this.shape = shapes[this.shapeIndex];
+    this.color = colors[this.shapeIndex];
+
+    // this.shape = [
+    //   ['■', '', ''],
+    //   ['■', '■', '■'],
+    //   ['', '', '']
+    // ];
+
+    this.x = x;
+    this.y = y;
     this.currentX = this.x;
     this.currentY = this.y;
+
+    // this.drop = this.drop.bind(this);
   }
 
   draw() {
@@ -34,31 +57,32 @@ export default class Tetromino {
 
     if (!ctx || !blockSize) return;
 
-    ctx.fillStyle = this.color;
+    // ctx.fillStyle = this.color;
 
-    const gridLineWidth = this.board.pxToCanvas(1);
-    const borderRadius = this.board.pxToCanvas(10);
-    const offset = this.board.pxToCanvas(3);
-    const size = 1 - gridLineWidth - offset * 2;
+    // const gridLineWidth = this.board.pxToCanvas(1);
+    // const borderRadius = this.board.pxToCanvas(10);
+    // const offset = this.board.pxToCanvas(3);
+    // const size = 1 - gridLineWidth - offset * 2;
 
-    ctx.beginPath();
+    // ctx.beginPath();
 
     this.shape.forEach((row, y) => {
       row.forEach((value, x) => {
         if (!value) return;
+        this.board.drawBlock(this.currentX + x, this.currentY + y, this.color);
 
-        const xPos = this.currentX + x + gridLineWidth + offset;
-        const yPos = this.currentY + y;
+        // const xPos = this.currentX + x + gridLineWidth + offset;
+        // const yPos = this.currentY + y;
 
-        ctx.roundRect(xPos, yPos, size, size, borderRadius);
+        // ctx.roundRect(xPos, yPos, size, size, borderRadius);
       });
     });
 
-    ctx.fill();
+    // ctx.fill();
   }
 
   move(x: number, y: number) {
-    if (!this.board.isValidMove(x, y, this.shape)) return;
+    if (!this.board.isValidMove(x, y, this.shape)) return false;
 
     this.x = x;
     this.y = y;
@@ -68,8 +92,20 @@ export default class Tetromino {
       currentY: y,
       overwrite: false,
       duration: 0.2,
-      ease: moveEase
+      // duration: 4,
+      ease: moveEase,
+      onUpdate: () => {
+        if (!this.board.isPlaying) {
+          this.board.draw();
+        }
+      }
     });
+
+    return true;
+  }
+
+  drop() {
+    return this.move(this.x, this.y + 1);
   }
 
   rotate(direction: 'right' | 'left') {
@@ -93,6 +129,59 @@ export default class Tetromino {
 
     if (this.board.isValidMove(this.x, this.y, shape)) {
       this.shape = shape;
+      return true;
     }
+
+    return false;
   }
 }
+
+export const colors = [
+  'transparent',
+  colorVars.greenAccent,
+  colorVars.yellowAccent,
+  colorVars.redAccent,
+  '#EE1FF2',
+  '#FD640F',
+  '#3D50FF',
+  '#8840FF'
+];
+
+export const shapes = [
+  [],
+  [
+    ['', '', '', ''],
+    ['■', '■', '■', '■'],
+    ['', '', '', ''],
+    ['', '', '', '']
+  ],
+  [
+    ['■', '', ''],
+    ['■', '■', '■'],
+    ['', '', '']
+  ],
+  [
+    ['', '', '■'], // '','' -> 2,'' ; '',1 -> 1,'' ; '',2 -> '',''
+    ['■', '■', '■'], // 1,'' -> 2,1 ; 1,1 -> 1,1 ; 1,2 -> '',1
+    ['', '', '']
+  ], // 2,'' -> 2,2 ; 2,1 -> 1,2 ; 2,2 -> '',2
+  [
+    ['■', '■'],
+    ['■', '■']
+  ],
+  [
+    ['', '■', '■'],
+    ['■', '■', ''],
+    ['', '', '']
+  ],
+  [
+    ['', '■', ''],
+    ['■', '■', '■'],
+    ['', '', '']
+  ],
+  [
+    ['■', '■', ''],
+    ['', '■', '■'],
+    ['', '', '']
+  ]
+];
