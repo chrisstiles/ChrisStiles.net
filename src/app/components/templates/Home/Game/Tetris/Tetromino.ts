@@ -1,4 +1,5 @@
 import TetrisBoard from './TetrisBoard';
+import Block from './Block';
 import * as colorVars from '@colors';
 import gsap from 'gsap';
 import BezierEasing from 'bezier-easing';
@@ -6,43 +7,48 @@ import { random } from 'lodash';
 
 const moveEase = BezierEasing(0.16, 0.89, 0.27, 1);
 
+export type Shape = Nullable<Block>[][];
+
 export default class Tetromino {
   board: TetrisBoard;
   shapeIndex: number;
-  color: string;
-  shape: string[][];
+  // color: string;
+  // shape: string[][];
+  // shape: Nullable<Block>[][];
+  shape: Shape;
   x: number;
   y: number;
   currentX: number;
   currentY: number;
 
-  // static blockIndex = 0;
-
   constructor(board: TetrisBoard, x: number = 0, y: number = 0) {
     this.board = board;
     // this.shapeIndex = Math.floor(Math.random() * shapes.length - 1) + 1;
     this.shapeIndex = random(1, shapes.length - 1);
-    console.log(this.shapeIndex);
-    // this.color = colors.greenAccent;
-    // this.color =
-    //   blockIndex % 2 === 0 ? colors.yellowAccent : colors.greenAccent;
-    // this.color = blockColors[Tetromino.blockIndex];
-    // console.log(this.color, Tetromino.blockIndex);
+    // this.shapeIndex = 1;
+    // this._projectionColor = tinycolor(colors[this.shapeIndex]).setAlpha(0.5).toString();
+    // this.shape = shapes[this.shapeIndex];
+    // this.color = colors[this.shapeIndex];
 
-    // Tetromino.blockIndex =
-    //   Tetromino.blockIndex === blockColors.length - 1
-    //     ? 0
-    //     : Tetromino.blockIndex + 1;
+    this.shape = shapes[this.shapeIndex].map((row, rowIndex) => {
+      return row.map((value, colIndex) => {
+        if (!value) return null;
 
-    // Tetromino.blockIndex++;
-    this.shape = shapes[this.shapeIndex];
-    this.color = colors[this.shapeIndex];
+        // const block = new Block(board, x + rowIndex, y + colIndex, this.color);
+        const block = new Block(
+          board,
+          x + rowIndex,
+          y + colIndex,
+          this.shapeIndex
+        );
 
-    // this.shape = [
-    //   ['■', '', ''],
-    //   ['■', '■', '■'],
-    //   ['', '', '']
-    // ];
+        return block;
+
+        // return !value
+        //   ? null
+        //   : new Block(board, x + rowIndex, y + colIndex, this.color);
+      });
+    });
 
     this.x = x;
     this.y = y;
@@ -52,33 +58,55 @@ export default class Tetromino {
     // this.drop = this.drop.bind(this);
   }
 
+  getDropPoint() {
+    if (!this.board) -1;
+
+    // let y = this.board.rows;
+
+    // while (y > this.y && !this.board.isValidMove(this.x, y, this.shape)) {
+    //   y--;
+    // }
+
+    let y = this.y;
+
+    while (this.board.isValidMove(this.x, y + 1, this.shape)) {
+      y++;
+    }
+
+    return y;
+  }
+
   draw() {
     const { ctx, blockSize } = this.board;
 
     if (!ctx || !blockSize) return;
 
-    // ctx.fillStyle = this.color;
+    const dropY = this.getDropPoint();
 
-    // const gridLineWidth = this.board.pxToCanvas(1);
-    // const borderRadius = this.board.pxToCanvas(10);
-    // const offset = this.board.pxToCanvas(3);
-    // const size = 1 - gridLineWidth - offset * 2;
+    for (let y = 0; y < this.shape.length; y++) {
+      for (let x = 0; x < this.shape[y].length; x++) {
+        const block = this.shape[y][x];
+        if (!block) continue;
 
-    // ctx.beginPath();
+        block.x = this.x + x;
+        block.y = this.y + y;
 
-    this.shape.forEach((row, y) => {
-      row.forEach((value, x) => {
-        if (!value) return;
-        this.board.drawBlock(this.currentX + x, this.currentY + y, this.color);
+        if (dropY >= this.y) {
+          // block.draw(this.currentX + x, dropY + y, 'rgba(255, 255, 255, 0.1)');
+          block.draw(this.currentX + x, dropY + y, true);
+        }
 
-        // const xPos = this.currentX + x + gridLineWidth + offset;
-        // const yPos = this.currentY + y;
+        block.draw(this.currentX + x, this.currentY + y);
 
-        // ctx.roundRect(xPos, yPos, size, size, borderRadius);
-      });
-    });
+        // block.x = this.currentX + x;
+        // block.y = this.currentY + y;
+        // block.draw();
+      }
+    }
+  }
 
-    // ctx.fill();
+  get isAnimating() {
+    return this.x !== this.currentX || this.y !== this.currentY;
   }
 
   move(x: number, y: number) {
@@ -92,13 +120,7 @@ export default class Tetromino {
       currentY: y,
       overwrite: false,
       duration: 0.2,
-      // duration: 4,
-      ease: moveEase,
-      onUpdate: () => {
-        if (!this.board.isPlaying) {
-          this.board.draw();
-        }
-      }
+      ease: moveEase
     });
 
     return true;
@@ -161,10 +183,10 @@ export const shapes = [
     ['', '', '']
   ],
   [
-    ['', '', '■'], // '','' -> 2,'' ; '',1 -> 1,'' ; '',2 -> '',''
-    ['■', '■', '■'], // 1,'' -> 2,1 ; 1,1 -> 1,1 ; 1,2 -> '',1
+    ['', '', '■'],
+    ['■', '■', '■'],
     ['', '', '']
-  ], // 2,'' -> 2,2 ; 2,1 -> 1,2 ; 2,2 -> '',2
+  ],
   [
     ['■', '■'],
     ['■', '■']
