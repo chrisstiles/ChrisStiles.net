@@ -22,7 +22,6 @@ export default class Block {
     return colors[this._colorIndex];
   }
 
-  // draw(x: number = this.x, y: number = this.y, color: string = this.color) {
   draw(x = this.x, y = this.y, isProjection = false) {
     const { ctx, blockSize } = this.board;
     if (!ctx || !blockSize) return;
@@ -46,7 +45,6 @@ export default class Block {
 
     if (isProjection) {
       ctx.globalAlpha = 0.45;
-      // ctx.strokeStyle = projectionColors[this._colorIndex];
       ctx.strokeStyle = this.color;
       ctx.lineWidth = strokeWidth;
       ctx.stroke();

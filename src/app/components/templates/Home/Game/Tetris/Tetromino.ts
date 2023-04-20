@@ -12,41 +12,22 @@ export type Shape = Nullable<Block>[][];
 export default class Tetromino {
   board: TetrisBoard;
   shapeIndex: number;
-  // color: string;
-  // shape: string[][];
-  // shape: Nullable<Block>[][];
   shape: Shape;
   x: number;
   y: number;
   currentX: number;
   currentY: number;
+  hasHardDropped = false;
 
   constructor(board: TetrisBoard, x: number = 0, y: number = 0) {
     this.board = board;
-    // this.shapeIndex = Math.floor(Math.random() * shapes.length - 1) + 1;
     this.shapeIndex = random(1, shapes.length - 1);
-    // this.shapeIndex = 1;
-    // this._projectionColor = tinycolor(colors[this.shapeIndex]).setAlpha(0.5).toString();
-    // this.shape = shapes[this.shapeIndex];
-    // this.color = colors[this.shapeIndex];
 
     this.shape = shapes[this.shapeIndex].map((row, rowIndex) => {
       return row.map((value, colIndex) => {
-        if (!value) return null;
-
-        // const block = new Block(board, x + rowIndex, y + colIndex, this.color);
-        const block = new Block(
-          board,
-          x + rowIndex,
-          y + colIndex,
-          this.shapeIndex
-        );
-
-        return block;
-
-        // return !value
-        //   ? null
-        //   : new Block(board, x + rowIndex, y + colIndex, this.color);
+        return !value
+          ? null
+          : new Block(board, x + rowIndex, y + colIndex, this.shapeIndex);
       });
     });
 
@@ -54,18 +35,10 @@ export default class Tetromino {
     this.y = y;
     this.currentX = this.x;
     this.currentY = this.y;
-
-    // this.drop = this.drop.bind(this);
   }
 
   getDropPoint() {
     if (!this.board) -1;
-
-    // let y = this.board.rows;
-
-    // while (y > this.y && !this.board.isValidMove(this.x, y, this.shape)) {
-    //   y--;
-    // }
 
     let y = this.y;
 
@@ -91,26 +64,29 @@ export default class Tetromino {
         block.x = this.x + x;
         block.y = this.y + y;
 
-        if (dropY >= this.y) {
-          // block.draw(this.currentX + x, dropY + y, 'rgba(255, 255, 255, 0.1)');
+        if (!this.hasHardDropped && dropY >= this.y) {
           block.draw(this.currentX + x, dropY + y, true);
         }
 
-        block.draw(this.currentX + x, this.currentY + y);
+        const shapeX = this.hasHardDropped ? this.x : this.currentX;
+        const shapeY = this.hasHardDropped ? dropY : this.currentY;
 
-        // block.x = this.currentX + x;
-        // block.y = this.currentY + y;
-        // block.draw();
+        block.draw(shapeX + x, shapeY + y);
       }
     }
   }
 
   get isAnimating() {
-    return this.x !== this.currentX || this.y !== this.currentY;
+    return (
+      !this.hasHardDropped &&
+      (this.x !== this.currentX || this.y !== this.currentY)
+    );
   }
 
   move(x: number, y: number) {
-    if (!this.board.isValidMove(x, y, this.shape)) return false;
+    if (this.hasHardDropped || !this.board.isValidMove(x, y, this.shape)) {
+      return false;
+    }
 
     this.x = x;
     this.y = y;
@@ -131,6 +107,8 @@ export default class Tetromino {
   }
 
   rotate(direction: 'right' | 'left') {
+    if (this.hasHardDropped) return false;
+
     const shape = Array.from(this.shape, row => row.slice());
 
     for (let y = 0; y < shape.length; ++y) {
@@ -155,6 +133,16 @@ export default class Tetromino {
     }
 
     return false;
+  }
+
+  hardDrop() {
+    this.hasHardDropped = true;
+    const y = this.getDropPoint();
+
+    this.currentX = this.x;
+    this.y = y;
+    this.currentY = y;
+    this.draw();
   }
 }
 
