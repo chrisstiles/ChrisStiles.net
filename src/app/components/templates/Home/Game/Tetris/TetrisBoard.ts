@@ -1,5 +1,6 @@
 import Tetromino, { type Shape } from './Tetromino';
 import Block from './Block';
+import Trail from './Trail';
 import { isSSR } from '@helpers';
 import gsap from 'gsap';
 import type { RefObject } from 'react';
@@ -32,6 +33,7 @@ export default class TetrisBoard {
     this.setNextPiece = this.setNextPiece.bind(this);
 
     // TESTING
+    // TODO Remove testing code
     if (!isSSR()) {
       (<any>window).board = this;
       (<any>window).gsap = gsap;
@@ -63,7 +65,10 @@ export default class TetrisBoard {
 
   get isAnimating() {
     return (
-      this.isPlaying || this.piece?.isAnimating || this._animatingRows.length
+      this.isPlaying ||
+      this.piece?.isAnimating ||
+      this._animatingRows.length ||
+      this.trails.length
     );
   }
 
@@ -115,6 +120,8 @@ export default class TetrisBoard {
   }
 
   setNextPiece() {
+    // TODO Set starting position correctly
+    // TODO Prevent rendering new piece inside occupied space
     this.piece = new Tetromino(this, 0);
   }
 
@@ -126,9 +133,6 @@ export default class TetrisBoard {
 
       if (this.piece?.hasHardDropped || this.elapsedTime >= this.dropInterval) {
         this.intervalStart = timestamp;
-        // this.intervalStart = this.piece?.hasHardDropped
-        //   ? timestamp + 300
-        //   : timestamp;
 
         if (!this.drop()) {
           this.isPlaying = false;
@@ -246,6 +250,7 @@ export default class TetrisBoard {
     if (!this.ctx) return;
 
     this.piece?.draw();
+    this.trails.forEach(t => t.draw());
 
     const rows = this.grid.concat(this._animatingRows);
 
@@ -304,6 +309,14 @@ export default class TetrisBoard {
     return !this.grid[y] || !!this.grid[y][x];
   }
 
+  trails: Trail[] = [];
+
+  hardDrop() {
+    if (!this.piece) return;
+    this.trails.push(new Trail(this, this.piece));
+    this.piece.hardDrop();
+  }
+
   handleKeyDown(e: KeyboardEvent) {
     if (!this.isVisible || e.metaKey || e.shiftKey || e.ctrlKey) return;
 
@@ -335,8 +348,10 @@ export default class TetrisBoard {
           break;
         case 'z':
           this.piece.rotate('left');
+          break;
         case ' ':
-          this.piece.hardDrop();
+          this.hardDrop();
+          break;
       }
     }
   }

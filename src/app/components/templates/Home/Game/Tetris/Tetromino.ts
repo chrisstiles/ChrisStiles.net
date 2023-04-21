@@ -50,9 +50,9 @@ export default class Tetromino {
   }
 
   draw() {
-    const { ctx, blockSize } = this.board;
+    const { ctx } = this.board;
 
-    if (!ctx || !blockSize) return;
+    if (!ctx) return;
 
     const dropY = this.getDropPoint();
 
