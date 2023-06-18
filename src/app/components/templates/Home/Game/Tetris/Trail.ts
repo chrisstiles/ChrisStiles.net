@@ -2,6 +2,7 @@ import TetrisBoard from './TetrisBoard';
 import Tetromino, { colors } from './Tetromino';
 import Block from './Block';
 import Particle from './Particle';
+import gsap from 'gsap';
 import tinycolor, { TinyColor } from '@ctrl/tinycolor';
 import BezierEasing from 'bezier-easing';
 import { random } from 'lodash';
@@ -42,6 +43,8 @@ export default class Trail {
 
     const gridLineWidth = this.board.pxToCanvas(1);
     const offset = this.board.pxToCanvas(this.board.offset);
+    const width = 1 - gridLineWidth - offset * 2;
+    const borderRadius = this.board.pxToCanvas(Block.borderRadius);
 
     for (let x = 0; x < this.piece.shape[0].length; x++) {
       for (let y = 0; y < this.piece.shape.length; y++) {
@@ -50,9 +53,7 @@ export default class Trail {
         if (block) {
           const x1 = block.x + gridLineWidth + offset;
           const y1 = this.startY;
-          const width = 1 - gridLineWidth - offset * 2;
-          const height =
-            block.y - this.startY + this.board.pxToCanvas(Block.borderRadius);
+          const height = block.y - this.startY + borderRadius;
 
           this._trailLines.push(
             new TrailLine(this.board, x1, y1, width, height, this.color)
@@ -89,7 +90,7 @@ class TrailLine {
   y: number;
   width: number;
   height: number;
-  opacity = 0.5;
+  opacity = 0.6;
   color: TinyColor;
   gradient?: CanvasGradient;
 
@@ -132,7 +133,7 @@ class TrailLine {
       );
     }
 
-    const baseNumParticles = 25;
+    const baseNumParticles = 30;
     const baseHeight = 10;
     const numParticles = Math.ceil((baseNumParticles * height) / baseHeight);
 
@@ -163,7 +164,7 @@ class TrailLine {
     await Promise.all([
       gsap.to(this, {
         opacity: 0,
-        duration: 0.4,
+        duration: 0.32,
         ease: BezierEasing(0.04, 0.56, 0.28, 0.97)
       }),
       gsap.to(this._particles, {

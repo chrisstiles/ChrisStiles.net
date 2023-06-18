@@ -8,6 +8,7 @@ export default class Block {
   x: number;
   y: number;
   scale = 1;
+  opacity = 1;
 
   private _colorIndex: number;
 
@@ -50,8 +51,10 @@ export default class Block {
       ctx.stroke();
       ctx.globalAlpha = 1;
     } else {
+      ctx.globalAlpha = this.opacity;
       ctx.fillStyle = this.color;
       ctx.fill();
+      ctx.globalAlpha = 1;
     }
   }
 }

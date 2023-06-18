@@ -19,22 +19,29 @@ export default class Tetromino {
   currentY: number;
   hasHardDropped = false;
 
-  constructor(board: TetrisBoard, x: number = 0, y: number = 0) {
+  constructor(board: TetrisBoard) {
     this.board = board;
     this.shapeIndex = random(1, shapes.length - 1);
 
-    this.shape = shapes[this.shapeIndex].map((row, rowIndex) => {
+    const shape = shapes[this.shapeIndex];
+
+    this.x = Math.floor(board.columns / 2 - shape[0].length / 2);
+    this.y = 0;
+    this.currentX = this.x;
+    this.currentY = this.y;
+
+    this.shape = shape.map((row, rowIndex) => {
       return row.map((value, colIndex) => {
         return !value
           ? null
-          : new Block(board, x + rowIndex, y + colIndex, this.shapeIndex);
+          : new Block(
+              board,
+              this.x + rowIndex,
+              this.y + colIndex,
+              this.shapeIndex
+            );
       });
     });
-
-    this.x = x;
-    this.y = y;
-    this.currentX = this.x;
-    this.currentY = this.y;
   }
 
   getDropPoint() {
@@ -83,7 +90,21 @@ export default class Tetromino {
     );
   }
 
-  move(x: number, y: number) {
+  move(direction: 'left' | 'right' | 'down') {
+    let { x, y } = this;
+
+    switch (direction) {
+      case 'left':
+        x--;
+        break;
+      case 'right':
+        x++;
+        break;
+      case 'down':
+        y++;
+        break;
+    }
+
     if (this.hasHardDropped || !this.board.isValidMove(x, y, this.shape)) {
       return false;
     }
@@ -103,7 +124,7 @@ export default class Tetromino {
   }
 
   drop() {
-    return this.move(this.x, this.y + 1);
+    return this.move('down');
   }
 
   rotate(direction: 'right' | 'left') {

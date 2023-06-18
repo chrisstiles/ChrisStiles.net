@@ -64,6 +64,7 @@ export default class TetrisBoard {
   }
 
   get isAnimating() {
+    // TODO Ensure particle animations complete before returning false
     return (
       this.isPlaying ||
       this.piece?.isAnimating ||
@@ -120,9 +121,23 @@ export default class TetrisBoard {
   }
 
   setNextPiece() {
-    // TODO Set starting position correctly
-    // TODO Prevent rendering new piece inside occupied space
-    this.piece = new Tetromino(this, 0);
+    const piece = new Tetromino(this);
+
+    if (!this.isValidMove(piece.x, piece.y, piece.shape)) {
+      // this.piece = null;
+      this.isPlaying = false;
+      console.log('GAME OVER setNextPiece()');
+      return;
+    }
+
+    this.piece = piece;
+    // this.piece = new Tetromino(this);
+
+    // if (!this.isValidMove(this.piece.x, this.piece.y, this.piece.shape)) {
+    //   // this.piece = null;
+    //   this.isPlaying = false;
+    //   console.log('GAME OVER setNextPiece()');
+    // }
   }
 
   animate(timestamp = 0) {
@@ -230,8 +245,9 @@ export default class TetrisBoard {
   clearRow(row: Nullable<Block>[]) {
     this.animateRow(row, {
       scale: 0,
+      opacity: 0,
       duration: 0.3,
-      stagger: 0.02
+      stagger: 0.013
     });
   }
 
@@ -241,12 +257,13 @@ export default class TetrisBoard {
     this.animateRow(row, {
       y: `+=${numLines}`,
       duration: 0.4,
-      delay: 0.02 * this.columns - 0.05,
+      delay: 0.013 * this.columns - 0.05,
       ease: 'bounce.out'
     });
   }
 
   draw() {
+    // TODO Ensure draw is called when browser resizes even if not playing
     if (!this.ctx) return;
 
     this.piece?.draw();
@@ -332,11 +349,11 @@ export default class TetrisBoard {
       switch (e.key) {
         case 'ArrowLeft':
         case 'Left':
-          this.piece.move(this.piece.x - 1, this.piece.y);
+          this.piece.move('left');
           break;
         case 'ArrowRight':
         case 'Right':
-          this.piece.move(this.piece.x + 1, this.piece.y);
+          this.piece.move('right');
           break;
         case 'ArrowDown':
         case 'Down':
