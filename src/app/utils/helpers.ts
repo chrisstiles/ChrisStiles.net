@@ -88,5 +88,5 @@ export function isSafari() {
   cachedIsSafari ??=
     !window.hasOwnProperty('chrome') && /Safari/i.test(navigator.userAgent);
 
-  return cachedIsSafari;
+  return !!cachedIsSafari;
 }

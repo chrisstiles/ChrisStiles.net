@@ -138,6 +138,7 @@ $borderRadius: 8px;
     opacity: 0.6;
     transition: all 0.2s;
 
+    // Safari seems to have issues animating mix-blend-mode
     @at-root .safari .tabWrapper:not(.active) svg {
       transition: none;
     }

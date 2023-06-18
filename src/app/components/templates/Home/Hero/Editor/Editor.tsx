@@ -20,10 +20,6 @@ import { isSafari as _isSafari } from '@helpers';
 import classNames from 'classnames';
 import { Language } from '@global';
 
-// Hack for weird Safari behavior when animating
-// opacity with mix-blend-mode on icons
-// const isSafari = _isSafari();
-
 export default memo(function Editor({
   inView = true,
   showSelectHighlight = false,
@@ -38,7 +34,6 @@ export default memo(function Editor({
   const mouse = useRef<HTMLDivElement>(null);
   const autocomplete = useRef<AutocompleteHandle>(null);
 
-  // const isSafari = useMemo(() => _isSafari(), []);
   const [isSafari, setIsSafari] = useState(false);
   useEffect(() => setIsSafari(_isSafari()), []);
 
