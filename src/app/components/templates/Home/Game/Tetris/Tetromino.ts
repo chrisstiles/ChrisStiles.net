@@ -44,8 +44,6 @@ export default class Tetromino {
   }
 
   getDropPoint() {
-    if (!this.board) -1;
-
     let y = this.y;
 
     while (this.board.isValidMove(this.x, y + 1, this.shape)) {

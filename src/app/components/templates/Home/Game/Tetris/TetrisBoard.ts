@@ -5,6 +5,9 @@ import { isSSR } from '@helpers';
 import gsap from 'gsap';
 import type { RefObject } from 'react';
 
+// TODO Implement scoring system
+// TODO Speed up game as score increases
+
 export default class TetrisBoard {
   piece: Nullable<Tetromino> = null;
   isPlaying = false;
@@ -13,7 +16,7 @@ export default class TetrisBoard {
   columns = 0;
   rows = 6;
   blockSize = 0;
-  offset = 1.5;
+  offset = 1.8;
   grid: Nullable<Block>[][] = [];
   dropInterval = 1100;
   intervalStart = 0;

@@ -29,7 +29,7 @@ export default class Block {
 
     const gridLineWidth = this.board.pxToCanvas(1);
     const offset = this.board.pxToCanvas(this.board.offset);
-    const strokeWidth = isProjection ? this.board.pxToCanvas(1.6) : 0;
+    const strokeWidth = isProjection ? this.board.pxToCanvas(2.2) : 0;
     const size = 1 - gridLineWidth - offset * 2 - strokeWidth * 2;
     const scaledSize = size * this.scale;
     const scaleOffset = (size - scaledSize) / 2;
