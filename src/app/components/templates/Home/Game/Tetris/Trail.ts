@@ -162,12 +162,12 @@ class TrailLine {
 
   async animate() {
     await Promise.all([
-      gsap.to(this, {
+      this.board.createAnimation(this, {
         opacity: 0,
         duration: 0.32,
         ease: BezierEasing(0.04, 0.56, 0.28, 0.97)
       }),
-      gsap.to(this._particles, {
+      this.board.createAnimation(this._particles, {
         opacity: 0,
         x: () => `-=${this.board.pxToCanvas(random(-5, 5))}`,
         y: () => `-=${this.board.pxToCanvas(random(60, 10))}`,

@@ -1,7 +1,6 @@
 import TetrisBoard from './TetrisBoard';
 import Block from './Block';
 import * as colorVars from '@colors';
-import gsap from 'gsap';
 import BezierEasing from 'bezier-easing';
 import { random } from 'lodash';
 
@@ -112,7 +111,7 @@ export default class Tetromino {
     this.x = x;
     this.y = y;
 
-    gsap.to(this, {
+    this.board.createAnimation(this, {
       currentX: x,
       currentY: y,
       overwrite: false,

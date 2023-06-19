@@ -22,6 +22,7 @@ export default class TetrisBoard {
   private _canvas: RefObject<HTMLCanvasElement>;
   private _requestId: Nullable<number> = null;
   private _isVisible = false;
+  private _animations: Set<gsap.core.Tween> = new Set();
   private _animatingRows: Nullable<Block>[][] = [];
 
   constructor(canvas: RefObject<HTMLCanvasElement>) {
@@ -30,14 +31,16 @@ export default class TetrisBoard {
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.setBoardSize = this.setBoardSize.bind(this);
     this.animate = this.animate.bind(this);
+    this.createAnimation = this.createAnimation.bind(this);
     this.setNextPiece = this.setNextPiece.bind(this);
 
     // TESTING
     // TODO Remove testing code
-    if (!isSSR()) {
-      (<any>window).board = this;
-      (<any>window).gsap = gsap;
-    }
+    // if (!isSSR()) {
+    //   (<any>window).board = this;
+    //   (<any>window).gsap = gsap;
+    //   (<any>window).animations = this._animations;
+    // }
   }
 
   get canvas() {
@@ -55,7 +58,7 @@ export default class TetrisBoard {
   set isVisible(value: boolean) {
     if (value === this._isVisible) return;
     if (!value) {
-      this.pause();
+      this.pause(true);
     } else if (!this.isPlaying && this.hasStarted) {
       this.play();
     }
@@ -64,9 +67,9 @@ export default class TetrisBoard {
   }
 
   get isAnimating() {
-    // TODO Ensure particle animations complete before returning false
     return (
       this.isPlaying ||
+      this._animations.size ||
       this.piece?.isAnimating ||
       this._animatingRows.length ||
       this.trails.length
@@ -85,12 +88,22 @@ export default class TetrisBoard {
   play() {
     this.isPlaying = true;
     this.hasStarted = true;
+    this._animations.forEach(animation => animation.play());
     this.draw();
     this.animate();
   }
 
-  pause() {
-    if (this._requestId) cancelAnimationFrame(this._requestId);
+  async pause(finishAnimations = false) {
+    if (finishAnimations) {
+      await Promise.all(this._animations);
+    } else {
+      this._animations.forEach(animation => animation.pause());
+    }
+
+    if (this._requestId) {
+      cancelAnimationFrame(this._requestId);
+    }
+
     this.isPlaying = false;
     this._requestId = null;
   }
@@ -124,20 +137,13 @@ export default class TetrisBoard {
     const piece = new Tetromino(this);
 
     if (!this.isValidMove(piece.x, piece.y, piece.shape)) {
-      // this.piece = null;
+      this.piece = null;
       this.isPlaying = false;
       console.log('GAME OVER setNextPiece()');
       return;
     }
 
     this.piece = piece;
-    // this.piece = new Tetromino(this);
-
-    // if (!this.isValidMove(this.piece.x, this.piece.y, this.piece.shape)) {
-    //   // this.piece = null;
-    //   this.isPlaying = false;
-    //   console.log('GAME OVER setNextPiece()');
-    // }
   }
 
   animate(timestamp = 0) {
@@ -153,7 +159,10 @@ export default class TetrisBoard {
           this.isPlaying = false;
           console.log('GAME OVER animate()');
 
-          if (!this.isAnimating) return;
+          if (!this.isAnimating) {
+            console.log('STOPPING ANIMATION');
+            return;
+          }
         }
       }
     }
@@ -227,10 +236,17 @@ export default class TetrisBoard {
       .reverse();
   }
 
+  async createAnimation(target: gsap.TweenTarget, vars: gsap.TweenVars) {
+    const animation = gsap.to(target, vars);
+    this._animations.add(animation);
+    await animation;
+    this._animations.delete(animation);
+  }
+
   async animateRow(row: Nullable<Block>[], vars: gsap.TweenVars) {
     this._animatingRows.push(row);
 
-    await gsap.to(
+    await this.createAnimation(
       row.filter(b => b),
       vars
     );
@@ -263,7 +279,6 @@ export default class TetrisBoard {
   }
 
   draw() {
-    // TODO Ensure draw is called when browser resizes even if not playing
     if (!this.ctx) return;
 
     this.piece?.draw();
@@ -303,6 +318,8 @@ export default class TetrisBoard {
     canvas.style.width = `${width}px`;
     canvas.style.height = `${height}px`;
     ctx.scale(this.blockSize, this.blockSize - gridLineWidth);
+
+    this.draw();
   }
 
   isValidMove(xPos: number, yPos: number, shape: Shape) {
