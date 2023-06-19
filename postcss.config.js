@@ -11,7 +11,8 @@ const prodOnlyPlugins =
 module.exports = {
   plugins: {
     ...prodOnlyPlugins,
-    'postcss-inset': {},
+    // 'postcss-inset': {},
+    'postcss-logical': {},
     'postcss-flexbugs-fixes': {},
     'postcss-font-variant': {},
     'postcss-preset-env': {
