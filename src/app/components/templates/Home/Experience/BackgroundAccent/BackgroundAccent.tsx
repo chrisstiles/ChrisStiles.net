@@ -25,17 +25,17 @@ const BackgroundAccentDefinitions = memo(function BackgroundAccentDefinitions({
 
     if (isVisible && !hasAnimated.current && back.current && front.current) {
       hasAnimated.current = true;
-      // gsap.fromTo(
-      //   [back.current, front.current],
-      //   { rotate: 16 },
-      //   {
-      //     delay,
-      //     rotate: 0,
-      //     duration: 1.2,
-      //     ease: accentEase,
-      //     stagger: 0.25
-      //   }
-      // );
+      gsap.fromTo(
+        [back.current, front.current],
+        { rotate: 16 },
+        {
+          delay,
+          rotate: 0,
+          duration: 1.2,
+          ease: accentEase,
+          stagger: 0.25
+        }
+      );
     }
   }, [isVisible, delay]);
 

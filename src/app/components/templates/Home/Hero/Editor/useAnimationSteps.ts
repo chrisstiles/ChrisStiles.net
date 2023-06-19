@@ -1,6 +1,5 @@
 import { useMemo, type Dispatch, type SetStateAction } from 'react';
 import { autocompleteLists } from './Autocomplete';
-import { sleep } from '@helpers';
 import { Language } from '@global';
 import type { HeroState, SetHeroStateFunction } from '../Hero';
 
@@ -26,9 +25,7 @@ export default function useAnimationState({
   setState,
   setHeaderBoundsVisible,
   setHeaderBullets,
-  setAccentsVisible,
-  setAutocompleteVisible,
-  pause
+  setAccentsVisible
 }: AnimationStepsConfig): AnimationSteps {
   const { steps, initialView, baseText }: AnimationSteps = useMemo(() => {
     /*-----------------------------------*/

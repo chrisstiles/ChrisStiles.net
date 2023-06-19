@@ -1,7 +1,6 @@
 import { useEffect, useRef, useMemo } from 'react';
 import styles from './Tetris.module.scss';
 import TetrisBoard from './TetrisBoard';
-import Tetromino from './Tetromino';
 import { useInView } from 'react-intersection-observer';
 
 export default function Tetris() {
@@ -18,11 +17,7 @@ export default function Tetris() {
 
   useEffect(() => {
     board.init();
-
-    // setTimeout(() => {
     board.play();
-    // }, 1000);
-    // board.piece = new Tetromino(board);
 
     return () => board.destroy();
   }, [board]);

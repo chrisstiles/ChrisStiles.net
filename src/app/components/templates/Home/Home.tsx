@@ -53,7 +53,7 @@ type HomeTemplateProps = {
 
 export const HomeTemplateContext = createContext<HomeGlobalState>({
   modalIsOpen: false,
-  setModalIsOpen: _ => {}
+  setModalIsOpen: () => {}
 });
 
 export type HomeGlobalState = {

@@ -2,7 +2,6 @@ import {
   memo,
   useState,
   useCallback,
-  useEffect,
   type SetStateAction,
   type Dispatch
 } from 'react';

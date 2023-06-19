@@ -1,4 +1,4 @@
-import { type FunctionComponent, type HTMLAttributes, type ReactElement } from 'react';
+import { type FunctionComponent, type HTMLAttributes } from 'react';
 import styles from './Heading.module.scss';
 import classNames from 'classnames';
 import type { ReactNode } from 'react';

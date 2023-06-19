@@ -85,15 +85,6 @@ export default memo(function TextField({
     }
   }, [value]);
 
-  const errorComponent = !errorMessage ? null : (
-    <span
-      id={`${id}-error`}
-      className={styles.fieldError}
-    >
-      {errorMessage}
-    </span>
-  );
-
   return (
     <div
       className={classNames(styles.field, wrapperClassName, {
