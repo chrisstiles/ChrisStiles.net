@@ -23,8 +23,6 @@ function MetaData({ article }: { article: ArticleWithData }) {
     description ??
     (headline !== url.hostname ? url.origin : url.origin + url.pathname);
 
-  console.log(article);
-
   return !headline ? null : (
     <a
       href={url.href}
