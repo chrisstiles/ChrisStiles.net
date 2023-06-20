@@ -1,7 +1,8 @@
 import TetrisBoard from './TetrisBoard';
-import Tetromino, { colors } from './Tetromino';
+import Tetromino from './Tetromino';
 import Block from './Block';
 import Particle from './Particle';
+import { colors } from './pieces';
 import gsap from 'gsap';
 import tinycolor, { TinyColor } from '@ctrl/tinycolor';
 import BezierEasing from 'bezier-easing';
@@ -170,9 +171,9 @@ class TrailLine {
       this.board.createAnimation(this._particles, {
         opacity: 0,
         x: () => `-=${this.board.pxToCanvas(random(-5, 5))}`,
-        y: () => `-=${this.board.pxToCanvas(random(60, 10))}`,
+        y: () => `-=${this.board.pxToCanvas(random(70, 15))}`,
         ease: BezierEasing(0.04, 0.56, 0.28, 0.97),
-        duration: 0.5
+        duration: 0.6
       })
     ]);
 

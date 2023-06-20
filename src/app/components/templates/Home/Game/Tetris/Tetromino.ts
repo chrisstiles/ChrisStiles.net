@@ -1,6 +1,6 @@
 import TetrisBoard from './TetrisBoard';
 import Block from './Block';
-import * as colorVars from '@colors';
+import { shapes } from './pieces';
 import BezierEasing from 'bezier-easing';
 import { random } from 'lodash';
 
@@ -20,7 +20,7 @@ export default class Tetromino {
 
   constructor(board: TetrisBoard) {
     this.board = board;
-    this.shapeIndex = random(1, shapes.length - 1);
+    this.shapeIndex = random(0, shapes.length - 1);
 
     const shape = shapes[this.shapeIndex];
 
@@ -43,14 +43,41 @@ export default class Tetromino {
     });
   }
 
+  clone() {
+    const clone = new Tetromino(this.board);
+
+    clone.shapeIndex = this.shapeIndex;
+    clone.shape = this.shape;
+    clone.x = this.x;
+    clone.y = this.y;
+    clone.currentX = this.currentX;
+    clone.currentY = this.currentY;
+    clone.hasHardDropped = this.hasHardDropped;
+
+    return clone;
+  }
+
+  // We cache the drop point to avoid unnecessary calculations
+  private _dropPoint: Nullable<DropPoint> = null;
+
   getDropPoint() {
+    if (this._dropPoint && this.x === this._dropPoint.x) {
+      return this._dropPoint;
+    }
+
     let y = this.y;
 
     while (this.board.isValidMove(this.x, y + 1, this.shape)) {
       y++;
     }
 
-    return y;
+    this._dropPoint = { x: this.x, y };
+
+    return this._dropPoint;
+  }
+
+  clearCachedDropPoint() {
+    this._dropPoint = null;
   }
 
   draw() {
@@ -58,7 +85,7 @@ export default class Tetromino {
 
     if (!ctx) return;
 
-    const dropY = this.getDropPoint();
+    const { y: dropY } = this.getDropPoint();
 
     for (let y = 0; y < this.shape.length; y++) {
       for (let x = 0; x < this.shape[y].length; x++) {
@@ -93,9 +120,11 @@ export default class Tetromino {
     switch (direction) {
       case 'left':
         x--;
+        this.clearCachedDropPoint();
         break;
       case 'right':
         x++;
+        this.clearCachedDropPoint();
         break;
       case 'down':
         y++;
@@ -127,6 +156,8 @@ export default class Tetromino {
   rotate(direction: 'right' | 'left') {
     if (this.hasHardDropped) return false;
 
+    this.clearCachedDropPoint();
+
     const shape = Array.from(this.shape, row => row.slice());
 
     for (let y = 0; y < shape.length; ++y) {
@@ -154,62 +185,17 @@ export default class Tetromino {
   }
 
   hardDrop() {
-    this.hasHardDropped = true;
-    const y = this.getDropPoint();
+    const { x, y } = this.getDropPoint();
 
-    this.currentX = this.x;
+    this.hasHardDropped = true;
+    this.currentX = x;
     this.y = y;
     this.currentY = y;
     this.draw();
   }
 }
 
-export const colors = [
-  'transparent',
-  colorVars.greenAccent,
-  colorVars.yellowAccent,
-  colorVars.redAccent,
-  '#EE1FF2',
-  '#FD640F',
-  '#3D50FF',
-  '#8840FF'
-];
-
-export const shapes = [
-  [],
-  [
-    ['', '', '', ''],
-    ['■', '■', '■', '■'],
-    ['', '', '', ''],
-    ['', '', '', '']
-  ],
-  [
-    ['■', '', ''],
-    ['■', '■', '■'],
-    ['', '', '']
-  ],
-  [
-    ['', '', '■'],
-    ['■', '■', '■'],
-    ['', '', '']
-  ],
-  [
-    ['■', '■'],
-    ['■', '■']
-  ],
-  [
-    ['', '■', '■'],
-    ['■', '■', ''],
-    ['', '', '']
-  ],
-  [
-    ['', '■', ''],
-    ['■', '■', '■'],
-    ['', '', '']
-  ],
-  [
-    ['■', '■', ''],
-    ['', '■', '■'],
-    ['', '', '']
-  ]
-];
+type DropPoint = {
+  x: number;
+  y: number;
+};

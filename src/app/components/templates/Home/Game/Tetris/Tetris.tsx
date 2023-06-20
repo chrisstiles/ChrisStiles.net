@@ -1,26 +1,26 @@
 import { useEffect, useRef, useMemo } from 'react';
 import styles from './Tetris.module.scss';
 import TetrisBoard from './TetrisBoard';
-import { useInView } from 'react-intersection-observer';
+import useIsVisible from '@hooks/useIsVisible';
 
 export default function Tetris() {
   const canvas = useRef<HTMLCanvasElement>(null);
-  const board = useMemo(() => {
-    return new TetrisBoard(canvas);
-  }, []);
+  const game = useMemo(() => new TetrisBoard(canvas), []);
+  const hasStarted = useRef(false);
+  const { ref: wrapper, isVisible } = useIsVisible();
 
-  const { ref: wrapper, inView } = useInView({
-    fallbackInView: true
-  });
-
-  board.isVisible = inView;
+  game.isVisible = isVisible;
 
   useEffect(() => {
-    board.init();
-    board.play();
+    game.init();
+    return () => game.destroy();
+  }, [game]);
 
-    return () => board.destroy();
-  }, [board]);
+  useEffect(() => {
+    if (!hasStarted.current && isVisible) {
+      game.play();
+    }
+  }, [game, isVisible]);
 
   return (
     <div

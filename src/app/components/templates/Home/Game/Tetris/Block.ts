@@ -1,5 +1,5 @@
 import TetrisBoard from './TetrisBoard';
-import { colors } from './Tetromino';
+import { colors } from './pieces';
 
 export default class Block {
   static borderRadius = 7;
