@@ -29,7 +29,7 @@ export function isSSR() {
 }
 
 export function sleep(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise<any>(resolve => setTimeout(resolve, ms));
 }
 
 export function getElementIndex(node: Element) {

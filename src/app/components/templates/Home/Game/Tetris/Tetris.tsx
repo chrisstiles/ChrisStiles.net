@@ -13,11 +13,16 @@ export default function Tetris() {
 
   useEffect(() => {
     game.init();
-    return () => game.destroy();
+    return () => {
+      hasStarted.current = false;
+      game.destroy();
+    };
   }, [game]);
 
   useEffect(() => {
     if (!hasStarted.current && isVisible) {
+      hasStarted.current = true;
+      // game.isBotPlaying = true;
       game.play();
     }
   }, [game, isVisible]);

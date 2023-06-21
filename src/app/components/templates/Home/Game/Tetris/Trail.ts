@@ -27,6 +27,9 @@ export default class Trail {
 
     this._firstBlockIndex = piece.shape.findIndex(r => r.some(b => b));
     this.startY = piece.y + Math.max(0, this._firstBlockIndex);
+
+    this.init = this.init.bind(this);
+    this.remove = this.remove.bind(this);
   }
 
   async init() {
@@ -76,11 +79,7 @@ export default class Trail {
   }
 
   draw() {
-    const { ctx } = this.board;
-    if (!ctx) return;
-
     if (!this._hasRendered) this.init();
-
     this._trailLines.forEach(l => l.draw());
   }
 }
@@ -159,16 +158,18 @@ class TrailLine {
         )
       );
     }
+
+    this.animate = this.animate.bind(this);
   }
 
   async animate() {
     await Promise.all([
-      this.board.createAnimation(this, {
+      this.board.animate(this, {
         opacity: 0,
         duration: 0.32,
         ease: BezierEasing(0.04, 0.56, 0.28, 0.97)
       }),
-      this.board.createAnimation(this._particles, {
+      this.board.animate(this._particles, {
         opacity: 0,
         x: () => `-=${this.board.pxToCanvas(random(-5, 5))}`,
         y: () => `-=${this.board.pxToCanvas(random(70, 15))}`,

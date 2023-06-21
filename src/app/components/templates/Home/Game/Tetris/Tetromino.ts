@@ -138,7 +138,7 @@ export default class Tetromino {
     this.x = x;
     this.y = y;
 
-    this.board.createAnimation(this, {
+    this.board.animate(this, {
       currentX: x,
       currentY: y,
       overwrite: false,

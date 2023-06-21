@@ -1,7 +1,8 @@
 import Tetromino, { type Shape } from './Tetromino';
 import Block from './Block';
 import Trail from './Trail';
-import { isSSR } from '@helpers';
+import TetrisBot from './TetrisBot';
+import { isSSR, sleep } from '@helpers';
 import gsap from 'gsap';
 import type { RefObject } from 'react';
 
@@ -10,6 +11,8 @@ import type { RefObject } from 'react';
 
 export default class TetrisBoard {
   piece: Nullable<Tetromino> = null;
+  bot: TetrisBot;
+  isBotPlaying = false;
   isGameActive = false;
   isPaused = false;
   // TODO Set the default number of rows and columns
@@ -17,7 +20,7 @@ export default class TetrisBoard {
   rows = 6;
   blockSize = 0;
   offset = 1.8;
-  grid: Nullable<Block>[][] = [];
+  grid: TetrisGrid = [];
   clearedRows = 0;
   dropInterval = 1100;
   intervalStart = 0;
@@ -26,18 +29,22 @@ export default class TetrisBoard {
   private _canvas: RefObject<HTMLCanvasElement>;
   private _isDestroyed = false;
   private _hasInitialized = false;
-  private _requestId: Nullable<number> = null;
   private _isVisible = false;
   private _animations: Set<gsap.core.Tween> = new Set();
   private _animatingRows: Nullable<Block>[][] = [];
+  private _requestId: Nullable<number> = null;
 
   constructor(canvas: RefObject<HTMLCanvasElement>) {
     this._canvas = canvas;
+    this.bot = new TetrisBot(this);
 
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.setBoardSize = this.setBoardSize.bind(this);
+    this.tick = this.tick.bind(this);
+    this.play = this.play.bind(this);
+    this.pause = this.pause.bind(this);
+    this.hardDrop = this.hardDrop.bind(this);
     this.animate = this.animate.bind(this);
-    this.createAnimation = this.createAnimation.bind(this);
     this.setNextPiece = this.setNextPiece.bind(this);
 
     // TESTING
@@ -67,6 +74,7 @@ export default class TetrisBoard {
 
   set isVisible(value: boolean) {
     if (value === this._isVisible) return;
+
     if (!value) {
       this.pause(!this.isGameActive);
     } else if (this.isGameActive && this.isPaused) {
@@ -79,11 +87,13 @@ export default class TetrisBoard {
   get isAnimating() {
     return (
       !this._isDestroyed &&
-      (this.isPlaying ||
+      !!(
+        this.isPlaying ||
         this._animations.size ||
         this.piece?.isAnimating ||
         this._animatingRows.length ||
-        this.trails.length)
+        this.trails.length
+      )
     );
   }
 
@@ -94,7 +104,6 @@ export default class TetrisBoard {
     this._isDestroyed = false;
 
     this.setBoardSize();
-    this.draw();
 
     window.addEventListener('resize', this.setBoardSize);
     window.addEventListener('keydown', this.handleKeyDown);
@@ -109,34 +118,39 @@ export default class TetrisBoard {
     this.isPaused = false;
 
     this.draw();
-    this.animate();
+    this.tick();
 
-    this._animations.forEach(animation => animation.resume());
+    this._animations.forEach(animation => animation.play(null, false));
   }
 
   async pause(finishAnimations = false) {
     this.isPaused = true;
 
     if (finishAnimations) {
-      await Promise.all(this._animations);
+      await this.waitUntilAnimationsComplete();
     } else {
       this._animations.forEach(animation => animation.pause());
     }
 
-    if (this._requestId) {
+    // Don't cancel animation frame if game was
+    // unpaused while waiting for animations to finish
+    if (this.isPaused && this._requestId) {
       cancelAnimationFrame(this._requestId);
+      this._requestId = null;
     }
   }
 
   async gameOver() {
+    console.log('GAME OVER');
     this.piece = null;
     this.isGameActive = false;
     this.isPaused = false;
 
-    await Promise.all(this._animations);
+    await this.waitUntilAnimationsComplete(300);
 
     if (this._requestId) {
       cancelAnimationFrame(this._requestId);
+      this._requestId = null;
     }
   }
 
@@ -154,8 +168,12 @@ export default class TetrisBoard {
     //   new Array(this.columns).fill(null)
     // );
 
+    // b[this.rows - 2][0] = new Block(this, 0, this.rows - 2, 2);
+    // // b[this.rows - 2][1] = new Block(this, 1, this.rows - 2, 2);
+    // b[this.rows - 1][0] = new Block(this, 0, this.rows - 1, 3);
+
     // for (let i = 4; i < this.columns; i++) {
-    //   b[this.rows - 2][i] = new Block(this, i, this.rows - 2, 0);
+    //   b[this.rows - 2][i + 2] = new Block(this, i + 2, this.rows - 2, 0);
     //   b[this.rows - 1][i] = new Block(this, i, this.rows - 1, 0);
     // }
 
@@ -176,9 +194,21 @@ export default class TetrisBoard {
     }
 
     this.piece = piece;
+
+    if (this.isBotPlaying) {
+      const move = this.bot.getBestMove();
+      console.log(move);
+
+      if (move) {
+        this.piece.x = move.x;
+        this.piece.currentX = move.x;
+        this.piece.shape = move.shape;
+        setTimeout(this.hardDrop, 250);
+      }
+    }
   }
 
-  animate(timestamp = 0) {
+  tick(timestamp = 0) {
     if (!this.isAnimating || !this.ctx) return;
 
     if (this.isPlaying) {
@@ -189,16 +219,12 @@ export default class TetrisBoard {
 
         if (!this.drop()) {
           this.gameOver();
-          if (!this.isAnimating) return;
         }
       }
     }
 
-    if (this.isAnimating) {
-      this.ctx.clearRect(0, 0, this.columns, this.rows);
-      this.draw();
-      this._requestId = requestAnimationFrame(this.animate);
-    }
+    this.draw();
+    this._requestId = requestAnimationFrame(this.tick);
   }
 
   drop() {
@@ -262,17 +288,45 @@ export default class TetrisBoard {
       .reverse();
   }
 
-  async createAnimation(target: gsap.TweenTarget, vars: gsap.TweenVars) {
-    const animation = gsap.to(target, vars);
-    this._animations.add(animation);
-    await animation;
-    this._animations.delete(animation);
+  animate(target: gsap.TweenTarget, vars: gsap.TweenVars) {
+    // GSAP seems to have weird behavior with promises,
+    // so instead we manually resolve one in onComplete
+    return new Promise<void>(resolve => {
+      const animation = gsap.to(target, {
+        immediateRender: true,
+        ...vars,
+        onComplete: () => {
+          requestAnimationFrame(() => {
+            vars.onComplete?.();
+            this._animations.delete(animation);
+            resolve();
+          });
+        }
+      });
+
+      this._animations.add(animation);
+    });
+  }
+
+  async waitUntilAnimationsComplete(delay = 0) {
+    const pendingAnimations: gsap.core.Tween[] = [];
+
+    this._animations.forEach(animation => {
+      if (!animation.isActive()) {
+        animation.progress(1, false);
+      } else {
+        pendingAnimations.push(animation);
+      }
+    });
+
+    await Promise.all(pendingAnimations);
+    if (delay) await sleep(delay);
   }
 
   async animateRow(row: Nullable<Block>[], vars: gsap.TweenVars) {
     this._animatingRows.push(row);
 
-    await this.createAnimation(
+    await this.animate(
       row.filter(b => b),
       vars
     );
@@ -308,8 +362,9 @@ export default class TetrisBoard {
   draw() {
     if (!this.ctx) return;
 
-    this.piece?.draw();
+    this.ctx.clearRect(0, 0, this.columns, this.rows);
     this.trails.forEach(t => t.draw());
+    this.piece?.draw();
 
     const rows = this.grid.concat(this._animatingRows);
 
@@ -373,13 +428,27 @@ export default class TetrisBoard {
   trails: Trail[] = [];
 
   hardDrop() {
-    if (!this.piece) return;
-    this.trails.push(new Trail(this, this.piece));
+    if (!this.piece || this.piece.hasHardDropped) return;
+
+    const { x, y } = this.piece.getDropPoint();
+
+    if (y > 1 && this.isValidMove(x, y, this.piece.shape)) {
+      this.trails.push(new Trail(this, this.piece));
+    }
+
     this.piece.hardDrop();
   }
 
   handleKeyDown(e: KeyboardEvent) {
-    if (!this.isVisible || e.metaKey || e.shiftKey || e.ctrlKey) return;
+    if (
+      this.isBotPlaying ||
+      !this.isVisible ||
+      e.metaKey ||
+      e.shiftKey ||
+      e.ctrlKey
+    ) {
+      return;
+    }
 
     // Move current tetromino
     if (
@@ -426,6 +495,7 @@ export default class TetrisBoard {
     this.trails = [];
 
     if (this._requestId) cancelAnimationFrame(this._requestId);
+
     window.removeEventListener('resize', this.setBoardSize);
     window.removeEventListener('keydown', this.handleKeyDown);
   }
@@ -448,3 +518,5 @@ const movementKeys = [
   'z',
   ' '
 ];
+
+export type TetrisGrid = Nullable<Block>[][];
