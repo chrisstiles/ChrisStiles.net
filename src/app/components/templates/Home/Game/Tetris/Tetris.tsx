@@ -13,6 +13,7 @@ export default function Tetris() {
 
   useEffect(() => {
     game.init();
+
     return () => {
       hasStarted.current = false;
       game.destroy();
@@ -22,10 +23,25 @@ export default function Tetris() {
   useEffect(() => {
     if (!hasStarted.current && isVisible) {
       hasStarted.current = true;
-      // game.isBotPlaying = true;
+      game.isBotPlaying = true;
       game.play();
     }
   }, [game, isVisible]);
+  // if (!hasStarted.current && isVisible) {
+  //   hasStarted.current = true;
+  //   game.isBotPlaying = true;
+  //   game.init();
+  //   game.play();
+  // }
+
+  // game.isVisible = isVisible;
+
+  // useEffect(() => {
+  //   return () => {
+  //     console.log('DESTROYING');
+  //     game.destroy();
+  //   };
+  // }, [game]);
 
   return (
     <div

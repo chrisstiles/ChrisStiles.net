@@ -163,26 +163,37 @@ export default class TetrisBoard {
   }
 
   getEmptyBoard() {
-    // TESTING
-    // const b = Array.from({ length: this.rows }, () =>
-    //   new Array(this.columns).fill(null)
-    // );
-
-    // b[this.rows - 2][0] = new Block(this, 0, this.rows - 2, 2);
-    // // b[this.rows - 2][1] = new Block(this, 1, this.rows - 2, 2);
-    // b[this.rows - 1][0] = new Block(this, 0, this.rows - 1, 3);
-
-    // for (let i = 4; i < this.columns; i++) {
-    //   b[this.rows - 2][i + 2] = new Block(this, i + 2, this.rows - 2, 0);
-    //   b[this.rows - 1][i] = new Block(this, i, this.rows - 1, 0);
-    // }
-
-    // return b;
-    // END TESTING
-
     return Array.from({ length: this.rows }, () =>
       new Array(this.columns).fill(null)
     );
+
+    // TESTING
+    // const board = [
+    //   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    //   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    //   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    //   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    //   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    //   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    //   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    //   // [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+    //   // [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+    //   // [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+    //   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    //   [1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 1],
+    //   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1]
+    // ];
+
+    // return Array.from({ length: this.rows }, () =>
+    //   new Array(this.columns).fill(null)
+    // ).map((row, y) => {
+    //   return row.map((_, x) => {
+    //     return board[y][x]
+    //       ? new Block(this, x, y, Math.floor(Math.random() * 7))
+    //       : null;
+    //   });
+    // });
+    // END TESTING
   }
 
   setNextPiece() {
@@ -197,13 +208,24 @@ export default class TetrisBoard {
 
     if (this.isBotPlaying) {
       const move = this.bot.getBestMove();
-      console.log(move);
+      // console.log(move);
 
       if (move) {
-        this.piece.x = move.x;
-        this.piece.currentX = move.x;
-        this.piece.shape = move.shape;
-        setTimeout(this.hardDrop, 250);
+        setTimeout(() => {
+          piece.x = move.x;
+          piece.currentX = move.x;
+
+          // piece.shape = move.shape;
+          // setTimeout(this.pause, 300);
+
+          setTimeout(() => {
+            piece.shape = move.shape;
+
+            setTimeout(() => {
+              this.hardDrop();
+            }, 250);
+          }, 100);
+        }, 250);
       }
     }
   }

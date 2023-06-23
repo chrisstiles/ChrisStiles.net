@@ -17,6 +17,9 @@ import { useInView } from 'react-intersection-observer';
 import ResizeObserver from 'resize-observer-polyfill';
 import { round, shuffle, chunk } from 'lodash';
 
+// TODO Combine column and logo tweens with timeline
+// TODO Look into useLayoutEffect and gsap.context() for animations
+
 const columnCount = 4;
 const columnEase = BezierEasing(0.11, 0.98, 0.32, 1);
 const baseLogoSize = parseInt(styles.logoSize);

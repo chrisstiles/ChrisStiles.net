@@ -61,7 +61,11 @@ export default class Tetromino {
   private _dropPoint: Nullable<DropPoint> = null;
 
   getDropPoint() {
-    if (this._dropPoint && this.x === this._dropPoint.x) {
+    if (
+      !this.board.isBotPlaying &&
+      this._dropPoint &&
+      this.x === this._dropPoint.x
+    ) {
       return this._dropPoint;
     }
 
@@ -153,7 +157,7 @@ export default class Tetromino {
     return this.move('down');
   }
 
-  rotate(direction: 'right' | 'left') {
+  rotate(direction: 'right' | 'left', force = false) {
     if (this.hasHardDropped) return false;
 
     this.clearCachedDropPoint();
@@ -176,7 +180,8 @@ export default class Tetromino {
       shape.reverse();
     }
 
-    if (this.board.isValidMove(this.x, this.y, shape)) {
+    // if (this.board.isValidMove(this.x, this.y, shape)) {
+    if (force || this.board.isValidMove(this.x, this.y, shape)) {
       this.shape = shape;
       return true;
     }
