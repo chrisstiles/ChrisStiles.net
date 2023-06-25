@@ -5,6 +5,7 @@
 @use 'sass:math';
 
 .wrapper {
+  --intersection: 1;
   width: calc((100% + var(--grid-offset) * 2) / 12 * var(--column-count, 4));
   margin-right: calc((100% + 2 * var(--grid-offset)) / 12 - var(--grid-offset));
   flex: none;
@@ -65,15 +66,33 @@
   justify-content: center;
   transform: translateZ(0);
   z-index: -30;
-}
 
-.sentinel {
-  position: absolute;
-  top: 240px;
-  bottom: 180px;
-  left: 0;
-  width: 1px;
-  visibility: hidden;
+  --min-saturation: 0.05;
+  --min-brightness: 0.4;
+  --min-opacity: 0.1;
+  --intersection-multiplier: 1;
+
+  $multiplier: var(--intersection-multiplier, 2);
+  $intersection: var(--intersection, 1);
+  $minSaturation: var(--min-saturation, 1);
+  $minBrightness: var(--min-brightness, 1);
+  $minOpacity: var(--min-opacity, 1);
+
+  --saturation: calc(
+    #{$minSaturation} + (1 - #{$minSaturation}) * (#{$intersection} * #{$multiplier})
+  );
+
+  --brightness: calc(
+    #{$minBrightness} + (1 - #{$minBrightness}) * (#{$intersection} * #{$multiplier})
+  );
+
+  --opacity: calc(
+    #{$minOpacity} + (1 - #{$minOpacity}) * (#{$intersection} * #{$multiplier})
+  );
+
+  filter: saturate(clamp($minSaturation, var(--saturation), 1))
+    brightness(clamp($minBrightness, var(--brightness), 1))
+    opacity(clamp($minOpacity, var(--opacity), 1));
 }
 
 .columnWrapper {

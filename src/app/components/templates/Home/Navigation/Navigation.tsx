@@ -1,4 +1,4 @@
-import { memo, useContext } from 'react';
+import { memo, useContext, useRef } from 'react';
 import styles from './Navigation.module.scss';
 import GitHub from './github.svg';
 import LinkedIn from './linkedin.svg';
@@ -7,6 +7,7 @@ import { Button, ContactModal } from '@elements';
 
 export default memo(function Navigation() {
   const { modalIsOpen, setModalIsOpen } = useContext(HomeTemplateContext);
+  const button = useRef<HTMLButtonElement>(null);
 
   return (
     <>
@@ -30,10 +31,9 @@ export default memo(function Navigation() {
           </li>
           <li className={styles.cta}>
             <Button
+              ref={button}
               onClick={() => {
-                if (!modalIsOpen) {
-                  setModalIsOpen(true);
-                }
+                if (!modalIsOpen) setModalIsOpen(true);
               }}
             >
               Get in touch
@@ -42,6 +42,7 @@ export default memo(function Navigation() {
         </ul>
       </nav>
       <ContactModal
+        openButton={button}
         isOpen={modalIsOpen}
         setIsOpen={setModalIsOpen}
       />

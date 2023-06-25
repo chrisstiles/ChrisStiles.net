@@ -1,9 +1,13 @@
-import { memo, type ReactNode, type FunctionComponent } from 'react';
+import {
+  memo,
+  type ReactNode,
+  type FunctionComponent,
+  type RefObject
+} from 'react';
 import styles from './ContactModal.module.scss';
 import * as Icon from './icons';
 import { H2 } from '@elements';
 import classNames from 'classnames';
-import type { RefObject } from 'react';
 
 export default memo(function ContactDetails({
   headlineId,

@@ -109,6 +109,10 @@ button {
     outline-offset: 3px;
     outline-width: 2px;
   }
+
+  &.no-outline {
+    outline: none !important;
+  }
 }
 
 @include app.highlight {

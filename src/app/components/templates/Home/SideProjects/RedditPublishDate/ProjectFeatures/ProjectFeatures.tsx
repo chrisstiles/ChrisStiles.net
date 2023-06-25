@@ -7,7 +7,6 @@ import {
   type MouseEventHandler
 } from 'react';
 import styles from './ProjectFeatures.module.scss';
-import { useGlobalState } from '@templates/Home';
 import squircleModule from 'css-houdini-squircle/squircle.min.js';
 import gsap from 'gsap';
 import ResizeObserver from 'resize-observer-polyfill';
@@ -20,7 +19,6 @@ export default memo(function ProjectFeatures() {
   const scroller = useRef<HTMLDivElement>(null);
   const animation = useRef<gsap.core.Tween | null>(null);
   const [hasStarted, setHasStarted] = useState(false);
-  const { modalIsOpen } = useGlobalState();
   const { ref, inView } = useInView({
     fallbackInView: true
   });
@@ -100,13 +98,13 @@ export default memo(function ProjectFeatures() {
     return () => observer?.disconnect();
   }, []);
 
-  useEffect(() => {
-    if (!modalIsOpen && inView) {
-      animation.current?.play();
+  if (animation.current && hasStarted) {
+    if (inView) {
+      animation.current.play();
     } else {
-      animation.current?.pause();
+      animation.current.pause();
     }
-  }, [modalIsOpen, inView, hasStarted]);
+  }
 
   const hoverTimer = useRef<number>();
 

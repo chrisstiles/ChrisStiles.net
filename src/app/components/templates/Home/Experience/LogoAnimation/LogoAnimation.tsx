@@ -8,7 +8,6 @@ import {
   type Dispatch
 } from 'react';
 import styles from './LogoAnimation.module.scss';
-import { useGlobalState } from '@templates/Home';
 import { isSafari } from '@helpers';
 import gsap from 'gsap';
 import BezierEasing from 'bezier-easing';
@@ -60,86 +59,64 @@ export default memo(function LogoAnimation({
 
   const [isVisible, setIsVisible] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const { modalIsOpen } = useGlobalState();
-  const { ref, inView, entry } = useInView({
-    fallbackInView: true,
-    threshold: [0, startThreshold, showAccentsThreshold]
-  });
-
-  useEffect(() => {
-    let showAccentsTimer: number;
-
-    if (inView && entry) {
-      if (entry.intersectionRatio >= startThreshold) {
-        setIsVisible(true);
-      }
-
-      if (!modalIsOpen && entry.intersectionRatio >= showAccentsThreshold) {
-        showAccentsTimer = window.setTimeout(() => {
-          setAccentsVisible(true);
-        }, 1300);
-      }
-    }
-
-    setIsPlaying(inView);
-
-    return () => clearTimeout(showAccentsTimer);
-  }, [modalIsOpen, inView, entry, setAccentsVisible]);
 
   // We dim the logo animation when it is
   // mostly outside the viewport to prevent it
   // distracting from the hero animation
-  const content = useRef<HTMLDivElement>(null);
-  const filterTween = useRef<gsap.core.Tween | null>(null);
-  const filterProgress = useRef(0);
+  // const content = useRef<HTMLDivElement>(null);
+  const filterRatio = useRef(0);
+  const hasReachedAccentsThreshold = useRef(false);
+  const showAccentsTimer = useRef<number>();
 
-  const { ref: sentinel, entry: sentinelEntry } = useInView({
+  const { ref: wrapper } = useInView({
     fallbackInView: true,
-    threshold: observerThresholds
-  });
-
-  useEffect(() => {
-    if ('IntersectionObserver' in window && content.current) {
-      gsap.set(content.current, {
-        filter: 'saturate(0.2) brightness(0.7) opacity(0.3)'
-      });
-
-      filterTween.current = gsap.to(content.current, {
-        filter: 'saturate(1) brightness(1) opacity(1)',
-        duration: 2,
-        paused: true,
-        ease: 'linear',
-        immediateRender: true
-      });
-    }
-  }, []);
-
-  useEffect(() => {
-    if (filterTween.current && sentinelEntry) {
-      const ratio =
-        sentinelEntry.boundingClientRect.top < 0
-          ? 1
-          : sentinelEntry.intersectionRatio;
-
-      if (ratio !== filterProgress.current) {
-        filterProgress.current = sentinelEntry.intersectionRatio;
-        filterTween.current.progress(sentinelEntry.intersectionRatio, true);
+    threshold: observerThresholds,
+    onChange: (inView, entry) => {
+      if (entry.intersectionRatio >= startThreshold) {
+        setIsVisible(true);
       }
+
+      const intersectionRatio =
+        entry.boundingClientRect.top < 0 ? 1 : entry.intersectionRatio;
+
+      const ratio = round(intersectionRatio, 5);
+
+      if (
+        entry.target instanceof HTMLElement &&
+        ratio !== filterRatio.current
+      ) {
+        filterRatio.current = ratio;
+        entry.target.style.setProperty('--intersection', ratio.toString());
+      }
+
+      if (
+        !hasReachedAccentsThreshold.current &&
+        ratio >= showAccentsThreshold
+      ) {
+        clearTimeout(showAccentsTimer.current);
+
+        showAccentsTimer.current = window.setTimeout(() => {
+          hasReachedAccentsThreshold.current = true;
+          setAccentsVisible(true);
+        }, 1300);
+      }
+
+      setIsPlaying(inView);
     }
-  }, [sentinelEntry]);
+  });
 
   return (
     <div
-      ref={ref}
+      ref={wrapper}
       role="presentation"
       aria-hidden="true"
-      style={{ '--column-count': columnCount }}
+      style={{
+        '--column-count': columnCount,
+        '--intersection': filterRatio.current
+      }}
       className={styles.wrapper}
     >
-      <div
-        ref={content}
-        className={styles.content}
-      >
+      <div className={styles.content}>
         {!!icons?.length &&
           icons.map((list, index) => (
             <LogoColumn
@@ -152,10 +129,6 @@ export default memo(function LogoAnimation({
             />
           ))}
       </div>
-      <div
-        ref={sentinel}
-        className={styles.sentinel}
-      />
     </div>
   );
 });
@@ -193,7 +166,6 @@ const LogoColumn = memo(function LogoColumn({
 
   // The distance each logo must animate before wrapping
   const [wrapperSize, setWrapperSize] = useState(0);
-  const [hasInitialWrapperSize, setHasInitialWrapperSize] = useState(false);
   const [logoSize, setLogoSize] = useState(baseLogoSize);
   const [logoOffset, setLogoOffset] = useState(baseLogoOffset);
 
@@ -212,8 +184,6 @@ const LogoColumn = memo(function LogoColumn({
         setLogoSize(logo.offsetHeight);
         setLogoOffset(!isNaN(offset) ? offset : 20);
       }
-
-      setHasInitialWrapperSize(true);
     });
 
     if (wrapperEl) {
@@ -225,61 +195,18 @@ const LogoColumn = memo(function LogoColumn({
   }, [logos, logoCount]);
 
   const hasInitialAnimation = useRef(false);
-  const hasStartedLogoAnimation = useRef(false);
   const isPlayingRef = useRef(false);
-  const logoTween = useRef<gsap.core.Tween | null>(null);
 
-  useEffect(() => {
-    isPlayingRef.current =
-      isPlaying && isVisible && hasStartedLogoAnimation.current;
+  const animation = useRef<gsap.core.Timeline>(
+    gsap.timeline({ paused: false })
+  );
 
-    if (isPlayingRef.current) {
-      logoTween.current?.play();
-    } else {
-      logoTween.current?.pause();
-    }
-  }, [isVisible, isPlaying]);
+  if (isPlaying && isVisible) {
+    animation.current.play();
+  } else if (animation.current.isActive()) {
+    animation.current.pause();
+  }
 
-  useEffect(() => {
-    const wrapperEl = wrapper.current;
-
-    if (hasInitialWrapperSize && wrapperEl && logoCount) {
-      const size = logoSize + logoOffset;
-      gsap.set(wrapperEl.children, { y: i => i * size });
-
-      // Calculate duration based on the
-      // number of logos to ensure all
-      // columns animate at the same speed
-      const distance = logoCount * size;
-
-      logoTween.current = gsap.to(wrapperEl.children, {
-        y: `+=${distance}`,
-        duration: round(size / logoVelocity, 5),
-        ease: 'none',
-        repeat: -1,
-        paused: !isPlayingRef.current,
-        immediateRender: true,
-        runBackwards: direction === 'up',
-        modifiers: {
-          y: gsap.utils.unitize(y => parseFloat(y) % distance)
-        }
-      });
-    }
-
-    return () => {
-      logoTween.current?.kill();
-    };
-  }, [
-    logoCount,
-    direction,
-    components,
-    logoSize,
-    logoOffset,
-    hasInitialWrapperSize
-  ]);
-
-  // Animate column in before starting individual logo animations
-  const columnTween = useRef<gsap.core.Tween | null>(null);
   const [hasInitialPosition, setHasInitialPosition] = useState(false);
 
   useEffect(() => {
@@ -291,6 +218,7 @@ const LogoColumn = memo(function LogoColumn({
     ) {
       hasInitialAnimation.current = true;
 
+      // Column tween
       const height = logoCount * (logoSize + logoOffset);
       const translate =
         direction === 'up'
@@ -319,19 +247,16 @@ const LogoColumn = memo(function LogoColumn({
       let hasCompleteBlurX = false;
       let hasCompleteBlurY = false;
 
-      columnTween.current = gsap.to(wrapper.current, {
+      animation.current.to(wrapper.current, {
         y:
           direction === 'down'
             ? 0
             : Math.round(-height + wrapperSize + (logoSize + logoOffset) * 2),
         duration: 3.2,
         ease: columnEase,
-        paused: !isVisible,
         delay: 0.5 + index * 0.32,
         onStart() {
-          hasStartedLogoAnimation.current = true;
           isPlayingRef.current = true;
-          logoTween.current?.play();
         },
         onUpdate() {
           if (!blurFilter.current || hasCompleteBlurX || hasCompleteBlurY) {
@@ -373,6 +298,30 @@ const LogoColumn = memo(function LogoColumn({
           blurFilter.current?.setAttribute('stdDeviation', '0,0');
         }
       });
+
+      // Logo tween
+      const size = logoSize + logoOffset;
+      gsap.set(wrapper.current.children, { y: i => i * size });
+
+      // Calculate duration based on the
+      // number of logos to ensure all
+      // columns animate at the same speed
+      const distance = logoCount * size;
+
+      animation.current.to(
+        wrapper.current.children,
+        {
+          y: `+=${distance}`,
+          duration: round(size / logoVelocity, 5),
+          ease: 'none',
+          repeat: -1,
+          runBackwards: direction === 'up',
+          modifiers: {
+            y: gsap.utils.unitize(y => parseFloat(y) % distance)
+          }
+        },
+        0
+      );
     }
   }, [
     direction,
@@ -415,10 +364,7 @@ const LogoColumn = memo(function LogoColumn({
 
   return (
     <>
-      <div
-        className={styles.columnWrapper}
-        // style={{ filter: !isSafari() ? `url('#${filterId}')` : undefined }}
-      >
+      <div className={styles.columnWrapper}>
         <div
           ref={wrapper}
           className={classNames(styles.column, direction, {

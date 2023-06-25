@@ -19,6 +19,7 @@
   align-items: center;
   justify-content: center;
   overflow-y: auto;
+  contain: strict;
 
   &.open,
   &.animating {
@@ -48,11 +49,19 @@
   z-index: 99999;
   flex-shrink: 0;
   display: flex;
+  contain: content;
+  outline: none;
+
+  // Offset to account for contain: content
+  pointer-events: none;
+  padding-top: 15px;
+  margin-top: -15px;
 }
 
 .details,
 .form {
   padding: 75px 80px;
+  pointer-events: auto;
 }
 
 $borderRadius: 9px;
@@ -107,11 +116,12 @@ $borderRadius: 9px;
 }
 
 .link {
+  $color: #c9c9da;
   display: inline-flex;
   align-items: center;
   justify-content: flex-start;
   font-size: 18px;
-  color: #c9c9da;
+  color: $color;
   line-height: 1;
   font-weight: 400;
   text-decoration: none;
@@ -130,6 +140,15 @@ $borderRadius: 9px;
 
     path {
       fill: var(--yellow-accent-color);
+    }
+  }
+
+  @at-root .wrapper:not(.open) & {
+    color: $color !important;
+    outline: none !important;
+
+    path {
+      fill: currentColor !important;
     }
   }
 }

@@ -4,7 +4,8 @@ import {
   useEffect,
   useRef,
   useCallback,
-  type Dispatch
+  type Dispatch,
+  type RefObject
 } from 'react';
 import { createPortal } from 'react-dom';
 import styles from './ContactModal.module.scss';
@@ -14,6 +15,7 @@ import useClickOutside from '@hooks/useClickOutside';
 import useEventListener from '@hooks/useEventListener';
 import useVariableRef from '@hooks/useVariableRef';
 import useSize from '@hooks/useSize';
+import { isSafari } from '@helpers';
 import { ContactForm } from '@elements';
 import gsap from 'gsap';
 import BezierEasing from 'bezier-easing';
@@ -23,27 +25,15 @@ import { RemoveScroll } from 'react-remove-scroll';
 
 export default memo(function ContactModal({
   isOpen,
+  openButton,
   setIsOpen
 }: ContactModalProps) {
   const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  const modal = useRef<HTMLDivElement>(null);
   const isOpenRef = useVariableRef(isOpen);
-  const [isVisible, setIsVisible] = useState(isOpen);
-  const [isAnimating, setIsAnimating] = useState(false);
-
-  useClickOutside(modal, () => setIsOpen(false));
-  useEventListener('keydown', e => {
-    if (e.key === 'Escape' || e.key === 'Esc') {
-      setIsOpen(false);
-    }
-  });
-
+  const prevIsOpen = useRef(false);
   const animation = useRef<gsap.core.Timeline | null>(null);
+  const modal = useRef<HTMLDivElement>(null);
+  const wrapper = useRef<HTMLDivElement>(null);
   const bg = useRef<HTMLDivElement>(null);
   const form = useRef<HTMLDivElement>(null);
   const detailsWrapper = useRef<HTMLDivElement>(null);
@@ -52,6 +42,15 @@ export default memo(function ContactModal({
   const circle = useRef<HTMLDivElement>(null);
   const leftBar = useRef<HTMLDivElement>(null);
   const rightBar = useRef<HTMLDivElement>(null);
+
+  useEffect(() => setIsMounted(true), []);
+
+  useClickOutside(modal, () => setIsOpen(false));
+  useEventListener('keydown', e => {
+    if (e.key === 'Escape' || e.key === 'Esc') {
+      setIsOpen(false);
+    }
+  });
 
   const getDetailsOffset = useCallback((rect?: Nullable<DOMRect>) => {
     const el = detailsWrapper.current;
@@ -105,15 +104,15 @@ export default memo(function ContactModal({
       paused: true,
       onStart: () => {
         startWidth = modalRectRef.current?.width;
-        setIsAnimating(true);
+        wrapper.current?.classList.add(styles.animating);
       },
       onComplete: () => {
         animation.current?.invalidate();
-        setIsAnimating(false);
+        wrapper.current?.classList.remove(styles.animating);
       },
       onReverseComplete: () => {
         animation.current?.invalidate();
-        setIsAnimating(false);
+        wrapper.current?.classList.remove(styles.animating);
 
         const currentWidth = modalRectRef.current?.width;
 
@@ -127,10 +126,6 @@ export default memo(function ContactModal({
     });
 
     const barHeight = borderRadius + barOffset;
-    const barEase = BezierEasing(0.18, 0.72, 0.22, 1);
-    const barEaseOut = BezierEasing(0.79, 0.02, 0.11, 1);
-    const circleBounce = BezierEasing(0.3, 1.22, 0.31, 1.3);
-    const slideXEase = BezierEasing(0.59, 0.59, 0.05, 1);
 
     animation.current
       .fromTo(
@@ -166,7 +161,7 @@ export default memo(function ContactModal({
           y: -barHeight,
           visibility: 'visible',
           duration: 0.23,
-          ease: BezierEasing(0.68, 0.15, 0.13, 0.98)
+          ease: bgEase
         },
         '>-0.1'
       )
@@ -198,21 +193,64 @@ export default memo(function ContactModal({
       );
   }, [modalRect, modalRectRef, getDetailsOffset]);
 
-  useEffect(() => {
-    if (!animation.current) {
-      setIsVisible(isOpen);
-      return;
-    }
+  const globalAnimations = useRef<
+    Nullable<gsap.core.Timeline | gsap.core.Tween>[]
+  >([]);
 
-    setIsAnimating(true);
-    setIsVisible(isOpen);
+  const resumeAnimationsTimer = useRef<number>();
+
+  if (animation.current && isOpen !== prevIsOpen.current) {
+    prevIsOpen.current = isOpen;
+
+    clearTimeout(resumeAnimationsTimer.current);
 
     if (isOpen) {
-      animation.current.play(undefined, false);
+      globalAnimations.current = gsap.globalTimeline
+        .getChildren(false, true, true)
+        .map(tween => {
+          if (
+            tween === animation.current ||
+            tween.parent === animation.current
+          ) {
+            return null;
+          }
+
+          tween.pause();
+
+          return tween;
+        });
+
+      setTimeout(() => {
+        modal.current?.focus();
+        animation.current?.play();
+      }, 0);
     } else {
+      wrapper.current?.classList.add(styles.animating);
       animation.current.reverse(undefined, false);
+
+      const delay =
+        animation.current.duration() *
+        0.8 *
+        animation.current.progress() *
+        1000;
+
+      resumeAnimationsTimer.current = window.setTimeout(() => {
+        globalAnimations.current.forEach(tween => tween?.play());
+        globalAnimations.current = [];
+
+        openButton.current?.classList.add('no-outline');
+        openButton.current?.focus({ preventScroll: true });
+
+        setTimeout(() => {
+          // Safari handles blur/focus different than other browsers
+          if (!isSafari()) {
+            openButton.current?.blur();
+            openButton.current?.classList.remove('no-outline');
+          }
+        }, 100);
+      }, delay);
     }
-  }, [isOpen]);
+  }
 
   return !isMounted
     ? null
@@ -224,14 +262,16 @@ export default memo(function ContactModal({
           <RemoveScroll
             allowPinchZoom
             enabled={isOpen}
+            ref={wrapper}
             className={classNames(styles.wrapper, {
-              [styles.open]: isVisible,
-              [styles.animating]: isAnimating || animation.current?.isActive()
+              [styles.open]: isOpen,
+              [styles.animating]: animation.current?.isActive()
             })}
           >
             <div
               ref={modal}
               className={styles.modal}
+              tabIndex={-1}
               role="dialog"
               aria-modal="true"
               aria-labelledby="contact-modal-title"
@@ -276,7 +316,14 @@ export default memo(function ContactModal({
 const borderRadius = parseInt(styles.borderRadius);
 const barOffset = parseInt(styles.barOffset);
 
+const barEase = BezierEasing(0.18, 0.72, 0.22, 1);
+const barEaseOut = BezierEasing(0.79, 0.02, 0.11, 1);
+const circleBounce = BezierEasing(0.3, 1.22, 0.31, 1.3);
+const slideXEase = BezierEasing(0.59, 0.59, 0.05, 1);
+const bgEase = BezierEasing(0.68, 0.15, 0.13, 0.98);
+
 type ContactModalProps = {
   isOpen: boolean;
   setIsOpen: Dispatch<boolean>;
+  openButton: RefObject<HTMLButtonElement>;
 };
