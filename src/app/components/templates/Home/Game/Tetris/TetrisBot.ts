@@ -1,8 +1,15 @@
-import TetrisBoard, { type TetrisGrid } from './TetrisBoard';
+import TetrisBoard from './TetrisBoard';
 import Tetromino from './Tetromino';
 
 export default class TetrisBot {
   board: TetrisBoard;
+  weights = {
+    lines: 50,
+    holes: 65,
+    bumpiness: 3,
+    distanceFromCenter: 1,
+    height: 12
+  };
 
   constructor(board: TetrisBoard) {
     this.board = board;
@@ -66,116 +73,92 @@ export default class TetrisBot {
   }
 
   getScore(piece: Tetromino) {
-    // TODO Make this more efficient so that we don't have to clone the board every time
-    const grid = this.board.grid.map(r => r.slice());
-    const dropPoint = piece.getDropPoint();
-    let shapeY: Nullable<number> = null;
+    const { rows, columns, grid } = this.board;
+    const dropPoint = piece.getDropPoint(false);
+    const shapeYOffset = piece.shape.findIndex(row => row.some(v => v));
+    const shapeY = dropPoint.y + (shapeYOffset === -1 ? 0 : shapeYOffset);
 
-    piece.shape.forEach((row, y) => {
-      row.forEach((value, x) => {
-        if (value) {
-          const gridX = x + dropPoint.x;
-          const gridY = y + dropPoint.y;
+    // To avoid having to clone the board every time
+    // we check a position, we check if a coordinate
+    // either contains a block on the existing board
+    // or if if is inside a given piece's drop point
+    const getBlock = (x: number, y: number) => {
+      if (grid[y][x]) return grid[y][x];
 
-          grid[gridY][gridX] = value;
+      if (
+        x < dropPoint.x ||
+        x >= dropPoint.x + piece.shape[0].length ||
+        y < dropPoint.y ||
+        y >= dropPoint.y + piece.shape.length
+      ) {
+        return null;
+      }
 
-          if (shapeY === null) shapeY = gridY;
-        }
-      });
-    });
+      // If the block is empty, check if it's part of the current piece
+      const shapeX = x - dropPoint.x;
+      const shapeY = y - dropPoint.y;
 
-    // TODO Combine loops to be more efficient
-    const lines = this.getLines(grid);
-    const holes = this.getHoles(grid);
-    const bumpiness = this.getBumpiness(grid);
+      return piece.shape[shapeY][shapeX];
+    };
+
     const distanceFromCenter = Math.max(
       3,
       Math.abs(dropPoint.x - this.board.columns / 2)
     );
 
-    const score =
-      lines * 50 -
-      holes * 55 -
-      bumpiness * 5 -
-      distanceFromCenter -
-      (grid.length - (shapeY ?? 0)) * 12;
+    // Completed rows that will be cleared
+    const filledRows = new Array(rows).fill(true);
 
-    return score;
-  }
-
-  getLines(grid: TetrisGrid) {
-    const { rows } = this.board;
-    let lines = 0;
-
-    for (let i = 0; i < rows; i++) {
-      if (grid[i].every(value => value)) lines++;
-    }
-
-    return lines;
-  }
-
-  getHoles(grid: TetrisGrid) {
-    // let testHoles = 0;
-    // let columnsWithBlocks: { [key: number]: boolean } = {};
-
-    // for (let y = this.board.rows - 1; y >= 0; y--) {
-    //   for (let x = 0; x < this.board.columns; x++) {
-    //     if (!columnsWithBlocks[x] && !grid[y][x]) {
-    //       columnsWithBlocks[x] = true;
-    //     } else if (columnsWithBlocks[x] && grid[y][x]) {
-    //       testHoles++;
-    //     }
-    //   }
-    // }
-
+    // Number of empty spaces below a block
     let holes = 0;
 
-    for (let x = 0; x < this.board.columns; x++) {
-      let block = false;
-
-      for (let y = this.board.rows - 1; y >= 0; y--) {
-        if (!block && !grid[y][x]) {
-          block = true;
-        } else if (block && grid[y][x]) {
-          holes++;
-        }
-      }
-    }
-
-    // console.log(holes, testHoles);
-
-    return holes;
-  }
-
-  // Calculate how much the height of each column
-  // varies from its neighboring columns. A lower bumpiness
-  // value indicates a more even distribution of blocks
-  getBumpiness(grid: any) {
-    const { columns, rows } = this.board;
+    // Difference in height between two columns
     let bumpiness = 0;
 
-    for (let x = 0; x < columns - 1; x++) {
-      let height = 0;
+    // for (let x = 0; x < columns - 1; x++) {
+    for (let x = 0; x < columns; x++) {
+      let height: Nullable<number> = null;
+      let nextHeight: Nullable<number> = null;
+      let hasEmptySpot = false;
 
       for (let y = rows - 1; y >= 0; y--) {
-        if (grid[y][x]) {
-          height = rows - y;
-          break;
+        const block = getBlock(x, y);
+        const nextBlock = getBlock(x + 1, y);
+
+        if (!block) filledRows[y] = false;
+
+        if (!hasEmptySpot && !block) {
+          hasEmptySpot = true;
+        } else if (hasEmptySpot && block) {
+          holes++;
+        }
+
+        if (x < columns - 1) {
+          if (height === null && block) {
+            height = rows - y;
+          }
+
+          if (nextHeight === null && nextBlock) {
+            nextHeight = rows - y;
+          }
         }
       }
 
-      let nextHeight = 0;
-
-      for (let y = rows - 1; y >= 0; y--) {
-        if (grid[y][x + 1]) {
-          nextHeight = rows - y;
-          break;
-        }
-      }
-
+      height ??= 0;
+      nextHeight ??= 0;
       bumpiness += Math.abs(height - nextHeight);
     }
 
-    return bumpiness;
+    // Number of complete lines
+    const lines = filledRows.filter(value => value).length;
+
+    const score =
+      lines * this.weights.lines -
+      holes * this.weights.holes -
+      bumpiness * this.weights.bumpiness -
+      distanceFromCenter * this.weights.distanceFromCenter -
+      (rows - (shapeY ?? 0)) * this.weights.height;
+
+    return score;
   }
 }

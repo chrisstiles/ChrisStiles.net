@@ -27,21 +27,6 @@ export default function Tetris() {
       game.play();
     }
   }, [game, isVisible]);
-  // if (!hasStarted.current && isVisible) {
-  //   hasStarted.current = true;
-  //   game.isBotPlaying = true;
-  //   game.init();
-  //   game.play();
-  // }
-
-  // game.isVisible = isVisible;
-
-  // useEffect(() => {
-  //   return () => {
-  //     console.log('DESTROYING');
-  //     game.destroy();
-  //   };
-  // }, [game]);
 
   return (
     <div

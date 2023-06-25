@@ -196,7 +196,10 @@ export default class TetrisBoard {
     // END TESTING
   }
 
+  numPieces = 0;
+
   setNextPiece() {
+    this.numPieces++;
     const piece = new Tetromino(this);
 
     if (!this.isValidMove(piece.x, piece.y, piece.shape)) {
@@ -208,15 +211,11 @@ export default class TetrisBoard {
 
     if (this.isBotPlaying) {
       const move = this.bot.getBestMove();
-      // console.log(move);
 
       if (move) {
         setTimeout(() => {
           piece.x = move.x;
           piece.currentX = move.x;
-
-          // piece.shape = move.shape;
-          // setTimeout(this.pause, 300);
 
           setTimeout(() => {
             piece.shape = move.shape;
@@ -225,7 +224,7 @@ export default class TetrisBoard {
               this.hardDrop();
             }, 250);
           }, 100);
-        }, 250);
+        }, 350);
       }
     }
   }
@@ -542,3 +541,8 @@ const movementKeys = [
 ];
 
 export type TetrisGrid = Nullable<Block>[][];
+
+export type Coordinate = {
+  x: number;
+  y: number;
+};

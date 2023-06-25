@@ -1,4 +1,4 @@
-import TetrisBoard from './TetrisBoard';
+import TetrisBoard, { type Coordinate } from './TetrisBoard';
 import Block from './Block';
 import { shapes } from './pieces';
 import BezierEasing from 'bezier-easing';
@@ -58,10 +58,11 @@ export default class Tetromino {
   }
 
   // We cache the drop point to avoid unnecessary calculations
-  private _dropPoint: Nullable<DropPoint> = null;
+  private _dropPoint: Nullable<Coordinate> = null;
 
-  getDropPoint() {
+  getDropPoint(useCached = true) {
     if (
+      useCached &&
       !this.board.isBotPlaying &&
       this._dropPoint &&
       this.x === this._dropPoint.x
@@ -199,8 +200,3 @@ export default class Tetromino {
     this.draw();
   }
 }
-
-type DropPoint = {
-  x: number;
-  y: number;
-};
