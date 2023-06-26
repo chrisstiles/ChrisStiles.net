@@ -150,7 +150,7 @@ export type FieldProps = {
   placeholder?: string;
   autoComplete?: 'on' | 'off';
   autoCorrect?: 'on' | 'off';
-  autoCapitalize?: 'on' | 'off';
+  autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
   spellCheck?: Booleanish;
   type?: string;
   validationState: ValidationState;

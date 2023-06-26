@@ -37,12 +37,13 @@
   right: 0;
   bottom: 0;
   left: 0;
-  background-color: #0b0e20;
+  background-color: rgba(#0b0e20, 0.93);
   opacity: 0;
-  will-change: opacity;
 }
 
 .modal {
+  --border-radius: 9px;
+  --bar-offset: 10px;
   width: 100%;
   max-width: 1000px;
   position: relative;
@@ -64,8 +65,6 @@
   pointer-events: auto;
 }
 
-$borderRadius: 9px;
-
 .detailsWrapper {
   position: relative;
   display: flex;
@@ -75,7 +74,7 @@ $borderRadius: 9px;
 }
 
 .detailsContent {
-  border-radius: $borderRadius;
+  border-radius: var(--border-radius);
   overflow: hidden;
   position: relative;
   z-index: 10;
@@ -83,9 +82,8 @@ $borderRadius: 9px;
 }
 
 .details {
-  border-radius: $borderRadius 0 0 $borderRadius;
+  border-radius: var(--border-radius) 0 0 var(--border-radius);
   opacity: 0;
-  will-change: opacity;
   position: relative;
   z-index: 20;
 
@@ -176,21 +174,23 @@ $borderRadius: 9px;
   top: 0;
   left: 0;
   right: 0;
-  height: $borderRadius * 2;
+  height: calc(var(--border-radius) * 2);
   transform-origin: center center;
   z-index: 15;
 }
 
 .circle {
-  width: $borderRadius * 2;
-  height: $borderRadius * 2;
+  width: calc(var(--border-radius) * 2);
+  height: calc(var(--border-radius) * 2);
   border-radius: 50%;
   background-color: var(--editor-background-color);
   position: absolute;
   top: 0;
   left: 50%;
-  margin-left: -$borderRadius;
+  margin-left: calc(var(--border-radius) * -1);
   z-index: 5;
+  transform: scale(0.0001);
+  opacity: 0;
 }
 
 .barWrapper {
@@ -209,56 +209,55 @@ $borderRadius: 9px;
   }
 }
 
-$barOffset: 10px;
-
 .bar {
   position: absolute;
   top: 0;
   bottom: 0;
-  width: calc(100% + #{$barOffset});
+  width: calc(100% + var(--bar-offset));
   background-color: var(--editor-background-color);
-  visibility: hidden;
+  opacity: 0;
   z-index: 500;
 
   @at-root .leftBar & {
-    left: -$barOffset - $borderRadius;
+    left: calc(var(--bar-offset) * -1 - var(--border-radius));
     transform: translateX(100%);
-    border-radius: $borderRadius 0 0 $borderRadius;
+    border-radius: var(--border-radius) 0 0 var(--border-radius);
   }
 
   @at-root .rightBar & {
-    right: -$barOffset - $borderRadius;
+    right: calc(var(--bar-offset) * -1 - var(--border-radius));
     transform: translateX(-100%);
-    border-radius: 0 $borderRadius $borderRadius 0;
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
   }
 }
 
 .detailsBg {
   position: absolute;
-  top: $borderRadius + $barOffset;
-  bottom: -#{$borderRadius + $barOffset};
+  top: calc(var(--border-radius) + var(--bar-offset));
+  bottom: calc((var(--border-radius) + var(--bar-offset)) * -1);
   right: 0;
   left: 0;
-  border-radius: $borderRadius;
+  border-radius: var(--border-radius);
   background-color: var(--editor-background-color);
   pointer-events: none;
   transform-origin: top center;
   z-index: -1;
-  visibility: hidden;
+  opacity: 0;
+  transform: translateY(-100%);
 }
 
 .formWrapper {
   flex-grow: 1;
   width: 100%;
-  margin-left: -$borderRadius;
+  margin-left: calc(var(--border-radius) * -1);
   overflow: hidden;
   display: flex;
 }
 
 .form {
   background-color: #323952;
-  border-left: $borderRadius solid var(--editor-background-color);
-  border-radius: 0 $borderRadius $borderRadius 0;
+  border-left: var(--border-radius) solid var(--editor-background-color);
+  border-radius: 0 var(--border-radius) var(--border-radius) 0;
   position: relative;
   flex-grow: 1;
   transform: translateX(-100%);
@@ -303,16 +302,12 @@ $barOffset: 10px;
   }
 }
 
-.detailsWrapper,
-.detailsBg,
-.circle,
-.bar,
-.form {
-  will-change: transform;
-  transform-style: preserve-3d;
-}
-
-:export {
-  borderRadius: $borderRadius;
-  barOffset: $barOffset;
-}
+// .detailsWrapper,
+// .detailsBg,
+// .circle,
+// .bar,
+// .form {
+//   will-change: transform;
+//   transform-style: preserve-3d;
+//   backface-visibility: hidden;
+// }

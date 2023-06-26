@@ -84,7 +84,7 @@ export default memo(function ArticleTextField({
       icon={<ArticleFavicon icon={favicon} />}
       theme="dark"
       autoComplete="off"
-      autoCapitalize="off"
+      autoCapitalize="none"
       spellCheck={false}
       validationState={isValid}
       showInlineValidIndicator={false}

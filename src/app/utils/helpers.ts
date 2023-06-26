@@ -1,4 +1,5 @@
 import { isPlainObject, isFunction } from 'lodash';
+import gsap from 'gsap';
 
 export function getState(state: any, value: any, name?: string) {
   if (!isPlainObject(state) || (!value && !name)) {
@@ -28,8 +29,19 @@ export function isSSR() {
   return typeof window === 'undefined' || typeof document === 'undefined';
 }
 
-export function sleep(ms: number) {
-  return new Promise<any>(resolve => setTimeout(resolve, ms));
+export function sleep(ms: number, ignoreGlobalTimeline = false) {
+  return new Promise<any>(resolve => {
+    if (ignoreGlobalTimeline) {
+      setTimeout(resolve, ms);
+    } else {
+      gsap.delayedCall(ms / 1000, resolve);
+    }
+  });
+}
+
+export function toggleGlobalAnimations(isActive: boolean) {
+  if (isSSR()) return;
+  gsap.globalTimeline.paused(!isActive);
 }
 
 export function getElementIndex(node: Element) {

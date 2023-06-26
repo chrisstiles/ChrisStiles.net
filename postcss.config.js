@@ -3,7 +3,7 @@ const prodOnlyPlugins =
     ? {}
     : {
         'postcss-pxtorem': {
-          rootValue: 18,
+          rootValue: 19,
           selectorBlackList: [/^html$/]
         }
       };

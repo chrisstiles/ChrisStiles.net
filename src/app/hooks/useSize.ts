@@ -10,9 +10,7 @@ export default function useSize(
   const [isMounted, setIsMounted] = useState(false);
   const callback = useRef(handler);
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  useEffect(() => setIsMounted(true), []);
 
   useEffect(() => {
     callback.current = handler;

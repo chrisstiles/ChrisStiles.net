@@ -27,6 +27,7 @@
     "lodash": "^4.17.21",
     "lru-cache": "^7.10.1",
     "memory-cache": "^0.2.0",
+    "motion": "^10.16.2",
     "next": "^12.1.0",
     "node-fetch": "^3.2.10",
     "prismjs": "^1.26.0",

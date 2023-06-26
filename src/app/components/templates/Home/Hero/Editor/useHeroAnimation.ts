@@ -20,6 +20,7 @@ import useVariableRef from '@hooks/useVariableRef';
 import { useGlobalState } from '@templates/Home';
 import { sleep, stripHtml } from '@helpers';
 import { random, isFunction, isNumber } from 'lodash';
+import gsap from 'gsap';
 import { Language } from '@global';
 import type { SetHeroStateFunction } from '../Hero';
 import type { TabHandle } from './Editor';
@@ -44,7 +45,7 @@ export default function useHeroAnimation({
   const [isPlaying, setIsPlaying] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
-  const timer = useRef<number>();
+  const delayedCall = useRef<gsap.core.Tween>();
   const queuedAnimation = useRef<AnimationCallback>(null);
   const hasStartedRef = useRef(hasStarted);
   const isPlayingRef = useRef(isPlaying);
@@ -171,11 +172,12 @@ export default function useHeroAnimation({
   const queue = useCallback(
     async (fn: () => void, delay = 200) => {
       return new Promise<void>(resolve => {
-        clearTimeout(timer.current);
+        delayedCall.current?.kill();
 
         const callback = () => {
           queuedAnimation.current = null;
-          clearTimeout(timer.current);
+
+          delayedCall.current?.kill();
 
           const run = async () => {
             await ensureAnimatingViewIsVisible();
@@ -189,7 +191,7 @@ export default function useHeroAnimation({
           if (delay === 0) {
             run();
           } else {
-            timer.current = window.setTimeout(run, delay);
+            delayedCall.current = gsap.delayedCall(delay / 1000, run);
           }
         };
 
@@ -442,14 +444,14 @@ export default function useHeroAnimation({
 
   // Start running animation initially after a delay
   useEffect(() => {
-    window.setTimeout(() => {
+    gsap.delayedCall(startDelay / 1000, () => {
       if (
         !isPausedRef.current &&
         visibleViewRef.current === animatingView.current
       ) {
         play();
       }
-    }, startDelay);
+    });
   }, [visibleViewRef, startDelay, setState, play]);
 
   // If the animation pauses and plays again, play a queued animation
