@@ -1,6 +1,6 @@
 import TetrisBoard, { type Coordinate } from './TetrisBoard';
 import Block from './Block';
-import { shapes } from './pieces';
+import { pieces } from './pieces';
 import BezierEasing from 'bezier-easing';
 import { random } from 'lodash';
 
@@ -20,9 +20,9 @@ export default class Tetromino {
 
   constructor(board: TetrisBoard) {
     this.board = board;
-    this.shapeIndex = random(0, shapes.length - 1);
+    this.shapeIndex = random(0, pieces.length - 1);
 
-    const shape = shapes[this.shapeIndex];
+    const { shape } = pieces[this.shapeIndex];
 
     this.x = Math.floor(board.columns / 2 - shape[0].length / 2);
     this.y = 0;
@@ -143,19 +143,21 @@ export default class Tetromino {
     this.x = x;
     this.y = y;
 
-    this.board.animate(this, {
+    return this.board.animate(this, {
       currentX: x,
       currentY: y,
       overwrite: false,
       duration: 0.2,
       ease: moveEase
     });
-
-    return true;
   }
 
   drop() {
     return this.move('down');
+  }
+
+  get maxRotations() {
+    return pieces[this.shapeIndex].maxRotations;
   }
 
   rotate(direction: 'right' | 'left', force = false) {
@@ -181,7 +183,6 @@ export default class Tetromino {
       shape.reverse();
     }
 
-    // if (this.board.isValidMove(this.x, this.y, shape)) {
     if (force || this.board.isValidMove(this.x, this.y, shape)) {
       this.shape = shape;
       return true;
@@ -198,5 +199,58 @@ export default class Tetromino {
     this.y = y;
     this.currentY = y;
     this.draw();
+  }
+
+  // Calculate if this piece's shape
+  // is the same as the given shape
+  isSameShape(shape: Shape) {
+    if (
+      this.shape.length !== shape.length ||
+      this.shape[0].length !== shape[0].length
+    ) {
+      return false;
+    }
+
+    // Filter empty rows
+    const trimRows = (shape: Shape) =>
+      shape.filter(row => row.some(value => !!value)).map(row => row.slice());
+
+    const shape1 = trimRows(this.shape);
+    const shape2 = trimRows(shape);
+
+    // Return false if the number of rows with blocks is different
+    if (shape1.length !== shape2.length) return false;
+
+    // Filter empty columns
+    const columns = shape1[0].length;
+
+    let shape1Index = 0;
+    let shape2Index = 0;
+
+    while (shape1Index < shape1[0].length && shape2Index < shape2[0].length) {
+      if (shape1Index < columns) {
+        if (shape1.every(row => !row[shape1Index])) {
+          shape1.forEach(row => row.splice(shape1Index, 1));
+          shape1Index--;
+        }
+
+        shape1Index++;
+      }
+
+      if (shape2Index < columns) {
+        if (shape2.every(row => !row[shape2Index])) {
+          shape2.forEach(row => row.splice(shape2Index, 1));
+          shape2Index--;
+        }
+
+        shape2Index++;
+      }
+    }
+
+    return shape1.every((row, rowIndex) => {
+      return row.every((value, colIndex) => {
+        return !!value === !!shape2[rowIndex][colIndex];
+      });
+    });
   }
 }

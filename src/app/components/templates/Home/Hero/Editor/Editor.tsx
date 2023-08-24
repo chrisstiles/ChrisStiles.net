@@ -20,6 +20,8 @@ import { isSafari as _isSafari } from '@helpers';
 import classNames from 'classnames';
 import { Language } from '@global';
 
+// TODO Fix text overflow in editor at larger font sizes
+
 export default memo(function Editor({
   inView = true,
   showSelectHighlight = false,

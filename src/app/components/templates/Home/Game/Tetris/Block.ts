@@ -1,5 +1,5 @@
 import TetrisBoard from './TetrisBoard';
-import { colors } from './pieces';
+import pieces from './pieces';
 
 export default class Block {
   static borderRadius = 7;
@@ -20,7 +20,7 @@ export default class Block {
   }
 
   get color() {
-    return colors[this._colorIndex];
+    return pieces[this._colorIndex].color;
   }
 
   draw(x = this.x, y = this.y, isProjection = false) {

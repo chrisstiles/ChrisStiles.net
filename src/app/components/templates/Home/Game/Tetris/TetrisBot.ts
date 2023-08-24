@@ -1,32 +1,72 @@
 import TetrisBoard from './TetrisBoard';
 import Tetromino from './Tetromino';
+import { sleep } from '@helpers';
 
 export default class TetrisBot {
   board: TetrisBoard;
   weights = {
     lines: 50,
-    holes: 65,
+    holes: 60,
     bumpiness: 3,
-    distanceFromCenter: 1,
-    height: 12
+    distanceFromCenter: 1.2,
+    height: 10
   };
 
   constructor(board: TetrisBoard) {
     this.board = board;
   }
 
-  getBestMove() {
-    if (!this.board.piece) return;
+  async moveToBestPosition(piece: Tetromino) {
+    // console.log('moveToBestPosition');
+    if (!this.board.isBotPlaying) return false;
+    // console.log('move to best position');
 
-    const piece = this.board.piece.clone();
+    const bestMove = this.getBestMove(piece);
+    if (!bestMove) return false;
+
+    const { shape } = bestMove;
+    const direction = bestMove.x > piece.x ? 'right' : 'left';
+
+    let { x } = piece;
+    let isDoneRotating = piece.maxRotations === 0 || piece.isSameShape(shape);
+    let isDoneMoving = x === bestMove.x;
+
+    while (
+      this.board.isBotPlaying &&
+      this.board.piece === piece &&
+      (!isDoneRotating || !isDoneMoving)
+    ) {
+      if (!isDoneRotating) {
+        piece.rotate('right');
+        await sleep(50);
+        isDoneRotating = piece.isSameShape(shape);
+      }
+
+      if (!isDoneMoving) {
+        const didMove = piece.move(direction);
+        await sleep(120);
+        x = piece.x;
+        isDoneMoving = x === bestMove.x;
+
+        // Wait until final move animation completes
+        if ((isDoneMoving || this.board.isPaused) && didMove) await didMove;
+
+        if (!didMove && isDoneRotating) break;
+      }
+    }
+
+    if (this.board.isBotPlaying) setTimeout(this.board.hardDrop, 200);
+  }
+
+  getBestMove(piece: Tetromino) {
+    piece = piece.clone();
 
     let bestScore = -Infinity;
     const bestMove = { x: 0, y: 0, shape: piece.shape };
 
-    const maxRotations = piece.shapeIndex === 3 ? 1 : 4; // Don't rotate squares
     const startX = piece.x;
 
-    for (let rotation = 0; rotation < maxRotations; rotation++) {
+    for (let rotation = 0; rotation <= piece.maxRotations; rotation++) {
       piece.x = startX;
 
       // Prefer dropping closer to the center of the
@@ -50,7 +90,11 @@ export default class TetrisBot {
         }
       };
 
+      checkPosition(piece.x);
+
       while (canMoveLeft || canMoveRight) {
+        if (!this.board.isBotPlaying) return;
+
         if (canMoveLeft) {
           leftX--;
           canMoveLeft = this.board.isValidMove(leftX, piece.y, piece.shape);
@@ -66,7 +110,7 @@ export default class TetrisBot {
         }
       }
 
-      if (maxRotations > 1) piece.rotate('right', true);
+      if (piece.maxRotations > 0) piece.rotate('right', true);
     }
 
     return bestMove;
@@ -112,10 +156,9 @@ export default class TetrisBot {
     // Number of empty spaces below a block
     let holes = 0;
 
-    // Difference in height between two columns
+    // Difference in heights between columns
     let bumpiness = 0;
 
-    // for (let x = 0; x < columns - 1; x++) {
     for (let x = 0; x < columns; x++) {
       let height: Nullable<number> = null;
       let nextHeight: Nullable<number> = null;
@@ -151,13 +194,14 @@ export default class TetrisBot {
 
     // Number of complete lines
     const lines = filledRows.filter(value => value).length;
+    const bottomOffset = rows - 1 - shapeY;
 
     const score =
       lines * this.weights.lines -
-      holes * this.weights.holes -
+      holes * (this.weights.holes - bottomOffset * 2) -
       bumpiness * this.weights.bumpiness -
       distanceFromCenter * this.weights.distanceFromCenter -
-      (rows - (shapeY ?? 0)) * this.weights.height;
+      bottomOffset * this.weights.height;
 
     return score;
   }

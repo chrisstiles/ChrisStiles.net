@@ -2,7 +2,7 @@ import TetrisBoard from './TetrisBoard';
 import Tetromino from './Tetromino';
 import Block from './Block';
 import Particle from './Particle';
-import { colors } from './pieces';
+import pieces from './pieces';
 import gsap from 'gsap';
 import tinycolor, { TinyColor } from '@ctrl/tinycolor';
 import BezierEasing from 'bezier-easing';
@@ -21,7 +21,7 @@ export default class Trail {
   constructor(board: TetrisBoard, piece: Tetromino) {
     this.board = board;
     this.piece = piece;
-    this.color = tinycolor(colors[this.piece.shapeIndex])
+    this.color = tinycolor(pieces[this.piece.shapeIndex].color)
       .desaturate(10)
       .lighten(8);
 
