@@ -5,31 +5,26 @@
 .wrapper {
   width: calc(100% + var(--grid-offset) * 2);
   margin-left: calc(var(--grid-offset) * -1);
-  // width: calc((100% + var(--grid-offset) * 2) / 2);
-  // width: calc(50% );
-  // margin: 0 auto;
-  // opacity: 0.1;
-  // left: calc(var(--grid-offset) * -1);
-  // background: blue;
-  // position: relative;
-
   margin-top: 60px;
   overflow: hidden;
 }
 
 .canvas {
-  --grid-num-rows: 10;
-  // --column-multiplier: 2;
-  --grid-num-columns: 24;
+  // We need to set the initial height of the canvas
+  // based on the block size. Since block size changes with
+  // device width we need to do some really ugly CSS calculations
+  --rows: 10;
+  --cols: var(--grid-num-columns);
+  --blocks-per-col: 2;
+  --block-offset: 1.8px;
+  --width-offset: calc((var(--content-padding) * 2) - (var(--grid-offset) * 2));
+  --max-width: calc(var(--content-width) - var(--width-offset) - 1px);
+  --width: min(calc(100vw - var(--width-offset) - 1px), var(--max-width));
+  --block-size: calc(var(--width) / (var(--cols) * var(--blocks-per-col)));
+  --height: calc(var(--block-size) * var(--rows) - var(--block-offset) - 1px);
+
   width: 100%;
+  height: var(--height);
   display: block;
-  height: calc(100% / var(--grid-num-columns) * var(--grid-num-rows));
   outline: none;
-  // height: calc(
-  //   (100% / (var(--grid-num-columns, 12) * var(--column-multiplier, 1))) *
-  //     var(--grid-num-rows)
-  // );
-  // background: red;
-  // opacity: 0.5;
-  // width: auto;
 }
