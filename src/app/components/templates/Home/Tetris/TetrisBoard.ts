@@ -11,8 +11,9 @@ import type { RefObject } from 'react';
 
 export default class TetrisBoard {
   piece: Nullable<Tetromino> = null;
+  nextPiece: Tetromino;
   bot: TetrisBot;
-  isBotPlaying = true;
+  isBotPlaying = false;
   isGameActive = false;
   isGameOver = false;
   isPaused = false;
@@ -20,6 +21,7 @@ export default class TetrisBoard {
   rows = 10;
   blockSize = 0;
   offset = 1.8;
+  // offset = 3;
   grid: TetrisGrid = [];
   timeline = gsap.timeline({ autoRemoveChildren: true });
   clearedRows = 0;
@@ -55,6 +57,7 @@ export default class TetrisBoard {
 
     // Have to manually assign state so Typescript doesn't complain
     this._state = this.setState();
+    this.nextPiece = new Tetromino(this);
 
     // TESTING
     // TODO Remove testing code
@@ -126,7 +129,7 @@ export default class TetrisBoard {
     return this._state;
   }
 
-  private emitChange() {
+  emitChange() {
     this._state = {
       isPlaying: this.isPlaying
     };
@@ -181,6 +184,7 @@ export default class TetrisBoard {
 
   async gameOver() {
     console.log('GAME OVER');
+
     this.isGameOver = true;
     this.piece = null;
     this.isGameActive = false;
@@ -236,11 +240,13 @@ export default class TetrisBoard {
   }
 
   private async setNextPiece(shouldEmitChange = true) {
-    const piece = new Tetromino(this);
+    const piece = this.nextPiece;
+    this.nextPiece = new Tetromino(this);
 
     if (!this.isValidMove(piece.x, piece.y, piece.shape)) {
-      console.log('game over2');
+      this.setGameOverPiece(piece);
       this.gameOver();
+
       return;
     }
 
@@ -284,7 +290,7 @@ export default class TetrisBoard {
       this.freezePiece();
       this.clearCompletedRows();
 
-      if (this.piece.y <= 0) return false;
+      if (this.piece.getShapeTopY() <= 0) return false;
 
       this.setNextPiece();
     }
@@ -298,8 +304,11 @@ export default class TetrisBoard {
 
     piece.shape.forEach((row, y) => {
       row.forEach((value, x) => {
-        if (value) {
-          this.grid[y + piece.y][x + piece.x] = value;
+        const blockX = piece.x + x;
+        const blockY = piece.y + y;
+
+        if (value && blockY >= 0 && !this.grid[blockY][blockX]) {
+          this.grid[blockY][blockX] = value;
         }
       });
     });
@@ -426,6 +435,30 @@ export default class TetrisBoard {
         rows[y][x]?.draw();
       }
     }
+  }
+
+  private getFirstRowWithBlocks() {
+    for (let rowIndex = 0; rowIndex < this.rows; rowIndex++) {
+      if (this.grid[rowIndex].some(value => value)) {
+        return rowIndex;
+      }
+    }
+
+    return null;
+  }
+
+  private setGameOverPiece(piece: Tetromino) {
+    const topRow = this.getFirstRowWithBlocks() ?? 0;
+    const shapeBottom = piece.getShapeBottomY(0);
+
+    piece.y = topRow - piece.shape.length + shapeBottom;
+    piece.currentY = piece.y;
+
+    this.piece = piece;
+    this.nextPiece = piece;
+
+    this.freezePiece();
+    this.draw();
   }
 
   private setBoardSize() {

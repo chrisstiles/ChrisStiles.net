@@ -6,12 +6,31 @@ import { random } from 'lodash';
 
 const moveEase = BezierEasing(0.16, 0.89, 0.27, 1);
 
+// TODO Replace actual random block with shuffled array of indexes to make it feel more random to player
+
+// TODO Remove this once proper implementation is done
+const testLabels = [
+  'optimized',
+  'accessible',
+  'fast',
+  'beautiful',
+  'responsive',
+  'secure',
+  'scalable',
+  'reliable',
+  'maintainable',
+  'compliant'
+];
+
+let testLabelIndex = 0;
+
 export type Shape = Nullable<Block>[][];
 
 export default class Tetromino {
   board: TetrisBoard;
   shapeIndex: number;
   shape: Shape;
+  label: string;
   x: number;
   y: number;
   currentX: number;
@@ -25,7 +44,10 @@ export default class Tetromino {
     const { shape } = pieces[this.shapeIndex];
 
     this.x = Math.floor(board.columns / 2 - shape[0].length / 2);
-    this.y = 0;
+
+    const shapeY = this.getShapeTopY(0, shape);
+    this.y = 0 - shapeY;
+
     this.currentX = this.x;
     this.currentY = this.y;
 
@@ -41,6 +63,41 @@ export default class Tetromino {
             );
       });
     });
+
+    this.getShapeTopY = this.getShapeTopY.bind(this);
+    this.getShapeBottomY = this.getShapeBottomY.bind(this);
+
+    // TODO Remove test implementation
+    this.label = testLabels[testLabelIndex % testLabels.length];
+    testLabelIndex++;
+  }
+
+  // The y position of the first non-empty row
+  getShapeTopY(
+    pieceY: number = this.y ?? 0,
+    shape: Shape | string[][] = this.shape
+  ) {
+    for (let rowY = 0; rowY < shape.length; rowY++) {
+      if (shape[rowY].some(value => value)) {
+        return rowY + pieceY;
+      }
+    }
+
+    return pieceY;
+  }
+
+  // The y position of the last non-empty row
+  getShapeBottomY(
+    pieceY: number = this.y ?? 0,
+    shape: Shape | string[][] = this.shape
+  ) {
+    for (let rowY = shape.length - 1; rowY >= 0; rowY--) {
+      if (shape[rowY].some(value => value)) {
+        return rowY + pieceY;
+      }
+    }
+
+    return pieceY + shape.length;
   }
 
   clone() {

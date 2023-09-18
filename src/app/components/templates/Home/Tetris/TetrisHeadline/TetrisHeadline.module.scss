@@ -1,0 +1,72 @@
+/* --------------------------- */
+/* Tetris Headline */
+/* --------------------------- */
+
+.wrapper {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2px;
+
+  h2 {
+    font-weight: 400;
+    font-size: 24px;
+    color: var(--body-text-color);
+    // margin-bottom: 10px;
+  }
+
+  &.hidden {
+    visibility: hidden;
+  }
+}
+
+.content {
+  margin-top: 20px;
+  padding: 23px 35px 25px 35px;
+  border: 2px solid var(--grid-line-color);
+  display: inline-block;
+  color: #fff;
+  font-size: 37px;
+  line-height: 1;
+}
+
+.text {
+  margin-right: 8px;
+}
+
+.word {
+  display: inline-flex;
+}
+
+.piece {
+  display: inline-flex;
+  flex-direction: column;
+  flex: none;
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
+.blockRow {
+  margin-bottom: 2px;
+  display: inline-flex;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.block {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  margin-right: 2px;
+
+  &:last-child {
+    margin-right: 0;
+  }
+
+  &.filled {
+    background-color: currentColor;
+  }
+}

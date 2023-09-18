@@ -8,7 +8,7 @@ import {
 import Header from './Header';
 import Hero from './Hero';
 import Experience from './Experience';
-import Game from './Game';
+import Tetris from './Tetris';
 import { RedditPublishDate } from './SideProjects';
 import { GridLines } from '@elements';
 
@@ -39,7 +39,7 @@ export default function HomeTemplate({ iconFileNames }: HomeTemplateProps) {
           accentsVisible={accentsVisible}
           setAccentsVisible={setAccentsVisible}
         />
-        <Game />
+        <Tetris />
         <RedditPublishDate />
       </main>
       <GridLines />

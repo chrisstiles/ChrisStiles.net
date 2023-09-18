@@ -1,6 +1,6 @@
 import * as colorVars from '@colors';
 
-export const pieces = [
+export const pieces: Piece[] = [
   {
     color: colorVars.greenAccent,
     maxRotations: 1,
@@ -65,5 +65,11 @@ export const pieces = [
     ]
   }
 ];
+
+export type Piece = {
+  color: string;
+  maxRotations: number;
+  shape: string[][];
+};
 
 export default pieces;
