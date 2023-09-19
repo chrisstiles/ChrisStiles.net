@@ -2,7 +2,9 @@ import Tetromino, { type Shape } from './Tetromino';
 import Block from './Block';
 import Trail from './Trail';
 import TetrisBot from './TetrisBot';
+import PiecePreview from './PiecePreview';
 import { isSSR, sleep } from '@helpers';
+import { random } from 'lodash';
 import gsap from 'gsap';
 import type { RefObject } from 'react';
 
@@ -11,9 +13,10 @@ import type { RefObject } from 'react';
 
 export default class TetrisBoard {
   piece: Nullable<Tetromino> = null;
+  preview: PiecePreview;
   nextPiece: Tetromino;
   bot: TetrisBot;
-  isBotPlaying = false;
+  isBotPlaying = true;
   isGameActive = false;
   isGameOver = false;
   isPaused = false;
@@ -21,7 +24,6 @@ export default class TetrisBoard {
   rows = 10;
   blockSize = 0;
   offset = 1.8;
-  // offset = 3;
   grid: TetrisGrid = [];
   timeline = gsap.timeline({ autoRemoveChildren: true });
   clearedRows = 0;
@@ -53,18 +55,20 @@ export default class TetrisBoard {
     this.pause = this.pause.bind(this);
     this.hardDrop = this.hardDrop.bind(this);
     this.animate = this.animate.bind(this);
+    this.wait = this.wait.bind(this);
     this.setNextPiece = this.setNextPiece.bind(this);
 
     // Have to manually assign state so Typescript doesn't complain
     this._state = this.setState();
     this.nextPiece = new Tetromino(this);
+    this.preview = new PiecePreview(this, this.nextPiece);
 
     // TESTING
     // TODO Remove testing code
-    if (!isSSR()) {
-      (<any>window).board = this;
-      (<any>window).gsap = gsap;
-    }
+    // if (!isSSR()) {
+    //   (<any>window).board = this;
+    //   (<any>window).gsap = gsap;
+    // }
   }
 
   get canvas() {
@@ -121,19 +125,12 @@ export default class TetrisBoard {
   }
 
   setState(state: Partial<GameState> = {}) {
-    this._state = {
-      isPlaying: this.isPlaying,
-      ...state
-    };
-
+    this._state = { ...this._state, ...state };
     return this._state;
   }
 
   emitChange() {
-    this._state = {
-      isPlaying: this.isPlaying
-    };
-
+    this.setState();
     this._listeners.forEach(callback => callback());
   }
 
@@ -187,6 +184,7 @@ export default class TetrisBoard {
 
     this.isGameOver = true;
     this.piece = null;
+    this.nextPiece = new Tetromino(this);
     this.isGameActive = false;
     this.isPaused = false;
     this.isBotPlaying = false;
@@ -212,31 +210,6 @@ export default class TetrisBoard {
     return Array.from({ length: this.rows }, () =>
       new Array(this.columns).fill(null)
     );
-
-    // TESTING
-    // const board = [
-    //   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    //   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    //   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    //   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    //   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    //   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    //   [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    //   [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    //   [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    //   [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-    // ];
-
-    // return Array.from({ length: this.rows }, () =>
-    //   new Array(this.columns).fill(null)
-    // ).map((row, y) => {
-    //   return row.map((_, x) => {
-    //     return board[y][x]
-    //       ? new Block(this, x, y, Math.floor(Math.random() * 7))
-    //       : null;
-    //   });
-    // });
-    // END TESTING
   }
 
   private async setNextPiece(shouldEmitChange = true) {
@@ -251,11 +224,15 @@ export default class TetrisBoard {
     }
 
     this.piece = piece;
+    this.preview = new PiecePreview(this, piece);
 
     if (shouldEmitChange) this.emitChange();
 
+    this.preview.typeLabel();
+
     if (this.isBotPlaying) {
-      await sleep(200);
+      // await sleep(200, false, this.timeline);
+      await this.wait(200);
       this.bot.moveToBestPosition(piece);
     }
   }
@@ -273,10 +250,7 @@ export default class TetrisBoard {
 
       if (hasHardDropped || this.elapsedTime >= this.dropInterval) {
         this.intervalStart = timestamp;
-
-        if (!this.drop()) {
-          this.gameOver();
-        }
+        if (!this.drop()) this.gameOver();
       }
     }
 
@@ -290,7 +264,7 @@ export default class TetrisBoard {
       this.freezePiece();
       this.clearCompletedRows();
 
-      if (this.piece.getShapeTopY() <= 0) return false;
+      if (this.piece.getShapeY() <= 0) return false;
 
       this.setNextPiece();
     }
@@ -368,6 +342,10 @@ export default class TetrisBoard {
     });
   }
 
+  wait(minDelay: number, maxDelay?: number) {
+    return sleep(random(minDelay, maxDelay ?? minDelay), false, this.timeline);
+  }
+
   private async waitUntilAnimationsComplete(delay = 0) {
     const pendingAnimations: gsap.core.Tween[] = [];
 
@@ -382,7 +360,7 @@ export default class TetrisBoard {
 
     await Promise.all(pendingAnimations);
 
-    if (delay) await sleep(delay);
+    if (delay) await this.wait(delay);
   }
 
   private async animateRow(row: Nullable<Block>[], vars: gsap.TweenVars) {
@@ -449,9 +427,11 @@ export default class TetrisBoard {
 
   private setGameOverPiece(piece: Tetromino) {
     const topRow = this.getFirstRowWithBlocks() ?? 0;
-    const shapeBottom = piece.getShapeBottomY(0);
+    const shapeHeight = piece.shape.filter(row =>
+      row.some(value => !!value)
+    ).length;
 
-    piece.y = topRow - piece.shape.length + shapeBottom;
+    piece.y = topRow - shapeHeight;
     piece.currentY = piece.y;
 
     this.piece = piece;
@@ -617,4 +597,5 @@ export type Coordinate = {
 
 type GameState = {
   isPlaying: boolean;
+  preview: PiecePreview;
 };

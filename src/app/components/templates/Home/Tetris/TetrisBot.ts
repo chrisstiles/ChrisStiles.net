@@ -1,6 +1,5 @@
 import TetrisBoard from './TetrisBoard';
 import Tetromino from './Tetromino';
-import { sleep } from '@helpers';
 
 export default class TetrisBot {
   board: TetrisBoard;
@@ -36,32 +35,44 @@ export default class TetrisBot {
     ) {
       if (!isDoneRotating) {
         piece.rotate('right');
-        await sleep(50);
+        await this.board.wait(50, 70);
         isDoneRotating = piece.isSameShape(shape);
       }
 
       if (!isDoneMoving) {
         const didMove = piece.move(direction);
-        await sleep(120);
+        await this.board.wait(60, 85);
         x = piece.x;
         isDoneMoving = x === bestMove.x;
 
         // Wait until final move animation completes
         if ((isDoneMoving || this.board.isPaused) && didMove) await didMove;
-
         if (!didMove && isDoneRotating) break;
       }
     }
+    if (this.board.isBotPlaying) {
+      if (this.board.preview.isTyping) {
+        await this.board.preview.isDoneTyping;
+        await this.board.wait(450, 650);
+      } else {
+        await this.board.wait(180, 250);
+      }
 
-    if (this.board.isBotPlaying) setTimeout(this.board.hardDrop, 200);
+      if (this.board.isBotPlaying) this.board.hardDrop();
+    }
   }
 
   getBestMove(piece: Tetromino) {
     piece = piece.clone();
 
-    let bestScore = -Infinity;
-    const bestMove = { x: 0, y: 0, shape: piece.shape };
+    if (piece.shapeIndex === 0) {
+      piece.y = 0;
+      piece.currentY = 0;
+    }
 
+    let bestScore = -Infinity;
+
+    const bestMove = { x: 0, y: 0, shape: piece.shape };
     const startX = piece.x;
 
     for (let rotation = 0; rotation <= piece.maxRotations; rotation++) {

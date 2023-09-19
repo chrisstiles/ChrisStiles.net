@@ -1,22 +1,11 @@
 import { useMemo } from 'react';
 import styles from './TetrisHeadline.module.scss';
-import Tetromino from '../Tetromino';
-import pieces from '../pieces';
+import PiecePreview from '../PiecePreview';
 import useHasRendered from '@hooks/useHasRendered';
 import classNames from 'classnames';
 
-export default function TetrisHeadline({ piece }: TetrisHeadlineProps) {
+export default function TetrisHeadline({ preview }: TetrisHeadlineProps) {
   const hasRendered = useHasRendered();
-  const { color } = pieces[piece.shapeIndex];
-
-  const label = hasRendered ? (
-    <span style={{ color: hasRendered ? color : undefined }}>
-      <PiecePreview piece={piece} />
-      {piece.label}
-    </span>
-  ) : (
-    'optimized'
-  );
 
   return (
     <div
@@ -26,53 +15,61 @@ export default function TetrisHeadline({ piece }: TetrisHeadlineProps) {
     >
       <h2>Making modern applications is hard</h2>
       <h3 className={styles.content}>
-        <span className={styles.text}>Your website has to be</span> {label}
-        {/* <span className={styles.text}>Your website has to be</span>{' '}
-        {!hasRendered ? (
-          'optimized'
-        ) : (
-          <span style={{ color: hasRendered ? color : undefined }}>
-            <PiecePreview piece={piece} />
-            {piece.label}
-          </span>
-        )} */}
+        <span className={styles.text}>Your website has to be</span>{' '}
+        <PieceLabel preview={preview} />
       </h3>
     </div>
   );
 }
 
-function PiecePreview({ piece }: { piece: Tetromino }) {
+function PieceLabel({ preview }: TetrisHeadlineProps) {
+  const hasRendered = useHasRendered();
+  const isLinePiece = preview.piece.shapeIndex === 0;
+
   const shape = useMemo(() => {
-    return piece.shape
+    // Display line piece vertically
+    const shape = !isLinePiece ? preview.shape : [['■'], ['■'], ['■'], ['■']];
+
+    return shape
       .filter(row => row.some(value => !!value))
       .map(row => row.slice());
-  }, [piece]);
+  }, [preview, isLinePiece]);
 
-  return (
-    <span className={styles.piece}>
-      {/* {shape.map((row, rowIndex) => (
-        
-      )} */}
-      {shape.map((row, rowIndex) => (
-        <span
-          key={rowIndex}
-          className={styles.blockRow}
-        >
-          {row.map((block, colIndex) => (
-            <span
-              key={colIndex}
-              className={classNames(styles.block, {
-                [styles.filled]: !!block
-              })}
-            />
-          ))}
-        </span>
-      ))}
+  return !hasRendered ? (
+    <>optimized</>
+  ) : (
+    <span
+      className={classNames(styles.previewWrapper, {
+        [styles.linePiece]: isLinePiece
+      })}
+      style={{
+        '--cols': shape[0].length,
+        color: hasRendered ? preview.color : undefined
+      }}
+      aria-hidden="true"
+    >
+      <span className={styles.piece}>
+        {shape.map((row, rowIndex) => (
+          <span
+            key={rowIndex}
+            className={styles.blockRow}
+          >
+            {row.map((block, colIndex) => (
+              <span
+                key={colIndex}
+                className={classNames(styles.block, {
+                  [styles.filled]: !!block
+                })}
+              />
+            ))}
+          </span>
+        ))}
+      </span>{' '}
+      <span className={styles.label}>{preview.currentLabel}</span>
     </span>
   );
 }
 
 type TetrisHeadlineProps = {
-  piece: Tetromino;
-  // shapeIndex: number;
+  preview: PiecePreview;
 };

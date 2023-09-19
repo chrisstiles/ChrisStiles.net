@@ -29,12 +29,23 @@ export function isSSR() {
   return typeof window === 'undefined' || typeof document === 'undefined';
 }
 
-export function sleep(ms: number, ignoreGlobalTimeline = false) {
+export function sleep(
+  ms: number,
+  ignoreGlobalTimeline = false,
+  timeline?: gsap.core.Timeline
+) {
   return new Promise<any>(resolve => {
     if (ignoreGlobalTimeline) {
       setTimeout(resolve, ms);
     } else {
-      gsap.delayedCall(ms / 1000, resolve);
+      // gsap.delayedCall(ms / 1000, resolve);
+      const delay = ms / 1000;
+
+      if (timeline) {
+        timeline.add(gsap.delayedCall(delay, resolve), timeline.time() + delay);
+      } else {
+        gsap.delayedCall(delay, resolve);
+      }
     }
   });
 }

@@ -34,7 +34,8 @@ export const pieces: Piece[] = [
     maxRotations: 0,
     shape: [
       ['■', '■'],
-      ['■', '■']
+      ['■', '■'],
+      ['', '']
     ]
   },
   {

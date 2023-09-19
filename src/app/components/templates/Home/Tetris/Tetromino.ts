@@ -8,29 +8,10 @@ const moveEase = BezierEasing(0.16, 0.89, 0.27, 1);
 
 // TODO Replace actual random block with shuffled array of indexes to make it feel more random to player
 
-// TODO Remove this once proper implementation is done
-const testLabels = [
-  'optimized',
-  'accessible',
-  'fast',
-  'beautiful',
-  'responsive',
-  'secure',
-  'scalable',
-  'reliable',
-  'maintainable',
-  'compliant'
-];
-
-let testLabelIndex = 0;
-
-export type Shape = Nullable<Block>[][];
-
 export default class Tetromino {
   board: TetrisBoard;
   shapeIndex: number;
   shape: Shape;
-  label: string;
   x: number;
   y: number;
   currentX: number;
@@ -45,7 +26,7 @@ export default class Tetromino {
 
     this.x = Math.floor(board.columns / 2 - shape[0].length / 2);
 
-    const shapeY = this.getShapeTopY(0, shape);
+    const shapeY = this.getShapeY(0, shape);
     this.y = 0 - shapeY;
 
     this.currentX = this.x;
@@ -64,16 +45,11 @@ export default class Tetromino {
       });
     });
 
-    this.getShapeTopY = this.getShapeTopY.bind(this);
-    this.getShapeBottomY = this.getShapeBottomY.bind(this);
-
-    // TODO Remove test implementation
-    this.label = testLabels[testLabelIndex % testLabels.length];
-    testLabelIndex++;
+    this.getShapeY = this.getShapeY.bind(this);
   }
 
   // The y position of the first non-empty row
-  getShapeTopY(
+  getShapeY(
     pieceY: number = this.y ?? 0,
     shape: Shape | string[][] = this.shape
   ) {
@@ -84,20 +60,6 @@ export default class Tetromino {
     }
 
     return pieceY;
-  }
-
-  // The y position of the last non-empty row
-  getShapeBottomY(
-    pieceY: number = this.y ?? 0,
-    shape: Shape | string[][] = this.shape
-  ) {
-    for (let rowY = shape.length - 1; rowY >= 0; rowY--) {
-      if (shape[rowY].some(value => value)) {
-        return rowY + pieceY;
-      }
-    }
-
-    return pieceY + shape.length;
   }
 
   clone() {
@@ -245,6 +207,14 @@ export default class Tetromino {
       return true;
     }
 
+    // Ensure line piece can rotate when it first appears
+    if (this.y < 0 && this.board.isValidMove(this.x, 0, shape)) {
+      this.shape = shape;
+      this.y = 0;
+      this.currentY = 0;
+      return true;
+    }
+
     return false;
   }
 
@@ -311,3 +281,5 @@ export default class Tetromino {
     });
   }
 }
+
+export type Shape = Nullable<Block>[][];

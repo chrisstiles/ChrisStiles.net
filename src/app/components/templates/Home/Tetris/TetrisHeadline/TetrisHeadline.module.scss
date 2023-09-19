@@ -13,7 +13,6 @@
     font-weight: 400;
     font-size: 24px;
     color: var(--body-text-color);
-    // margin-bottom: 10px;
   }
 
   &.hidden {
@@ -35,20 +34,69 @@
   margin-right: 8px;
 }
 
-.word {
-  display: inline-flex;
+.previewWrapper {
+  --block-size: 12px;
+  --block-offset: 2px;
+
+  position: relative;
+  padding-left: 20px;
+  padding-left: calc(
+    (var(--block-size) + var(--block-offset)) * var(--cols, 3)
+  );
+
+  &.linePiece {
+    --block-size: 11px;
+  }
+}
+
+.label {
+  margin-left: 10px;
+
+  &:after {
+    content: '';
+    line-height: 0;
+    height: 1em;
+    width: 1px;
+    display: inline-block;
+    margin-left: 1px;
+    vertical-align: middle;
+    background: currentColor;
+    margin-top: -3px;
+    animation: blink 0.75s step-end infinite;
+  }
+
+  @keyframes blink {
+    0% {
+      opacity: 1;
+    }
+
+    50% {
+      opacity: 0;
+    }
+
+    100% {
+      opacity: 1;
+    }
+  }
 }
 
 .piece {
   display: inline-flex;
   flex-direction: column;
   flex: none;
-  margin-right: 10px;
-  vertical-align: middle;
+  position: absolute;
+  top: 50%;
+  margin-top: 2px;
+  left: 0;
+  transform: translateY(-50%);
+
+  @at-root .linePiece & {
+    margin-top: 1px;
+  }
 }
 
 .blockRow {
-  margin-bottom: 2px;
+  margin-bottom: var(--block-offset);
   display: inline-flex;
 
   &:last-child {
@@ -57,10 +105,10 @@
 }
 
 .block {
-  width: 10px;
-  height: 10px;
+  width: var(--block-size);
+  height: var(--block-size);
   border-radius: 2px;
-  margin-right: 2px;
+  margin-right: var(--block-offset);
 
   &:last-child {
     margin-right: 0;
