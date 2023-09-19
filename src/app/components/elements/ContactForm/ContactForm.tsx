@@ -13,8 +13,8 @@ import {
 import styles from './ContactForm.module.scss';
 import * as Icon from './icons';
 import { TextField, Button, type ValidationState } from '@elements';
-import gsap from 'gsap';
 import { upperFirst } from 'lodash';
+import classNames from 'classnames';
 import type { ContactFormRequest, ContactFormResponse } from '@api/contact';
 
 export default memo(function ContactForm() {
@@ -125,22 +125,12 @@ export default memo(function ContactForm() {
 
   const form = useRef<HTMLFormElement>(null);
 
-  useEffect(() => {
-    if (apiResponse?.success && form.current) {
-      gsap.to(form.current, {
-        opacity: 0,
-        duration: 0.4,
-        onComplete() {
-          if (form.current) {
-            form.current.style.visibility = 'hidden';
-          }
-        }
-      });
-    }
-  }, [apiResponse?.success]);
-
   return (
-    <div className={styles.formWrapper}>
+    <div
+      className={classNames(styles.formWrapper, {
+        [styles.submitted]: apiResponse?.success
+      })}
+    >
       <form
         noValidate
         ref={form}

@@ -23,8 +23,10 @@ const limiter = rateLimit({
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<ContactFormResponse>
+  res: NextApiResponse<ContactFormResponse | string>
 ) {
+  if (req.method !== 'POST') return res.redirect('/not-found');
+
   try {
     await limiter.check(req, res, maxRequestsPerMinute);
   } catch {
@@ -40,7 +42,7 @@ export default async function handler(
     const formSubmitTime = new Date();
 
     if (
-      !data.hasOwnProperty('honeypot') ||
+      !Object.getOwnPropertyDescriptor(data, 'honeypot') ||
       !!data.honeypot ||
       !isValidDate(pageLoadTime) ||
       formSubmitTime.getTime() - pageLoadTime.getTime() < minTime
