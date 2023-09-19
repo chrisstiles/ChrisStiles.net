@@ -28,7 +28,6 @@ export default function Tetris() {
         ref={ref}
         className={styles.content}
       >
-        {/* <TetrisHeadline piece={game.piece ?? game.nextPiece} /> */}
         <TetrisHeadline preview={game.preview} />
         <canvas
           tabIndex={-1}

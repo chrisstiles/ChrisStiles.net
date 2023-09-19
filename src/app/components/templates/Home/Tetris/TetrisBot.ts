@@ -28,6 +28,13 @@ export default class TetrisBot {
     let isDoneRotating = piece.maxRotations === 0 || piece.isSameShape(shape);
     let isDoneMoving = x === bestMove.x;
 
+    // Ensure full preview label is on screen for a moment
+    // before hard dropping and moving to the next piece
+    const canHardDrop = (async () => {
+      await this.board.preview.isDoneTyping;
+      await this.board.wait(260);
+    })();
+
     while (
       this.board.isBotPlaying &&
       this.board.piece === piece &&
@@ -40,6 +47,7 @@ export default class TetrisBot {
       }
 
       if (!isDoneMoving) {
+        // const test = 'sad';
         const didMove = piece.move(direction);
         await this.board.wait(60, 85);
         x = piece.x;
@@ -50,15 +58,11 @@ export default class TetrisBot {
         if (!didMove && isDoneRotating) break;
       }
     }
-    if (this.board.isBotPlaying) {
-      if (this.board.preview.isTyping) {
-        await this.board.preview.isDoneTyping;
-        await this.board.wait(450, 650);
-      } else {
-        await this.board.wait(180, 250);
-      }
 
-      if (this.board.isBotPlaying) this.board.hardDrop();
+    await canHardDrop;
+
+    if (this.board.isBotPlaying && this.board.piece === piece) {
+      this.board.hardDrop();
     }
   }
 

@@ -65,10 +65,10 @@ export default class TetrisBoard {
 
     // TESTING
     // TODO Remove testing code
-    // if (!isSSR()) {
-    //   (<any>window).board = this;
-    //   (<any>window).gsap = gsap;
-    // }
+    if (!isSSR()) {
+      (<any>window).board = this;
+      (<any>window).gsap = gsap;
+    }
   }
 
   get canvas() {
@@ -198,7 +198,7 @@ export default class TetrisBoard {
   reset() {
     this.isGameOver = false;
     this.grid = this.getEmptyBoard();
-    this.setNextPiece(false);
+    this.setNextPiece(false, true);
     this.intervalStart = gsap.ticker.time;
     this.clearedRows = 0;
     this.elapsedTime = 0;
@@ -212,9 +212,12 @@ export default class TetrisBoard {
     );
   }
 
-  private async setNextPiece(shouldEmitChange = true) {
+  private async setNextPiece(
+    shouldEmitChange = true,
+    shouldResetPieceQueue = false
+  ) {
     const piece = this.nextPiece;
-    this.nextPiece = new Tetromino(this);
+    this.nextPiece = new Tetromino(this, shouldResetPieceQueue);
 
     if (!this.isValidMove(piece.x, piece.y, piece.shape)) {
       this.setGameOverPiece(piece);
@@ -231,7 +234,6 @@ export default class TetrisBoard {
     this.preview.typeLabel();
 
     if (this.isBotPlaying) {
-      // await sleep(200, false, this.timeline);
       await this.wait(200);
       this.bot.moveToBestPosition(piece);
     }

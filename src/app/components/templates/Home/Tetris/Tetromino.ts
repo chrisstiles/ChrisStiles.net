@@ -2,11 +2,7 @@ import TetrisBoard, { type Coordinate } from './TetrisBoard';
 import Block from './Block';
 import { pieces } from './pieces';
 import BezierEasing from 'bezier-easing';
-import { random } from 'lodash';
-
-const moveEase = BezierEasing(0.16, 0.89, 0.27, 1);
-
-// TODO Replace actual random block with shuffled array of indexes to make it feel more random to player
+import { shuffle } from 'lodash';
 
 export default class Tetromino {
   board: TetrisBoard;
@@ -18,9 +14,9 @@ export default class Tetromino {
   currentY: number;
   hasHardDropped = false;
 
-  constructor(board: TetrisBoard) {
+  constructor(board: TetrisBoard, shouldResetPieceQueue = false) {
     this.board = board;
-    this.shapeIndex = random(0, pieces.length - 1);
+    this.shapeIndex = getRandomPiece(shouldResetPieceQueue);
 
     const { shape } = pieces[this.shapeIndex];
 
@@ -281,5 +277,27 @@ export default class Tetromino {
     });
   }
 }
+
+const moveEase = BezierEasing(0.16, 0.89, 0.27, 1);
+
+const getRandomPiece = (() => {
+  let pieceIndexes: number[] = [];
+
+  return (shouldResetQueue = false) => {
+    if (!pieceIndexes.length || shouldResetQueue) {
+      const indexes = Array.from(Array(pieces.length).keys());
+
+      // Use 14-bag to add a little extra randomness
+      indexes.push(...indexes);
+
+      // Give player a chance to get an extra line piece
+      if (Math.random() < 0.3) indexes.push(0);
+
+      pieceIndexes = shuffle(indexes);
+    }
+
+    return pieceIndexes.pop() ?? 0;
+  };
+})();
 
 export type Shape = Nullable<Block>[][];
