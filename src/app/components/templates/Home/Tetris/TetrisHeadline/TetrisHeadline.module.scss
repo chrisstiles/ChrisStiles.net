@@ -2,6 +2,8 @@
 /* Tetris Headline */
 /* --------------------------- */
 
+@use 'app';
+
 .wrapper {
   text-align: center;
   display: flex;
@@ -35,17 +37,17 @@
 }
 
 .previewWrapper {
-  --block-size: 12px;
-  --block-offset: 2px;
+  --size: 12px;
+  --offset: 2px;
 
   position: relative;
   padding-left: 20px;
   padding-left: calc(
-    (var(--block-size) + var(--block-offset)) * var(--cols, 3)
+    (var(--size) + var(--offset)) * var(--cols, 3) - var(--offset)
   );
 
   &.linePiece {
-    --block-size: 11px;
+    --size: 11px;
   }
 }
 
@@ -53,16 +55,38 @@
   margin-left: 10px;
 
   &:after {
+    --cursor-width: 2px;
     content: '';
     line-height: 0;
-    height: 1em;
-    width: 1px;
+    height: 0.85em;
+    width: var(--cursor-width);
+    margin: 0 calc(var(--cursor-width) * -1 - 2px) 0 2px;
     display: inline-block;
-    margin-left: 1px;
-    vertical-align: middle;
+    vertical-align: bottom;
     background: currentColor;
-    margin-top: -3px;
+    position: relative;
+    top: -2px;
     animation: blink 0.75s step-end infinite;
+
+    @at-root .typing & {
+      animation: none !important;
+    }
+
+    @at-root :global(.gamePaused) & {
+      visibility: hidden;
+    }
+
+    @include app.retina {
+      --cursor-width: 1.5px;
+    }
+  }
+
+  &:empty {
+    margin-left: 6px;
+
+    @at-root .linePiece & {
+      margin-left: 8px;
+    }
   }
 
   @keyframes blink {
@@ -96,7 +120,7 @@
 }
 
 .blockRow {
-  margin-bottom: var(--block-offset);
+  margin-bottom: var(--offset);
   display: inline-flex;
 
   &:last-child {
@@ -105,10 +129,10 @@
 }
 
 .block {
-  width: var(--block-size);
-  height: var(--block-size);
+  width: var(--size);
+  height: var(--size);
   border-radius: 2px;
-  margin-right: var(--block-offset);
+  margin-right: var(--offset);
 
   &:last-child {
     margin-right: 0;

@@ -5,6 +5,7 @@ import TetrisHeadline from './TetrisHeadline';
 import useIsVisible from '@hooks/useIsVisible';
 import { useGlobalState } from '@templates/Home';
 import { Section } from '@elements';
+import classNames from 'classnames';
 
 export default function Tetris() {
   const canvas = useRef<HTMLCanvasElement>(null);
@@ -26,7 +27,9 @@ export default function Tetris() {
     <Section className={styles.wrapper}>
       <div
         ref={ref}
-        className={styles.content}
+        className={classNames(styles.content, {
+          gamePaused: game.isPaused
+        })}
       >
         <TetrisHeadline preview={game.preview} />
         <canvas

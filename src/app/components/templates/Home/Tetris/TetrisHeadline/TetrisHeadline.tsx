@@ -23,33 +23,38 @@ export default function TetrisHeadline({ preview }: TetrisHeadlineProps) {
 }
 
 function PieceLabel({ preview }: TetrisHeadlineProps) {
-  const hasRendered = useHasRendered();
-  const isLinePiece = preview.piece.shapeIndex === 0;
+  const { piece, shape, color, label, currentLabel } = preview;
 
-  const shape = useMemo(() => {
+  const hasRendered = useHasRendered();
+  const isLinePiece = piece.shapeIndex === 0;
+
+  const icon = useMemo(() => {
     // Display line piece vertically
-    const shape = !isLinePiece ? preview.shape : [['■'], ['■'], ['■'], ['■']];
+    if (isLinePiece) return [['■'], ['■'], ['■'], ['■']];
 
     return shape
       .filter(row => row.some(value => !!value))
       .map(row => row.slice());
-  }, [preview, isLinePiece]);
+  }, [shape, isLinePiece]);
+
+  const isTyping = currentLabel && currentLabel !== label;
 
   return !hasRendered ? (
     <>optimized</>
   ) : (
     <span
       className={classNames(styles.previewWrapper, {
-        [styles.linePiece]: isLinePiece
+        [styles.linePiece]: isLinePiece,
+        [styles.typing]: isTyping
       })}
       style={{
-        '--cols': shape[0].length,
-        color: hasRendered ? preview.color : undefined
+        '--cols': icon[0].length,
+        color: hasRendered ? color : undefined
       }}
       aria-hidden="true"
     >
       <span className={styles.piece}>
-        {shape.map((row, rowIndex) => (
+        {icon.map((row, rowIndex) => (
           <span
             key={rowIndex}
             className={styles.blockRow}
@@ -65,7 +70,7 @@ function PieceLabel({ preview }: TetrisHeadlineProps) {
           </span>
         ))}
       </span>{' '}
-      <span className={styles.label}>{preview.currentLabel}</span>
+      <span className={styles.label}>{currentLabel}</span>
     </span>
   );
 }
