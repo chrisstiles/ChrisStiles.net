@@ -1,8 +1,8 @@
 import {
   memo,
   useState,
-  useEffect,
   useMemo,
+  useRef,
   useId,
   type ReactNode,
   type ChangeEvent,
@@ -35,26 +35,26 @@ export default memo(function TextField({
 }: FieldProps) {
   const id = useId();
   const [hasBlurred, setHasBlurred] = useState(false);
-  const [hasInput, setHasInput] = useState(false);
+  const hasInput = useRef(false);
+
+  if (value && !hasInput.current) {
+    hasInput.current = true;
+  }
+
   const Component = type === 'textarea' ? 'textarea' : 'input';
   const hasServerError = !!error?.trim();
   const isValid = validationState.value && !hasServerError;
-  const hasInteracted = hasBlurred && hasInput;
+  const hasInteracted = hasBlurred && hasInput.current;
   const shouldShowInvalid =
     !isValid &&
     ((hasInteracted && (required || !!value.trim())) || forceShowValidation);
+
   const errorMessage = useMemo(() => {
-    return isValid || ((!hasBlurred || !hasInput) && !forceShowValidation)
+    return isValid ||
+      ((!hasBlurred || !hasInput.current) && !forceShowValidation)
       ? null
       : error ?? validationState.message;
-  }, [
-    isValid,
-    hasBlurred,
-    hasInput,
-    forceShowValidation,
-    error,
-    validationState
-  ]);
+  }, [isValid, hasBlurred, forceShowValidation, error, validationState]);
 
   const props = {
     id: `${id}-input`,
@@ -70,7 +70,7 @@ export default memo(function TextField({
     },
     onBlur: (e: FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       handleChange(value, name);
-      if (hasInput) setHasBlurred(true);
+      if (hasInput.current) setHasBlurred(true);
       handleBlur?.(e);
     },
     'aria-invalid': shouldShowInvalid,
@@ -78,12 +78,6 @@ export default memo(function TextField({
       shouldShowInvalid && errorMessage ? `${id}-error` : undefined,
     ...restProps
   };
-
-  useEffect(() => {
-    if (!!value) {
-      setHasInput(true);
-    }
-  }, [value]);
 
   return (
     <div

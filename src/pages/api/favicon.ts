@@ -10,7 +10,9 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  let { url, fallback = null, size = 96 } = req.query;
+  const { fallback = null } = req.query;
+  let { url, size = 96 } = req.query;
+
   if (!url) return res.json({ url: fallback, isFallback: true });
 
   if (Array.isArray(url)) url = url[0];
@@ -69,7 +71,9 @@ async function isDarkIcon(response: Response) {
     const content = await response.arrayBuffer();
     const color = await getAverageColor(Buffer.from(content));
     return new TinyColor(color.hex).getBrightness() <= 100;
-  } catch {}
+  } catch {
+    // Ignore error and default to light icon
+  }
 
   return false;
 }

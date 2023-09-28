@@ -72,7 +72,7 @@ const Autocomplete = memo(
               const letters = text.split('');
               let matchedText = '';
 
-              for (let letter of letters) {
+              for (const letter of letters) {
                 if (!typedText.startsWith(matchedText + letter)) {
                   break;
                 }

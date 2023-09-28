@@ -38,7 +38,6 @@ export function sleep(
     if (ignoreGlobalTimeline) {
       setTimeout(resolve, ms);
     } else {
-      // gsap.delayedCall(ms / 1000, resolve);
       const delay = ms / 1000;
 
       if (timeline) {
@@ -109,7 +108,7 @@ export function isSafari() {
   if (isSSR()) return false;
 
   cachedIsSafari ??=
-    !window.hasOwnProperty('chrome') && /Safari/i.test(navigator.userAgent);
+    !('chrome' in window) && /Safari/i.test(navigator.userAgent);
 
   return !!cachedIsSafari;
 }

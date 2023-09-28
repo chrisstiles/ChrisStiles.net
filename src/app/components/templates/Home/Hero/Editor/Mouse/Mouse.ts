@@ -96,7 +96,7 @@ export default class Mouse {
       this.animation = null;
     }
 
-    let { duration, onUpdate, onComplete, delay } = opts;
+    const { onUpdate, onComplete, delay } = opts;
 
     if (!el) {
       return Promise.reject('Element not found');
@@ -162,6 +162,8 @@ export default class Mouse {
       });
 
       this.updatePosition();
+
+      let { duration } = opts;
 
       if (duration === undefined) {
         const velocity = 430;
@@ -318,7 +320,6 @@ export default class Mouse {
   }
 
   // Animates mouse to a tab and clicks it
-  // async clickTab(language: Language, hideOnComplete = true) {
   async clickTab(language: Language, opts: AnimationOptions = {}) {
     const tab = this.getTab(language);
 

@@ -50,12 +50,10 @@ export default memo(function ProjectFeatures() {
         const isRunning = animation.current?.isActive();
         if (isRunning) animation.current?.kill();
 
-        let distance = elements.reduce((offset, el) => {
+        const distance = elements.reduce((offset, el) => {
           const width = el.clientWidth;
-          gsap.set(el, {
-            x: offset,
-            left: -offset
-          });
+
+          gsap.set(el, { x: offset, left: -offset });
 
           if (width > maxChildWidth) {
             maxChildWidth = width;

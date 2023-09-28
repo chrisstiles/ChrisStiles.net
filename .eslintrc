@@ -1,10 +1,17 @@
 {
-  "extends": ["plugin:import/recommended", "next/core-web-vitals"],
+  "extends": [
+    "plugin:import/recommended",
+    "eslint:recommended",
+    "next/core-web-vitals"
+  ],
   "plugins": ["import", "@typescript-eslint"],
   "rules": {
-    "import/no-named-as-default": 0,
-    "no-unused-vars": 0,
-    "@typescript-eslint/no-unused-vars": 1,
+    "import/no-named-as-default": "off",
+    "@typescript-eslint/no-unused-vars": "warn",
+    "no-unused-vars": "off",
+    "no-unexpected-multiline": "off",
+    "no-async-promise-executor": "off",
+    "no-useless-escape": "off",
     "import/order": [
       1,
       {
@@ -62,5 +69,34 @@
         "pathGroupsExcludedImportTypes": ["type", "@global**"]
       }
     ]
-  }
+  },
+  "overrides": [
+    {
+      // Override recommended rules based on
+      // what is already handled by TypeScript
+      "files": ["*.ts", "*.tsx", "*.mts", "*.cts"],
+      "rules": {
+        "constructor-super": "off",
+        "getter-return": "off",
+        "no-const-assign": "off",
+        "no-dupe-args": "off",
+        "no-dupe-class-members": "off",
+        "no-dupe-keys": "off",
+        "no-func-assign": "off",
+        "no-import-assign": "off",
+        "no-new-symbol": "off",
+        "no-obj-calls": "off",
+        "no-redeclare": "off",
+        "no-setter-return": "off",
+        "no-this-before-super": "off",
+        "no-undef": "off",
+        "no-unreachable": "off",
+        "no-unsafe-negation": "off",
+        "no-var": "error",
+        "prefer-const": "error",
+        "prefer-rest-params": "error",
+        "prefer-spread": "error"
+      }
+    }
+  ]
 }

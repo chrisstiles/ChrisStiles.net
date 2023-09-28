@@ -20,6 +20,7 @@
   font-feature-settings: 'salt';
   border-radius: 6px;
   position: relative;
+  user-select: none;
 
   &:hover {
     background-color: #ffe983;

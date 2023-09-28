@@ -122,7 +122,7 @@ export default memo(function PublishDateWidget() {
           try {
             const apiUrl = `/api/favicon?url=${url.hostname}`;
             const res = await fetch(apiUrl);
-            let favicon = await res.json();
+            const favicon = await res.json();
 
             updateFavicon(favicon);
             callback?.(favicon);
