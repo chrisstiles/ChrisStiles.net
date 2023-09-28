@@ -1,9 +1,8 @@
 import { memo, type ReactNode } from 'react';
 import styles from './Header.module.scss';
 import Navigation from '../Navigation';
-import BoundingBox from '../BoundingBox';
-import Content from '@elements/Content';
 import Logo from '@images/logo.svg';
+import { Content, BoundingBox } from '@elements';
 
 export default function Header({ bullets, showBoundingBox }: HeaderProps) {
   return (

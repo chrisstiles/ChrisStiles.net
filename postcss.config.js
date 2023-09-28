@@ -5,13 +5,13 @@ const prodOnlyPlugins =
         'postcss-pxtorem': {
           rootValue: 19,
           selectorBlackList: [/^html$/]
-        }
+        },
+        'postcss-logical': {}
       };
 
 module.exports = {
   plugins: {
     ...prodOnlyPlugins,
-    'postcss-logical': {},
     'postcss-flexbugs-fixes': {},
     'postcss-font-variant': {},
     'postcss-preset-env': {

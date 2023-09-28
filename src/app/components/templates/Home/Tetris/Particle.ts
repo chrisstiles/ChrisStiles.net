@@ -4,7 +4,8 @@ export default class Particle {
   board: TetrisBoard;
   x: number;
   y: number;
-  r: number;
+  radius: number;
+  baseSize: number;
   opacity = 1;
   color = '#fff';
 
@@ -12,14 +13,16 @@ export default class Particle {
     board: TetrisBoard,
     x: number,
     y: number,
-    r: number,
+    baseSize: number,
+    radius: number,
     opacity = 1,
     color = '#fff'
   ) {
     this.board = board;
     this.x = x;
     this.y = y;
-    this.r = r;
+    this.baseSize = baseSize;
+    this.radius = radius;
     this.color = color;
     this.opacity = opacity;
   }
@@ -30,7 +33,7 @@ export default class Particle {
 
     ctx.globalAlpha = this.opacity;
     ctx.beginPath();
-    ctx.arc(this.x, this.y, this.r, 0, 2 * Math.PI);
+    ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
     ctx.fillStyle = this.color;
     ctx.fill();
     ctx.globalAlpha = 1;

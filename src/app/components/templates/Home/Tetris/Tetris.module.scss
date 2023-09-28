@@ -9,8 +9,7 @@
 .content {
   width: calc(100% + var(--grid-offset) * 2);
   margin-left: calc(var(--grid-offset) * -1);
-  margin-top: 60px;
-  overflow: hidden;
+  margin-top: 10px;
 }
 
 .canvas {

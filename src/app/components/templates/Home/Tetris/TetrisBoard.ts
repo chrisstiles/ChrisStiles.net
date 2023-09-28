@@ -25,6 +25,7 @@ export default class TetrisBoard {
   blockSize = 0;
   offset = 1.8;
   grid: TetrisGrid = [];
+  trails: Trail[] = [];
   timeline = gsap.timeline({ autoRemoveChildren: true });
   clearedRows = 0;
   dropInterval = 1100 / 1000;
@@ -125,7 +126,16 @@ export default class TetrisBoard {
   }
 
   setState(state: Partial<GameState> = {}) {
-    this._state = { ...this._state, ...state };
+    this._state = {
+      ...this._state,
+      isPlaying: this.isPlaying,
+      isPaused: this.isPaused,
+      isGameOver: this.isGameOver,
+      isGameActive: this.isGameActive,
+      isBotPlaying: this.isBotPlaying,
+      ...state
+    };
+
     return this._state;
   }
 
@@ -472,6 +482,8 @@ export default class TetrisBoard {
     canvas.style.height = `${height}px`;
     ctx.scale(this.blockSize, this.blockSize - gridLineWidth);
 
+    this.trails.forEach(t => t.refreshParticleSizes());
+
     this.draw();
   }
 
@@ -495,8 +507,6 @@ export default class TetrisBoard {
   isOccupied(x: number, y: number) {
     return !this.grid[y] || !!this.grid[y][x];
   }
-
-  trails: Trail[] = [];
 
   hardDrop() {
     if (!this.piece || this.piece.hasHardDropped) return;
@@ -599,5 +609,9 @@ export type Coordinate = {
 
 type GameState = {
   isPlaying: boolean;
+  isPaused: boolean;
+  isGameOver: boolean;
+  isGameActive: boolean;
+  isBotPlaying: boolean;
   preview: PiecePreview;
 };

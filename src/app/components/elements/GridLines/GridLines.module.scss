@@ -65,12 +65,14 @@
 }
 
 .bar {
+  --circle-size: 8px;
+
   position: absolute;
   color: var(--grid-line-color);
   display: block;
   inset: 0;
   padding: 0 7px;
-  height: 2.5px;
+  height: 2px;
 
   &:before {
     content: '';
@@ -81,11 +83,10 @@
   }
 
   span {
-    $size: 7px;
     content: '';
     position: absolute;
-    width: $size;
-    height: $size;
+    width: var(--circle-size);
+    height: var(--circle-size);
     top: 50%;
     transform: translate(-50%, -50%);
     border-radius: 50%;
@@ -97,6 +98,22 @@
 
     &:last-child {
       left: 100%;
+    }
+  }
+
+  @include app.retina {
+    --circle-size: 7px;
+
+    height: 2.5px;
+
+    span {
+      &:first-child {
+        margin-left: 0.5px;
+      }
+
+      &:last-child {
+        margin-left: -0.5px;
+      }
     }
   }
 }

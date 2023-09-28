@@ -1,6 +1,6 @@
 import { useMemo, memo, type ReactNode } from 'react';
 import styles from './Headline.module.scss';
-import BoundingBox from '../../BoundingBox';
+import { BoundingBox } from '@elements';
 import classNames from 'classnames';
 
 const fullText = 'Good ideas need great developers';

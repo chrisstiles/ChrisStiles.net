@@ -1,5 +1,6 @@
 export { Content, type ContentProps } from './Content';
 export { Section, type SectionProps } from './Section';
+export { default as BoundingBox } from './BoundingBox';
 export { Button, LinkButton } from './Button';
 export { default as Spinner } from './Spinner';
 export { default as GridLines, Grid, GridDivider } from './GridLines';

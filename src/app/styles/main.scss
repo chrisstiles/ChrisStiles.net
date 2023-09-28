@@ -86,23 +86,23 @@ h2 {
 }
 
 h1 {
-  font-size: 69px;
+  font-size: var(--h1-size);
   font-weight: 800;
 }
 
 h2 {
-  font-size: 37px;
+  font-size: var(--h2-size);
 }
 
 h3 {
-  font-size: 24px;
+  font-size: var(--h3-size);
   font-weight: 500;
   margin-bottom: 0.68em;
 }
 
 h4 {
   font-weight: 500;
-  font-size: 18px;
+  font-size: var(--h4-size);
 }
 
 p {

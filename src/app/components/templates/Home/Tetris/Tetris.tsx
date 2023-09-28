@@ -28,10 +28,15 @@ export default function Tetris() {
       <div
         ref={ref}
         className={classNames(styles.content, {
-          gamePaused: game.isPaused
+          'game-paused': game.isPaused,
+          'game-over': game.isGameOver
         })}
       >
-        <TetrisHeadline preview={game.preview} />
+        <TetrisHeadline
+          preview={game.preview}
+          isGameOver={game.isGameOver}
+          isBotPlaying={game.isBotPlaying}
+        />
         <canvas
           tabIndex={-1}
           ref={canvas}

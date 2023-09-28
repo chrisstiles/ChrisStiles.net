@@ -47,9 +47,9 @@ export default class TetrisBot {
       }
 
       if (!isDoneMoving) {
-        // const test = 'sad';
         const didMove = piece.move(direction);
-        await this.board.wait(60, 85);
+        await this.board.wait(45, 70);
+
         x = piece.x;
         isDoneMoving = x === bestMove.x;
 

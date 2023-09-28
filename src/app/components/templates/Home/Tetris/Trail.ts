@@ -82,6 +82,10 @@ export default class Trail {
     if (!this._hasRendered) this.init();
     this._trailLines.forEach(l => l.draw());
   }
+
+  refreshParticleSizes() {
+    this._trailLines.forEach(l => l.refreshParticleSizes());
+  }
 }
 
 class TrailLine {
@@ -138,12 +142,8 @@ class TrailLine {
     const numParticles = Math.ceil((baseNumParticles * height) / baseHeight);
 
     for (let i = 0; i < numParticles; i++) {
-      const radius = random(
-        this.board.pxToCanvas(1),
-        this.board.pxToCanvas(3.5),
-        true
-      );
-
+      const baseSize = random(1, 3.5, true);
+      const radius = this.board.pxToCanvas(baseSize);
       const particleColor = color.brighten(30).toString();
       const y2 = y + height;
 
@@ -152,6 +152,7 @@ class TrailLine {
           this.board,
           random(x + radius, x + width - radius, true),
           weightedRandom(y + y2 * 0.2, y2 - radius * 2),
+          baseSize,
           radius,
           random(0.1, 0.6),
           particleColor
@@ -160,6 +161,12 @@ class TrailLine {
     }
 
     this.animate = this.animate.bind(this);
+  }
+
+  refreshParticleSizes() {
+    this._particles.forEach(p => {
+      p.radius = this.board.pxToCanvas(p.baseSize);
+    });
   }
 
   async animate() {

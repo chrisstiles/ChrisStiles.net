@@ -9,31 +9,34 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 2px;
-
-  h2 {
-    font-weight: 400;
-    font-size: 24px;
-    color: var(--body-text-color);
-  }
+  margin-bottom: 35px;
+  font-size: var(--h2-size);
 
   &.hidden {
     visibility: hidden;
   }
 }
 
+.eyebrow {
+  font-size: max(0.5em, 18px);
+  margin-bottom: 0;
+  color: var(--green-accent-color);
+}
+
 .content {
-  margin-top: 20px;
-  padding: 23px 35px 25px 35px;
-  border: 2px solid var(--grid-line-color);
+  --text-spacing: 25px;
+
   display: inline-block;
+  margin-top: -5px;
   color: #fff;
-  font-size: 37px;
-  line-height: 1;
+  font-weight: 500;
+  font-size: inherit;
+  line-height: 1.2;
 }
 
 .text {
-  margin-right: 8px;
+  display: inline-block;
+  margin-top: var(--text-spacing);
 }
 
 .previewWrapper {
@@ -41,7 +44,10 @@
   --offset: 2px;
 
   position: relative;
+  display: inline-block;
   padding-left: 20px;
+  margin: var(--text-spacing) 8px 0 8px;
+  line-height: 1;
   padding-left: calc(
     (var(--size) + var(--offset)) * var(--cols, 3) - var(--offset)
   );
@@ -52,15 +58,17 @@
 }
 
 .label {
-  margin-left: 10px;
+  margin-left: 19px;
+  position: relative;
 
   &:after {
     --cursor-width: 2px;
+
     content: '';
     line-height: 0;
     height: 0.85em;
     width: var(--cursor-width);
-    margin: 0 calc(var(--cursor-width) * -1 - 2px) 0 2px;
+    margin: 0 calc(var(--cursor-width) * -1 + 2px) 0 2px;
     display: inline-block;
     vertical-align: bottom;
     background: currentColor;
@@ -72,8 +80,12 @@
       animation: none !important;
     }
 
-    @at-root :global(.gamePaused) & {
+    @at-root :global(.game-paused) & {
       visibility: hidden;
+    }
+
+    @at-root .hideCursor & {
+      display: none;
     }
 
     @include app.retina {
@@ -81,11 +93,9 @@
     }
   }
 
-  &:empty {
-    margin-left: 6px;
-
-    @at-root .linePiece & {
-      margin-left: 8px;
+  &.empty {
+    &:after {
+      left: 5px;
     }
   }
 
@@ -101,6 +111,14 @@
     100% {
       opacity: 1;
     }
+  }
+}
+
+.boundingBox {
+  inset: 3px -8px -1px -7px;
+
+  @at-root .empty & {
+    right: -20px;
   }
 }
 
@@ -141,4 +159,8 @@
   &.filled {
     background-color: currentColor;
   }
+}
+
+.divider {
+  margin-bottom: 2px;
 }

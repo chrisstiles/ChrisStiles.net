@@ -9,11 +9,9 @@ $handleOffset: -$handleSize / 2;
 
 .box {
   $offset: -12px;
+
   position: absolute;
-  top: $offset + 3px;
-  right: $offset;
-  bottom: $offset - 3px;
-  left: $offset;
+  inset: $offset + 3px $offset $offset - 3px $offset;
   border: 1px solid #2aa5fc;
   pointer-events: none;
   transform-origin: 2px 2px;

@@ -60,13 +60,14 @@ export function GridDivider({
   columns,
   className,
   barColor,
-  outlineColor,
+  showOutline = true,
+  outlineColor = 'var(--page-background-color)',
   offsetLeft,
   offsetRight
 }: GridDividerProps) {
   const circleStyle = {
     backgroundColor: barColor,
-    boxShadow: outlineColor ? `0 0 0 3px ${outlineColor}` : undefined
+    boxShadow: showOutline ? `0 0 0 3px ${outlineColor}` : undefined
   };
 
   return (
@@ -103,6 +104,7 @@ type GridDividerProps = {
   className?: string;
   barColor?: string;
   outlineColor?: string;
+  showOutline?: boolean;
   offsetLeft?: string | number;
   offsetRight?: string | number;
 };

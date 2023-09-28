@@ -84,7 +84,7 @@ export default class PiecePreview {
 
 const labels = shuffle([
   'optimized',
-  'cross-browser compatible',
+  'cross-browser',
   'accessible',
   'fast',
   'easy to use',

@@ -2,27 +2,44 @@ import { useMemo } from 'react';
 import styles from './TetrisHeadline.module.scss';
 import PiecePreview from '../PiecePreview';
 import useHasRendered from '@hooks/useHasRendered';
+import { GridDivider, BoundingBox } from '@elements';
 import classNames from 'classnames';
 
-export default function TetrisHeadline({ preview }: TetrisHeadlineProps) {
+export default function TetrisHeadline({
+  preview,
+  isGameOver
+}: TetrisHeadlineProps) {
   const hasRendered = useHasRendered();
 
+  // After a game over we finish typing the current label. To avoid a shift
+  // in the label width, we hide the caret after the second to last character
+  const shouldHideCursor =
+    isGameOver && preview.currentLabel.length >= preview.label.length - 1;
+
   return (
-    <div
-      className={classNames(styles.wrapper, {
-        [styles.hidden]: !hasRendered
-      })}
-    >
-      <h2>Making modern applications is hard</h2>
-      <h3 className={styles.content}>
-        <span className={styles.text}>Your website has to be</span>{' '}
-        <PieceLabel preview={preview} />
-      </h3>
-    </div>
+    <>
+      <div
+        className={classNames(styles.wrapper, {
+          [styles.hidden]: !hasRendered,
+          [styles.hideCursor]: shouldHideCursor
+        })}
+      >
+        <p className={styles.eyebrow}>Making modern applications is hard</p>
+        <h2 className={styles.content}>
+          <span className={styles.text}>Your website has to&nbsp;be</span>{' '}
+          <PieceLabel preview={preview} />
+        </h2>
+      </div>
+      <GridDivider
+        className={styles.divider}
+        offsetLeft={0}
+        offsetRight="calc(var(--grid-offset) * -2)"
+      />
+    </>
   );
 }
 
-function PieceLabel({ preview }: TetrisHeadlineProps) {
+function PieceLabel({ preview }: PiecePreviewProps) {
   const { piece, shape, color, label, currentLabel } = preview;
 
   const hasRendered = useHasRendered();
@@ -51,7 +68,8 @@ function PieceLabel({ preview }: TetrisHeadlineProps) {
         '--cols': icon[0].length,
         color: hasRendered ? color : undefined
       }}
-      aria-hidden="true"
+      // aria-hidden="true"
+      aria-live="polite"
     >
       <span className={styles.piece}>
         {icon.map((row, rowIndex) => (
@@ -70,11 +88,27 @@ function PieceLabel({ preview }: TetrisHeadlineProps) {
           </span>
         ))}
       </span>{' '}
-      <span className={styles.label}>{currentLabel}</span>
+      <span
+        className={classNames(styles.label, {
+          [styles.empty]: !currentLabel
+        })}
+      >
+        {currentLabel}
+        <BoundingBox
+          className={styles.boundingBox}
+          isVisible
+        />
+      </span>
     </span>
   );
 }
 
 type TetrisHeadlineProps = {
+  preview: PiecePreview;
+  isGameOver: boolean;
+  isBotPlaying: boolean;
+};
+
+type PiecePreviewProps = {
   preview: PiecePreview;
 };
