@@ -5,9 +5,11 @@ import type { ReactNode } from 'react';
 export default function Layout({
   title = 'Chris Stiles',
   description = 'Full stack software engineer and UI/UX designer',
+  pageClassName,
   children,
   header,
-  wrapMainContent = true
+  wrapMainContent = true,
+  showFooter = true
 }: LayoutProps) {
   return (
     <>
@@ -18,11 +20,18 @@ export default function Layout({
           content={description}
         />
       </Head>
-      {header}
-      {!wrapMainContent ? children : <main id="main">{children}</main>}
-      <footer id="footer">
-        <Content>© {new Date().getFullYear()} Chris Stiles</Content>
-      </footer>
+      <div
+        id="page-wrapper"
+        className={pageClassName}
+      >
+        {header}
+        {!wrapMainContent ? children : <main id="main">{children}</main>}
+        {showFooter && (
+          <footer id="footer">
+            <Content>© {new Date().getFullYear()} Chris Stiles</Content>
+          </footer>
+        )}
+      </div>
     </>
   );
 }
@@ -30,7 +39,9 @@ export default function Layout({
 type LayoutProps = {
   title?: string;
   description?: string;
+  pageClassName?: string;
   children?: ReactNode;
   header?: React.ReactNode;
   wrapMainContent?: boolean;
+  showFooter?: boolean;
 };

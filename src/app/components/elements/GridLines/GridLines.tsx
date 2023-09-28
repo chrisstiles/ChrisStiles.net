@@ -1,6 +1,6 @@
 import { memo, type HTMLProps } from 'react';
 import styles, { gridNumColumns } from './GridLines.module.scss';
-import { Content } from '@elements';
+import { Content, Line } from '@elements';
 import classNames from 'classnames';
 
 export const numColumns = parseInt(gridNumColumns);
@@ -16,37 +16,16 @@ export default memo(function GridLines({
       className={classNames('grid-line', styles.line)}
     >
       {index === 0 && (
-        <svg
-          viewBox="0 0 1 1"
-          preserveAspectRatio="none"
+        <Line
+          color={solidColor}
           className={styles.solid}
-        >
-          <line
-            x1="0.5"
-            y1="0"
-            x2="0.5"
-            y2="1"
-            stroke={solidColor}
-            strokeWidth="1"
-            vectorEffect="non-scaling-stroke"
-          />
-        </svg>
-      )}
-      <svg
-        viewBox="0 0 1 1"
-        preserveAspectRatio="none"
-      >
-        <line
-          x1="0.5"
-          y1="0"
-          x2="0.5"
-          y2="1"
-          stroke={dashColor}
-          strokeWidth="1"
-          strokeDasharray="6 10"
-          vectorEffect="non-scaling-stroke"
+          isSolid
         />
-      </svg>
+      )}
+      <Line
+        color={dashColor}
+        className={styles.dash}
+      />
     </div>
   ));
 

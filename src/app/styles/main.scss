@@ -52,6 +52,17 @@ body {
   position: relative;
 }
 
+#page-wrapper {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+
+  > main {
+    flex-grow: 1;
+  }
+}
+
 h1,
 h2,
 h3,
@@ -120,6 +131,11 @@ button {
   color: #fff;
 }
 
+#squircle-mask {
+  position: absolute;
+  pointer-events: none;
+}
+
 #footer {
   height: 60px;
   display: flex;
@@ -128,6 +144,7 @@ button {
   font-weight: 600;
   letter-spacing: 0.03em;
   color: #fff;
+  margin-top: auto;
 }
 
 #icon-sprites {

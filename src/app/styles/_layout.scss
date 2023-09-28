@@ -7,6 +7,7 @@
 :root {
   --content-width: 1460px;
   --content-padding: 50px;
+  --section-padding: 100px;
 }
 
 @media (width <= app.bp(xl)) {

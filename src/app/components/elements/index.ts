@@ -10,4 +10,5 @@ export {
 } from './TextField';
 export { default as ContactForm, type FormFieldName } from './ContactForm';
 export { default as ContactModal } from './ContactModal';
+export { default as Line } from './Line';
 export * from './Heading';

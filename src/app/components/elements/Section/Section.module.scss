@@ -3,7 +3,7 @@
 /* --------------------------- */
 
 .wrapper {
-  padding-top: 100px;
-  padding-bottom: 100px;
+  padding-top: var(--section-padding);
+  padding-bottom: var(--section-padding);
   position: relative;
 }

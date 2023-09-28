@@ -1,0 +1,104 @@
+/* --------------------------- */
+/* Page Not Found  */
+/* --------------------------- */
+
+@use 'sass:list';
+
+.wrapper {
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  text-align: center;
+  display: grid;
+  grid-template-rows: 1fr 1px 1fr;
+  row-gap: 50px;
+  padding: 40px 0;
+}
+
+.top,
+.bottom {
+  padding-left: var(--content-padding);
+  padding-right: var(--content-padding);
+}
+
+.top {
+  align-self: flex-end;
+}
+
+.title {
+  color: var(--green-accent-color);
+  margin-bottom: 30px;
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.bottom {
+  align-self: center;
+}
+
+.icon {
+  display: block;
+  width: 430px;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
+.circles {
+  --base-size: 380px;
+  --size-increment: 250px;
+
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  inset: 0;
+  overflow: hidden;
+
+  @media (width <= 1000px) {
+    --base-size: 280px;
+    --size-increment: 200px;
+  }
+
+  @media (width <= 640px) {
+    --base-size: 160px;
+    --size-increment: 150px;
+  }
+
+  @media (width <= 470px) {
+    --base-size: 120px;
+    --size-increment: 110px;
+  }
+}
+
+.circle {
+  background: red;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+
+  $colors: #2a3046, #24293f, #22263d, #202439;
+
+  @for $i from 1 through list.length($colors) {
+    &:nth-child(#{$i}) {
+      --size: calc(var(--base-size) + (var(--size-increment) * #{$i - 1}));
+
+      width: var(--size);
+      height: var(--size);
+      z-index: -$i;
+      background-color: list.nth($colors, $i);
+    }
+  }
+}
+
+.text {
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin: -10px 0 40px 0;
+  line-height: 1.4;
+
+  @media (width <= 760px) {
+    font-size: 1.3rem;
+  }
+}
