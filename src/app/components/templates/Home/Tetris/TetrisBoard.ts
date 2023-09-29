@@ -14,7 +14,7 @@ import type { RefObject } from 'react';
 export default class TetrisBoard {
   piece: Nullable<Tetromino> = null;
   preview: PiecePreview;
-  nextPiece: Tetromino;
+  pieceQueue: Tetromino[];
   bot: TetrisBot;
   isBotPlaying = true;
   isGameActive = false;
@@ -40,10 +40,12 @@ export default class TetrisBoard {
   private _isVisible = false;
   private _isDestroyed = false;
   private _animatingRows: Nullable<Block>[][] = [];
+  private _numQueuedPieces: number;
 
-  constructor(canvas: RefObject<HTMLCanvasElement>) {
+  constructor(canvas: RefObject<HTMLCanvasElement>, numQueuedPieces = 3) {
     this._canvas = canvas;
     this.bot = new TetrisBot(this);
+    this._numQueuedPieces = numQueuedPieces;
 
     this.subscribe = this.subscribe.bind(this);
     this.getState = this.getState.bind(this);
@@ -61,7 +63,12 @@ export default class TetrisBoard {
 
     // Have to manually assign state so Typescript doesn't complain
     this._state = this.setState();
-    this.nextPiece = new Tetromino(this);
+
+    this.pieceQueue = Array.from(
+      { length: numQueuedPieces },
+      (_, i) => new Tetromino(this, i === 0)
+    );
+
     this.preview = new PiecePreview(this, this.nextPiece);
 
     // TESTING
@@ -86,6 +93,10 @@ export default class TetrisBoard {
 
   get isVisible() {
     return this._isVisible;
+  }
+
+  get nextPiece() {
+    return this.pieceQueue[0];
   }
 
   set isVisible(value: boolean) {
@@ -194,7 +205,6 @@ export default class TetrisBoard {
 
     this.isGameOver = true;
     this.piece = null;
-    this.nextPiece = new Tetromino(this);
     this.isGameActive = false;
     this.isPaused = false;
     this.isBotPlaying = false;
@@ -226,8 +236,15 @@ export default class TetrisBoard {
     shouldEmitChange = true,
     shouldResetPieceQueue = false
   ) {
-    const piece = this.nextPiece;
-    this.nextPiece = new Tetromino(this, shouldResetPieceQueue);
+    if (shouldResetPieceQueue) {
+      this.pieceQueue = Array.from(
+        { length: this._numQueuedPieces },
+        (_, i) => new Tetromino(this, i === 0)
+      );
+    }
+
+    const piece = this.pieceQueue.shift() ?? new Tetromino(this);
+    this.pieceQueue.push(new Tetromino(this));
 
     if (!this.isValidMove(piece.x, piece.y, piece.shape)) {
       this.setGameOverPiece(piece);
@@ -447,7 +464,6 @@ export default class TetrisBoard {
     piece.currentY = piece.y;
 
     this.piece = piece;
-    this.nextPiece = piece;
 
     this.freezePiece();
     this.draw();
