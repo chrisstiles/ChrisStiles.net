@@ -1,5 +1,5 @@
 import TetrisBoard from './TetrisBoard';
-import Tetromino from './Tetromino';
+import Tetromino, { type Shape } from './Tetromino';
 
 export default class TetrisBot {
   board: TetrisBoard;
@@ -21,12 +21,14 @@ export default class TetrisBot {
     const bestMove = this.getBestMove(piece);
     if (!bestMove) return false;
 
-    const { shape } = bestMove;
+    const { shape, rotateX } = bestMove;
     const direction = bestMove.x > piece.x ? 'right' : 'left';
+    const hasRotateXPosition = rotateX !== null;
+    const canRotate = piece.maxRotations > 0 && !piece.isSameShape(shape);
 
     let { x } = piece;
-    let isDoneRotating = piece.maxRotations === 0 || piece.isSameShape(shape);
     let isDoneMoving = x === bestMove.x;
+    let isDoneRotating = !canRotate && !hasRotateXPosition;
 
     // Ensure full preview label is on screen for a moment
     // before hard dropping and moving to the next piece
@@ -40,7 +42,9 @@ export default class TetrisBot {
       this.board.piece === piece &&
       (!isDoneRotating || !isDoneMoving)
     ) {
-      if (!isDoneRotating) {
+      const isAtRotateX = !hasRotateXPosition || x === rotateX;
+
+      if (!isDoneRotating && isAtRotateX) {
         piece.rotate('right');
         await this.board.wait(50, 70);
         isDoneRotating = piece.isSameShape(shape);
@@ -51,7 +55,7 @@ export default class TetrisBot {
         await this.board.wait(45, 70);
 
         x = piece.x;
-        isDoneMoving = x === bestMove.x;
+        isDoneMoving = x === bestMove.x && isAtRotateX;
 
         // Wait until final move animation completes
         if ((isDoneMoving || this.board.isPaused) && didMove) await didMove;
@@ -60,6 +64,8 @@ export default class TetrisBot {
     }
 
     await canHardDrop;
+
+    if (hasRotateXPosition) await this.board.wait(50, 70);
 
     if (this.board.isBotPlaying && this.board.piece === piece) {
       this.board.hardDrop();
@@ -76,30 +82,76 @@ export default class TetrisBot {
 
     let bestScore = -Infinity;
 
-    const bestMove = { x: 0, y: 0, shape: piece.shape };
     const startX = piece.x;
+    const bestMove: BestScore = {
+      x: 0,
+      y: 0,
+      shape: piece.shape,
+      rotateX: null
+    };
+
+    const canRotate = piece.maxRotations > 0;
+
+    // If the piece can't rotate from its initial position,
+    // we try to find x positions where it can rotate
+    const shouldRecheckRotation =
+      canRotate && !piece.rotate('right', false, true);
 
     for (let rotation = 0; rotation <= piece.maxRotations; rotation++) {
       piece.x = startX;
 
       // Prefer dropping closer to the center of the
-      // board to make the design look more balanced.
+      // board to make the design look more balanced
       let leftX = piece.x;
       let canMoveLeft = true;
 
       let rightX = piece.x;
       let canMoveRight = true;
 
+      const updateBestScore = (
+        score: number,
+        piece: Tetromino,
+        rotateX: Nullable<number> = null
+      ) => {
+        bestScore = score;
+        bestMove.x = piece.x;
+        bestMove.y = piece.y;
+        bestMove.shape = piece.shape.slice();
+        bestMove.rotateX = rotateX;
+        bestMove.score = score;
+      };
+
       const checkPosition = (x: number) => {
         piece.x = x;
 
         const score = this.getScore(piece);
 
+        if (shouldRecheckRotation) {
+          const { shape } = piece;
+          let bestRotatedScore = -Infinity;
+
+          for (let rotation = 0; rotation < piece.maxRotations; rotation++) {
+            if (!piece.rotate('right')) break;
+
+            const rotatedScore = this.getScore(piece);
+
+            if (rotatedScore > bestRotatedScore) {
+              bestRotatedScore = rotatedScore;
+            }
+          }
+
+          if (bestRotatedScore > score) {
+            updateBestScore(bestRotatedScore, piece, x);
+            piece.shape = shape;
+
+            return;
+          }
+
+          piece.shape = shape;
+        }
+
         if (score > bestScore) {
-          bestScore = score;
-          bestMove.x = piece.x;
-          bestMove.y = piece.y;
-          bestMove.shape = piece.shape;
+          updateBestScore(score, piece);
         }
       };
 
@@ -123,7 +175,7 @@ export default class TetrisBot {
         }
       }
 
-      if (piece.maxRotations > 0) piece.rotate('right', true);
+      if (canRotate) piece.rotate('right', true);
     }
 
     return bestMove;
@@ -219,3 +271,11 @@ export default class TetrisBot {
     return score;
   }
 }
+
+type BestScore = {
+  x: number;
+  y: number;
+  shape: Shape;
+  rotateX: Nullable<number>;
+  score?: number;
+};

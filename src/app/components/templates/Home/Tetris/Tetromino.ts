@@ -14,17 +14,21 @@ export default class Tetromino {
   currentY: number;
   hasHardDropped = false;
 
-  constructor(board: TetrisBoard, shouldResetPieceQueue = false) {
+  constructor(
+    board: TetrisBoard,
+    shouldResetPieceQueue = false,
+    shapeIndex?: number
+  ) {
     this.board = board;
-    this.shapeIndex = getRandomPiece(shouldResetPieceQueue);
+    this.shapeIndex = shapeIndex ?? getRandomPiece(shouldResetPieceQueue);
 
     const { shape } = pieces[this.shapeIndex];
 
     this.x = Math.floor(board.columns / 2 - shape[0].length / 2);
 
     const shapeY = this.getShapeY(0, shape);
-    this.y = 0 - shapeY;
 
+    this.y = 0 - shapeY;
     this.currentX = this.x;
     this.currentY = this.y;
 
@@ -59,7 +63,7 @@ export default class Tetromino {
   }
 
   clone() {
-    const clone = new Tetromino(this.board);
+    const clone = new Tetromino(this.board, false, this.shapeIndex);
 
     clone.shapeIndex = this.shapeIndex;
     clone.shape = this.shape;
@@ -175,7 +179,7 @@ export default class Tetromino {
     return pieces[this.shapeIndex].maxRotations;
   }
 
-  rotate(direction: 'right' | 'left', force = false) {
+  rotate(direction: 'right' | 'left', force = false, isTest = false) {
     if (this.hasHardDropped) return false;
 
     this.clearCachedDropPoint();
@@ -199,15 +203,19 @@ export default class Tetromino {
     }
 
     if (force || this.board.isValidMove(this.x, this.y, shape)) {
-      this.shape = shape;
+      if (!isTest) this.shape = shape;
+
       return true;
     }
 
     // Ensure line piece can rotate when it first appears
     if (this.y < 0 && this.board.isValidMove(this.x, 0, shape)) {
-      this.shape = shape;
-      this.y = 0;
-      this.currentY = 0;
+      if (!isTest) {
+        this.shape = shape;
+        this.y = 0;
+        this.currentY = 0;
+      }
+
       return true;
     }
 

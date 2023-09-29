@@ -74,7 +74,7 @@ export default class TetrisBoard {
     // TESTING
     // TODO Remove testing code
     if (!isSSR()) {
-      (<any>window).board = this;
+      (<any>window).game = this;
       (<any>window).gsap = gsap;
     }
   }
@@ -269,6 +269,7 @@ export default class TetrisBoard {
   private tick(timestamp = 0) {
     if (!this.isAnimating || !this.ctx) {
       gsap.ticker.remove(this.tick);
+
       return;
     }
 
