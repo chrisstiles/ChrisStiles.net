@@ -84,8 +84,14 @@ export function GridDivider({
               color: barColor
             }}
           >
-            <span style={circleStyle} />
-            <span style={circleStyle} />
+            <span
+              className={styles.circle}
+              style={circleStyle}
+            />
+            <span
+              className={styles.circle}
+              style={circleStyle}
+            />
           </div>
         </div>
       </div>

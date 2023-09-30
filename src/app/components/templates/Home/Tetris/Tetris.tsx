@@ -7,6 +7,8 @@ import { useGlobalState } from '@templates/Home';
 import { Section } from '@elements';
 import classNames from 'classnames';
 
+// TODO Implement high score system (icons/filters for mobile vs desktop)
+
 export default function Tetris() {
   const canvas = useRef<HTMLCanvasElement>(null);
   const game = useMemo(() => new TetrisBoard(canvas), []);

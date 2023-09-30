@@ -82,38 +82,35 @@
     background-color: currentColor;
   }
 
-  span {
-    content: '';
-    position: absolute;
-    width: var(--circle-size);
-    height: var(--circle-size);
-    top: 50%;
-    transform: translate(-50%, -50%);
-    border-radius: 50%;
-    background-color: var(--grid-line-color);
-
-    &:first-child {
-      left: 0;
-    }
-
-    &:last-child {
-      left: 100%;
-    }
-  }
-
   @include app.retina {
     --circle-size: 7px;
 
     height: 2.5px;
+  }
+}
 
-    span {
-      &:first-child {
-        margin-left: 0.5px;
-      }
+.circle {
+  position: absolute;
+  width: var(--circle-size);
+  height: var(--circle-size);
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background-color: var(--grid-line-color);
 
-      &:last-child {
-        margin-left: -0.5px;
-      }
+  &:first-child {
+    left: 0;
+
+    @include app.retina {
+      margin-left: 0.5px;
+    }
+  }
+
+  &:last-child {
+    left: 100%;
+
+    @include app.retina {
+      margin-left: -0.5px;
     }
   }
 }
