@@ -7,7 +7,6 @@ import {
   type MouseEventHandler
 } from 'react';
 import styles from './ProjectFeatures.module.scss';
-import squircleModule from 'css-houdini-squircle/squircle.min.js';
 import gsap from 'gsap';
 import ResizeObserver from 'resize-observer-polyfill';
 import { useInView } from 'react-intersection-observer';
@@ -34,10 +33,7 @@ export default memo(function ProjectFeatures() {
   useEffect(() => {
     let observer: Nullable<ResizeObserver> = null;
 
-    const init = async () => {
-      await import('css-paint-polyfill');
-      CSS.paintWorklet.addModule(squircleModule);
-
+    const init = () => {
       const animate = () => {
         if (!wrapper.current || !scroller.current?.children.length) {
           return;

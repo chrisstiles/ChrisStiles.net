@@ -5,7 +5,11 @@
 @use 'app';
 
 .button {
+  --squircle-radius: 6px;
+  --squircle-smooth: 0.6;
+
   @include app.disable-native-button;
+
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
@@ -18,10 +22,14 @@
   padding: 0.95em 2em 1.05em 2em;
   letter-spacing: -0.01em;
   font-feature-settings: 'salt';
-  border-radius: 6px;
   position: relative;
   user-select: none;
   text-decoration: none;
+  border-radius: var(--squircle-radius);
+
+  @include app.supports-css-paint {
+    mask: paint(squircle);
+  }
 
   &:hover {
     background-color: #ffe983;

@@ -72,3 +72,9 @@
     @content;
   }
 }
+
+@mixin supports-css-paint {
+  @supports (background: paint(something)) {
+    @content;
+  }
+}

@@ -15,6 +15,11 @@ module.exports = withBundleAnalyzer({
       type: 'asset'
     });
 
+    config.experiments = {
+      ...config.experiments,
+      topLevelAwait: true
+    };
+
     return config;
   },
   experimental: {
