@@ -4,7 +4,7 @@ import Trail from './Trail';
 import TetrisBot from './TetrisBot';
 import PiecePreview from './PiecePreview';
 import { isSSR, sleep } from '@helpers';
-import { random } from 'lodash';
+import { random, uniqueId } from 'lodash';
 import gsap from 'gsap';
 import type { RefObject } from 'react';
 
@@ -16,13 +16,14 @@ export default class TetrisBoard {
   preview: PiecePreview;
   pieceQueue: Tetromino[];
   bot: TetrisBot;
-  isBotPlaying = true;
+  isBotPlaying = false;
   isGameActive = false;
   isGameOver = false;
   isPaused = false;
   columns = 24;
   rows = 10;
   blockSize = 0;
+  blockRadius = 0;
   offset = 1.8;
   grid: TetrisGrid = [];
   trails: Trail[] = [];
@@ -351,9 +352,9 @@ export default class TetrisBoard {
       .reverse();
   }
 
+  // GSAP seems to have weird behavior with promises,
+  // so instead we manually resolve one in onComplete
   animate(target: gsap.TweenTarget, vars: gsap.TweenVars) {
-    // GSAP seems to have weird behavior with promises,
-    // so instead we manually resolve one in onComplete
     return new Promise<boolean>(resolve => {
       this.timeline.to(
         target,
@@ -370,6 +371,16 @@ export default class TetrisBoard {
         this.timeline.time()
       );
     });
+  }
+
+  // If a references to the actual gsap tween is needed,
+  // this method returns one and adds it to the timeline
+  addAnimation(target: gsap.TweenTarget, vars: gsap.TweenVars) {
+    vars.id ??= uniqueId('game-animation-');
+
+    this.animate(target, vars);
+
+    return this.timeline.getById(String(vars.id));
   }
 
   wait(minDelay: number, maxDelay?: number) {
@@ -480,6 +491,7 @@ export default class TetrisBoard {
     const numCols = style.getPropertyValue('--cols');
     const blocksPerColumn = style.getPropertyValue('--blocks-per-col');
     const blockOffset = style.getPropertyValue('--block-offset');
+    const blockRadius = style.getPropertyValue('--block-border-radius');
 
     this.rows = parseInt(numRows) || 10;
     this.columns = (parseInt(numCols) || 12) * (parseInt(blocksPerColumn) || 1);
@@ -489,6 +501,7 @@ export default class TetrisBoard {
     const width = canvas.parentElement.offsetWidth - 1;
 
     this.blockSize = (width / this.columns) * dpr;
+    this.blockRadius = this.pxToCanvas(parseFloat(blockRadius) || 0);
 
     const height = (this.blockSize / dpr) * this.rows - this.offset - 1;
     const gridLineWidth = this.pxToCanvas(1);

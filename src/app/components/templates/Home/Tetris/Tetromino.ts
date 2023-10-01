@@ -138,7 +138,10 @@ export default class Tetromino {
     );
   }
 
+  private _entranceAnimations: (gsap.core.Tween | gsap.core.Timeline)[] = [];
+
   move(direction: 'left' | 'right' | 'down') {
+    const { x: prevX, y: prevY } = this;
     let { x, y } = this;
 
     switch (direction) {
@@ -159,16 +162,34 @@ export default class Tetromino {
       return false;
     }
 
+    const isEntranceAnimation = direction === 'down' && this.y < 0;
+
     this.x = x;
     this.y = y;
 
-    return this.board.animate(this, {
-      currentX: x,
-      currentY: y,
+    const animationVars: gsap.TweenVars = {
       overwrite: false,
       duration: 0.2,
-      ease: moveEase
-    });
+      ease: moveEase,
+      onComplete: () => {
+        if (isEntranceAnimation) {
+          this._entranceAnimations = this._entranceAnimations.filter(
+            a => a !== animation
+          );
+        }
+      }
+    };
+
+    if (x !== prevX) animationVars.currentX = x;
+    if (y !== prevY) animationVars.currentY = y;
+
+    const animation = this.board.addAnimation(this, animationVars);
+
+    if (isEntranceAnimation) {
+      this._entranceAnimations.push(animation);
+    }
+
+    return true;
   }
 
   drop() {
@@ -180,11 +201,14 @@ export default class Tetromino {
   }
 
   rotate(direction: 'right' | 'left', force = false, isTest = false) {
-    if (this.hasHardDropped) return false;
+    if (this.hasHardDropped || pieces[this.shapeIndex].maxRotations < 1) {
+      return false;
+    }
 
     this.clearCachedDropPoint();
 
     const shape = Array.from(this.shape, row => row.slice());
+    // console.log(shape);
 
     for (let y = 0; y < shape.length; ++y) {
       for (let x = 0; x < y; ++x) {
@@ -208,9 +232,11 @@ export default class Tetromino {
       return true;
     }
 
-    // Ensure line piece can rotate when it first appears
     if (this.y < 0 && this.board.isValidMove(this.x, 0, shape)) {
       if (!isTest) {
+        this._entranceAnimations.forEach(a => a.kill());
+        this._entranceAnimations = [];
+
         this.shape = shape;
         this.y = 0;
         this.currentY = 0;
@@ -224,6 +250,8 @@ export default class Tetromino {
 
   hardDrop() {
     const { x, y } = this.getDropPoint();
+
+    this.board.timeline.getTweensOf(this).forEach(a => a?.totalProgress(1));
 
     this.hasHardDropped = true;
     this.currentX = x;
