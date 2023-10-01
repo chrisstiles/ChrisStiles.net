@@ -1,7 +1,7 @@
 import { useEffect, useRef, useMemo, useSyncExternalStore } from 'react';
 import styles from './Tetris.module.scss';
 import TetrisBoard from './TetrisBoard';
-import TetrisHeadline from './TetrisHeadline';
+import TetrisHeader from './TetrisHeader';
 import useIsVisible from '@hooks/useIsVisible';
 import { useGlobalState } from '@templates/Home';
 import { Section } from '@elements';
@@ -34,16 +34,20 @@ export default function Tetris() {
           'game-over': game.isGameOver
         })}
       >
-        <TetrisHeadline
-          preview={game.preview}
-          isGameOver={game.isGameOver}
-          isBotPlaying={game.isBotPlaying}
-        />
-        <canvas
-          tabIndex={-1}
-          ref={canvas}
-          className={styles.canvas}
-        />
+        <div className={styles.game}>
+          <TetrisHeader
+            preview={game.preview}
+            isGameOver={game.isGameOver}
+            isBotPlaying={game.isBotPlaying}
+          />
+          <canvas
+            tabIndex={-1}
+            ref={canvas}
+            className={styles.canvas}
+          />
+        </div>
+
+        <div className={styles.sidebar}>Right content</div>
         <button
           style={{ position: 'absolute', top: 0, left: 0 }}
           onClick={() => {

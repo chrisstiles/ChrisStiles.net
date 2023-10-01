@@ -5,9 +5,8 @@
 @use 'app';
 
 .wrapper {
-  $offset: app.$gridOffset - 1px;
-  width: calc(100% + #{$offset * 2});
-  margin: 60px 0 70px #{-$offset};
+  width: calc(var(--grid-width) - 1px);
+  margin: 60px 0 70px calc((var(--grid-offset) - 1px) * -1);
   position: relative;
   overflow: hidden;
   contain: content;

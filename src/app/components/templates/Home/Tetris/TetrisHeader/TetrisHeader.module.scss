@@ -1,16 +1,16 @@
 /* --------------------------- */
-/* Tetris Headline */
+/* Tetris Header */
 /* --------------------------- */
 
 @use 'app';
 
 .wrapper {
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 35px;
+  --tetris-header-padding: 40px;
+}
+
+.contentWrapper {
   font-size: var(--h2-size);
+  padding: 0 var(--content-padding);
 
   &.hidden {
     visibility: hidden;
@@ -37,6 +37,7 @@
 .text {
   display: inline-block;
   margin-top: var(--text-spacing);
+  margin-right: 10px;
 }
 
 .previewWrapper {
@@ -45,8 +46,7 @@
 
   position: relative;
   display: inline-block;
-  padding-left: 20px;
-  margin: var(--text-spacing) 8px 0 8px;
+  margin: var(--text-spacing) 8px 0 0;
   line-height: 1;
   padding-left: calc(
     (var(--size) + var(--offset)) * var(--cols, 3) - var(--offset)
@@ -162,5 +162,11 @@
 }
 
 .divider {
-  margin-bottom: 2px;
+  &:first-child {
+    margin-bottom: var(--tetris-header-padding);
+  }
+
+  &:last-child {
+    margin-top: calc(var(--tetris-header-padding) - 5px);
+  }
 }

@@ -1,6 +1,5 @@
 import TetrisBoard from './TetrisBoard';
 import Tetromino from './Tetromino';
-import Block from './Block';
 import Particle from './Particle';
 import pieces from './pieces';
 import gsap from 'gsap';
@@ -48,7 +47,6 @@ export default class Trail {
     const gridLineWidth = this.board.pxToCanvas(1);
     const offset = this.board.pxToCanvas(this.board.offset);
     const width = 1 - gridLineWidth - offset * 2;
-    const borderRadius = this.board.pxToCanvas(Block.borderRadius);
 
     for (let x = 0; x < this.piece.shape[0].length; x++) {
       for (let y = 0; y < this.piece.shape.length; y++) {
@@ -57,7 +55,7 @@ export default class Trail {
         if (block) {
           const x1 = block.x + gridLineWidth + offset;
           const y1 = this.startY;
-          const height = block.y - this.startY + borderRadius;
+          const height = block.y - this.startY + this.board.blockRadius;
 
           this._trailLines.push(
             new TrailLine(this.board, x1, y1, width, height, this.color)

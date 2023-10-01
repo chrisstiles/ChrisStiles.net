@@ -7,6 +7,7 @@
 .button {
   --squircle-radius: 6px;
   --squircle-smooth: 0.6;
+  --border-radius: var(--squircle-radius);
 
   @include app.disable-native-button;
 
@@ -25,7 +26,7 @@
   position: relative;
   user-select: none;
   text-decoration: none;
-  border-radius: var(--squircle-radius);
+  border-radius: var(--border-radius);
 
   @include app.supports-css-paint {
     mask: paint(squircle);

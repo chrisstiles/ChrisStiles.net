@@ -62,8 +62,10 @@
   }
 
   :global(.button) {
+    --border-radius: 5px;
+    --squircle-radius: 5px;
+
     margin: 10px;
-    border-radius: 3px;
     padding: 0.85em 1.3em 0.95em 1.3em;
     min-height: 40px;
     font-size: 14px;

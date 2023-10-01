@@ -487,8 +487,8 @@ export default class TetrisBoard {
     if (isSSR() || !canvas || !canvas.parentElement || !ctx) return;
 
     const style = getComputedStyle(canvas);
-    const numRows = style.getPropertyValue('--rows');
-    const numCols = style.getPropertyValue('--cols');
+    const numRows = style.getPropertyValue('--game-rows');
+    const numCols = style.getPropertyValue('--game-cols');
     const blocksPerColumn = style.getPropertyValue('--blocks-per-col');
     const blockOffset = style.getPropertyValue('--block-offset');
     const blockRadius = style.getPropertyValue('--block-border-radius');

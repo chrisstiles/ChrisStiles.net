@@ -2,7 +2,8 @@ import TetrisBoard from './TetrisBoard';
 import pieces from './pieces';
 
 export default class Block {
-  static borderRadius = 7;
+  // static borderRadius = 7;
+  // static borderRadius = 7;
 
   board: TetrisBoard;
   x: number;
@@ -24,7 +25,7 @@ export default class Block {
   }
 
   draw(x = this.x, y = this.y, isProjection = false) {
-    const { ctx, blockSize } = this.board;
+    const { ctx, blockSize, blockRadius } = this.board;
     if (!ctx || !blockSize) return;
 
     const gridLineWidth = this.board.pxToCanvas(1);
@@ -33,8 +34,11 @@ export default class Block {
     const size = 1 - gridLineWidth - offset * 2 - strokeWidth * 2;
     const scaledSize = size * this.scale;
     const scaleOffset = (size - scaledSize) / 2;
-    const borderRadius =
-      this.board.pxToCanvas(Block.borderRadius) * this.scale * 2;
+    // const borderRadius =
+    //   this.board.pxToCanvas(Block.borderRadius) * this.scale * 2;
+    const borderRadius = blockRadius * this.scale * 2;
+
+    // console.log(blockRadius);
 
     drawSquircle(
       ctx,

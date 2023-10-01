@@ -26,8 +26,8 @@
 
 .grid {
   display: flex;
-  width: calc(100% + #{app.$gridOffset * 2});
-  margin-left: -#{app.$gridOffset};
+  width: var(--grid-width);
+  margin-left: calc(var(--grid-offset) * -1);
   flex: none;
 }
 
@@ -61,7 +61,7 @@
 
 .barSpacer {
   position: absolute;
-  inset: 0 -#{app.$gridOffset};
+  inset: 0 calc(var(--grid-offset) * -1);
 }
 
 .bar {
@@ -116,5 +116,5 @@
 }
 
 :export {
-  gridNumColumns: app.$gridNumColumns;
+  maxGridCols: app.$maxGridCols;
 }
