@@ -1,60 +1,73 @@
-import { memo, type HTMLProps } from 'react';
+import { memo, forwardRef, type HTMLProps } from 'react';
 import styles, { maxGridCols } from './GridLines.module.scss';
 import { Content, Line } from '@elements';
 import classNames from 'classnames';
 
 export const numColumns = parseInt(maxGridCols);
 
-export default memo(function GridLines({
-  className,
-  dashColor = 'var(--grid-line-color)',
-  solidColor = 'var(--grid-line-color)'
-}: GridLinesProps) {
-  const lines = Array.from({ length: numColumns }, (_, index) => (
-    <div
-      key={index}
-      className={classNames('grid-line', styles.line)}
-    >
-      {index === 0 && (
-        <Line
-          color={solidColor}
-          className={styles.solid}
-          isSolid
-        />
-      )}
-      <Line
-        color={dashColor}
-        className={styles.dash}
-      />
-    </div>
-  ));
+const GridLines = memo(
+  forwardRef<HTMLDivElement, GridLinesProps>(
+    (
+      {
+        className,
+        dashColor = 'var(--grid-line-color)',
+        solidColor = 'var(--grid-line-color)'
+      },
+      ref
+    ) => {
+      const lines = Array.from({ length: numColumns }, (_, index) => (
+        <div
+          key={index}
+          className={classNames('grid-line', styles.line)}
+        >
+          {index === 0 && (
+            <Line
+              color={solidColor}
+              className={styles.solid}
+              isSolid
+            />
+          )}
+          <Line
+            color={dashColor}
+            className={styles.dash}
+          />
+        </div>
+      ));
 
-  return (
-    <div
-      className={classNames(styles.wrapper, className)}
-      role="presentation"
-    >
-      <Content className={styles.linesWrapper}>
-        <Grid>{lines}</Grid>
-      </Content>
-    </div>
-  );
-});
+      return (
+        <div
+          className={classNames(styles.wrapper, className)}
+          role="presentation"
+        >
+          <Content className={styles.linesWrapper}>
+            <Grid ref={ref}>{lines}</Grid>
+          </Content>
+        </div>
+      );
+    }
+  )
+);
 
-export function Grid({
-  className,
-  children,
-  ...rest
-}: HTMLProps<HTMLDivElement>) {
-  return (
-    <div
-      className={classNames(styles.grid, className)}
-      {...rest}
-    >
-      {children}
-    </div>
-  );
-}
+GridLines.displayName = 'GridLines';
+
+export { GridLines as default, Grid };
+export { default as useGrid } from '@templates/Home/hooks/useGrid';
+
+const Grid = forwardRef<HTMLDivElement, HTMLProps<HTMLDivElement>>(
+  ({ className, children, ...rest }, ref) => {
+    return (
+      <div
+        ref={ref}
+        className={classNames(styles.grid, className)}
+        {...rest}
+      >
+        {children}
+      </div>
+    );
+  }
+);
+
+Grid.displayName = 'Grid';
 
 export function GridDivider({
   columns,

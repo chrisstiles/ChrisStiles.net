@@ -32,10 +32,11 @@
       "@layouts/*": ["src/app/components/layouts/*"],
       "@modules/*": ["src/app/components/modules/*"],
       "@styles/*": ["src/app/styles/*"],
+      "@style-vars": ["src/app/styles/abstracts/_variables.module.scss"],
       "@templates/*": ["src/app/components/templates/*"],
       "@utils/*": ["src/app/utils/*"],
 
-      // SASS paths
+      // Only for importing inside SCSS files
       "app": ["src/app/styles/abstracts/_app.scss"]
     }
   },

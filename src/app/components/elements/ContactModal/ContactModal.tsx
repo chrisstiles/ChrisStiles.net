@@ -65,8 +65,8 @@ export default memo(function ContactModal({
 
   useSize(modal, entry => {
     if (!modal.current) return;
-    const { width, height } = entry.contentRect;
 
+    const { width, height } = entry.contentRect;
     const detailsWidth = detailsWrapper.current?.offsetWidth ?? 0;
     const detailsOffset = Math.round(width / 2 - detailsWidth / 2);
     const style = getComputedStyle(modal.current);
@@ -311,7 +311,8 @@ export default memo(function ContactModal({
         >
           <RemoveScroll
             allowPinchZoom
-            enabled={isOpen}
+            // enabled={isOpen}
+            enabled={false}
             ref={wrapper}
             className={classNames(styles.wrapper, {
               [styles.open]: isOpen,

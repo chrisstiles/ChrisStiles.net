@@ -3,6 +3,8 @@
 /* --------------------------- */
 
 .wrapper {
+  --clip-offset: 100px;
+
   position: static;
   overflow: hidden;
   width: 100%;
@@ -14,7 +16,7 @@
 .contentWrapper {
   background-color: var(--page-background-dark-color);
   padding: 0;
-  $offset: 100px;
+  $offset: var(--clip-offset);
   clip-path: polygon(0 $offset, 100% 0, 100% calc(100% - #{$offset}), 0 100%);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;

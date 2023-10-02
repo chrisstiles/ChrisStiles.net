@@ -28,6 +28,16 @@ module.exports = withBundleAnalyzer({
         transform: 'lodash/{{member}}'
       }
     }
+  },
+  sassOptions: {
+    logger: {
+      warn(message) {
+        console.warn(message);
+      },
+      debug(message) {
+        console.log(message);
+      }
+    }
   }
 });
 

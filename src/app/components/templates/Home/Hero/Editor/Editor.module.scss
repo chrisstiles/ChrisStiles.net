@@ -8,10 +8,14 @@
 $borderRadius: 8px;
 
 .wrapper {
-  width: calc(50% + 6px);
   $offsetY: 200px;
-  padding-bottom: $offsetY;
-  margin: -90px -13px #{-$offsetY / 2} 0;
+
+  --offsetX: var(--grid-offset, 20px);
+  --offsetY: 200px;
+
+  width: app.grid-cols(6, calc(var(--offsetX) * -1));
+  padding-bottom: var(--offsetY);
+  margin: -90px calc(var(--offsetX) / -2) calc(var(--offsetY) / -2) 0;
   flex: none;
   position: relative;
   background-color: var(--editor-background-color);

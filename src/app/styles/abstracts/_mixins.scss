@@ -78,3 +78,7 @@
     @content;
   }
 }
+
+@mixin grid-cols-width($num, $offset) {
+  width: functions.grid-cols($num, $offset);
+}

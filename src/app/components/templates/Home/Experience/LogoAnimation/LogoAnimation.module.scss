@@ -6,14 +6,20 @@
 
 .wrapper {
   --intersection: 1;
-  width: calc((100% + var(--grid-offset) * 2) / 12 * var(--column-count, 4));
-  margin-right: calc((100% + 2 * var(--grid-offset)) / 12 - var(--grid-offset));
+  --cols: 4;
+  --col-padding: 16px;
+  --logo-size: calc(var(--grid-col-width) - (var(--col-padding) * 2));
+  --logo-offset: 28px;
+
   flex: none;
   text-align: center;
   position: relative;
   pointer-events: none;
   isolation: isolate;
   z-index: -10;
+  width: calc(var(--grid-col-width) * var(--cols));
+  left: var(--grid-offset);
+  margin-right: var(--grid-col-width);
 
   &:before,
   &:after {
@@ -24,6 +30,7 @@
     right: 3px;
     z-index: 3;
     height: 330px;
+
     $color: #161929;
     background: linear-gradient(
       173deg,
@@ -57,15 +64,11 @@
 }
 
 .content {
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
-  bottom: 0;
   display: flex;
   justify-content: center;
   transform: translateZ(0);
   z-index: -30;
+  height: 100%;
 
   --min-saturation: 0.05;
   --min-brightness: 0.4;
@@ -97,10 +100,10 @@
 
 .columnWrapper {
   position: relative;
-  height: 100%;
-  flex-grow: 1;
+  width: var(--grid-col-width);
+  padding: 0 var(--col-padding);
+  height: calc(100% - var(--clip-offset));
   contain: layout size style;
-  // will-change: filter;
 }
 
 .column,
@@ -110,28 +113,9 @@
   transform-style: preserve-3d;
 }
 
-$baseLogoSize: 80px;
-$baseLogoOffset: 28px;
-
-@mixin position-logos($size, $offset) {
-  @at-root {
-    .logo {
-      margin-top: -$size - $offset;
-      margin-bottom: $offset;
-    }
-
-    .icon {
-      width: $size;
-      height: $size;
-    }
-  }
-}
-
-@include position-logos($baseLogoSize, $baseLogoOffset);
-
 .column {
   width: 100%;
-  height: 100%;
+  height: calc(100% + var(--logo-size) + var(--logo-offset) + 100px);
   position: relative;
   opacity: 0;
   will-change: transform;
@@ -143,27 +127,18 @@ $baseLogoOffset: 28px;
 
 .logo {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  // content-visibility: auto;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
+  margin-top: calc(((var(--logo-size) - var(--logo-offset))) * -1);
+  margin-bottom: var(--logo-offset);
 }
 
-.iconWrapper {
+.icon {
   width: 100%;
+  height: auto;
+  display: block;
 }
 
 .blur {
   position: absolute;
   visibility: hidden;
   pointer-events: none;
-}
-
-:export {
-  logoSize: $baseLogoSize;
-  logoOffset: $baseLogoOffset;
 }

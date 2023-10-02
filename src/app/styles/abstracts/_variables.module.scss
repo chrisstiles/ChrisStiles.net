@@ -1,0 +1,31 @@
+/* --------------------------- */
+/* Variables */
+/* --------------------------- */
+
+@use 'sass:meta';
+
+// Fonts
+$font: 'brother-1816', sans-serif;
+$fontCode: 'source-code-pro', monospace;
+
+// Desktop values for grid variables to use in SSR
+// before the CSS custom properties can be parsed
+$maxGridCols: 13;
+$maxGridOffset: 20px;
+
+// Font sizes
+$h1Size: 69px;
+$h2Size: 37px;
+$h3Size: 24px;
+$h4Size: 18px;
+
+:export {
+  font: $font;
+  fontCode: $fontCode;
+  maxGridCols: $maxGridCols;
+  maxGridOffset: $maxGridOffset;
+  h1Size: $h1Size;
+  h2Size: $h2Size;
+  h3Size: $h3Size;
+  h4Size: $h4Size;
+}

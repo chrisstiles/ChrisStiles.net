@@ -62,7 +62,9 @@ function PieceLabel({ preview }: PiecePreviewProps) {
   const isTyping = currentLabel && currentLabel !== label;
 
   return !hasRendered ? (
-    <>optimized</>
+    <span className={styles.previewWrapper}>
+      <span className={styles.label}>optimized</span>
+    </span>
   ) : (
     <span
       className={classNames(styles.previewWrapper, {

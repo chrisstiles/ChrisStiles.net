@@ -1,5 +1,5 @@
 import { useContext, useEffect, useRef } from 'react';
-import { HomeTemplateContext, type HomeGlobalState } from './Home';
+import { HomeTemplateContext, type HomeGlobalState } from '../Home';
 
 export default function useGlobalState(
   handler?: (state: HomeGlobalState) => void

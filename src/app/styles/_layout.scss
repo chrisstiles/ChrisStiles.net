@@ -11,11 +11,11 @@
 
   // Grid
   --grid-cols: #{app.$maxGridCols};
-  --grid-offset: 20px;
+  // --grid-offset: 20px;
+  --grid-offset: #{app.$maxGridOffset};
   --grid-width-offset: calc((var(--content-padding) * 2) - (var(--grid-offset) * 2));
   --grid-max-width: calc(var(--content-width) - var(--grid-width-offset));
   --grid-width: min(calc(100vw - var(--grid-width-offset)), var(--grid-max-width));
-
   --grid-col-width: calc(var(--grid-width) / var(--grid-cols));
 }
 

@@ -208,7 +208,6 @@ export default class Tetromino {
     this.clearCachedDropPoint();
 
     const shape = Array.from(this.shape, row => row.slice());
-    // console.log(shape);
 
     for (let y = 0; y < shape.length; ++y) {
       for (let x = 0; x < y; ++x) {

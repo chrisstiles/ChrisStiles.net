@@ -1,6 +1,7 @@
 import {
   memo,
   useState,
+  useRef,
   useCallback,
   type SetStateAction,
   type Dispatch
@@ -25,6 +26,14 @@ export default memo(function Hero({
 
   const { ref, inView } = useInView({ fallbackInView: true });
 
+  // Fix edge case where timing issue where highlighting on headline
+  // text is not removed if animation pauses while out of view
+  const hasSelectedEmphasis = useRef(state.selectEmphasis);
+  if (state.selectEmphasis) hasSelectedEmphasis.current = true;
+
+  const showEmphasisHighlight =
+    !inView && hasSelectedEmphasis.current ? false : state.selectEmphasis;
+
   return (
     <Section
       ref={ref}
@@ -39,7 +48,7 @@ export default memo(function Hero({
           />
           <Headline
             text={state.headlineText}
-            selectEmphasis={state.selectEmphasis}
+            selectEmphasis={showEmphasisHighlight}
             boldText={state.boldText}
             alternateGlyphs={state.alternateGlyphs}
             growText={state.growText}

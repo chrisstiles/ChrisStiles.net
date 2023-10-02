@@ -1,20 +1,28 @@
-import { useState, useRef, useEffect, type RefObject } from 'react';
+import {
+  useState,
+  useRef,
+  useEffect,
+  type RefObject,
+  DependencyList
+} from 'react';
 import useIsomorphicLayoutEffect from './useIsomorphicLayoutEffect';
 import ResizeObserver from 'resize-observer-polyfill';
 
 export default function useSize(
   ref: RefObject<Element>,
-  handler?: (e: ResizeObserverEntry) => void
+  handler?: (e: ResizeObserverEntry) => void,
+  deps: DependencyList = []
 ) {
   const [size, setSize] = useState<Nullable<DOMRect>>(null);
   const [isMounted, setIsMounted] = useState(false);
   const callback = useRef(handler);
+  callback.current = handler;
 
   useEffect(() => setIsMounted(true), []);
 
-  useEffect(() => {
-    callback.current = handler;
-  }, [handler]);
+  // useEffect(() => {
+  //   callback.current = handler;
+  // }, [handler]);
 
   useIsomorphicLayoutEffect(() => {
     if (!isMounted || !ref.current) return;
@@ -29,7 +37,7 @@ export default function useSize(
     observer.observe(ref.current);
 
     return () => observer.disconnect();
-  }, [ref, isMounted]);
+  }, [ref, isMounted, ...deps]);
 
   return size;
 }

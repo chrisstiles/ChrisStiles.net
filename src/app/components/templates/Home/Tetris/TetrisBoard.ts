@@ -16,7 +16,7 @@ export default class TetrisBoard {
   preview: PiecePreview;
   pieceQueue: Tetromino[];
   bot: TetrisBot;
-  isBotPlaying = false;
+  isBotPlaying = true;
   isGameActive = false;
   isGameOver = false;
   isPaused = false;

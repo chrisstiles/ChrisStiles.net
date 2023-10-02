@@ -110,3 +110,13 @@
 
   @return $number;
 }
+
+// Returns a CSS calc() function that resolve
+// to the width of a given number of columns
+@function grid-cols($num, $offset) {
+  @if $offset != null {
+    @return calc(var(--grid-col-width) * #{$num} + #{$offset});
+  }
+
+  @return calc(var(--grid-col-width) * #{$num});
+}

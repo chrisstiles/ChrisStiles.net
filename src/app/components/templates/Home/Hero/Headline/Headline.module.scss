@@ -4,17 +4,16 @@
 
 @use 'app';
 
-$initialFontSize: 54px;
-$largeFontSize: 69px;
-$skew: -3.5deg;
-$transitionDuration: 0.3s;
-
 .headline {
+  --font-size: 65px;
+  --transition-duration: 0.3s;
+  --skew: -3.5deg;
+
   font-weight: 700;
-  font-size: $initialFontSize;
+  font-size: var(--font-size);
   line-height: 1;
   transition: {
-    duration: $transitionDuration;
+    duration: var(--transition-duration);
     property: transform, font-size;
     timing-function: ease;
   }
@@ -49,12 +48,12 @@ $transitionDuration: 0.3s;
   }
 
   &.grow {
-    font-size: $largeFontSize;
+    --font-size: 75px;
   }
 
   &.skew {
     transform-origin: top right;
-    transform: skewY($skew);
+    transform: skewY(var(--skew));
   }
 
   &.uppercase {
@@ -64,6 +63,7 @@ $transitionDuration: 0.3s;
   &.showColor {
     em {
       color: var(--yellow-accent-color);
+      background-color: transparent;
     }
   }
 
@@ -82,10 +82,10 @@ $transitionDuration: 0.3s;
 
 .box {
   :global(.handle) {
-    transition: transform $transitionDuration;
+    transition: transform var(--transition-duration);
 
     @at-root .skew & {
-      transform: skewY(-$skew);
+      transform: skewY(calc(var(--skew) * -1));
     }
   }
 }

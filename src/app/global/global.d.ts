@@ -1,6 +1,7 @@
 declare type Nullable<T> = T | null;
-type PropType<TObj, TProp extends keyof TObj> = TObj[TProp];
+declare type PropType<TObj, TProp extends keyof TObj> = TObj[TProp];
 declare type Booleanish = boolean | 'true' | 'false';
+declare type Timeout = ReturnType<typeof setTimeout>;
 declare module 'focus-visible';
 declare module 'css-paint-polyfill';
 declare module 'css-houdini-squircle/*';
