@@ -311,8 +311,7 @@ export default memo(function ContactModal({
         >
           <RemoveScroll
             allowPinchZoom
-            // enabled={isOpen}
-            enabled={false}
+            enabled={isOpen}
             ref={wrapper}
             className={classNames(styles.wrapper, {
               [styles.open]: isOpen,
