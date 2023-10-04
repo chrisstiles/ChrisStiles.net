@@ -18,7 +18,7 @@
   font-weight: 600;
   color: var(--page-background-color);
   line-height: 1;
-  font-size: 15px;
+  font-size: var(--button-font-size, 15px);
   transition: background-color 0.2s;
   padding: 0.95em 2em 1.05em 2em;
   letter-spacing: -0.01em;
@@ -27,6 +27,7 @@
   user-select: none;
   text-decoration: none;
   border-radius: var(--border-radius);
+  text-align: center;
 
   @include app.supports-css-paint {
     mask: paint(squircle);
@@ -38,6 +39,10 @@
 
   &.noTransition {
     transition: none !important;
+  }
+
+  &.hasIcon {
+    padding-left: 1em;
   }
 
   &[disabled] {
@@ -61,11 +66,32 @@
 }
 
 .text {
-  display: inline-flex;
+  display: flex;
+  width: 100%;
   align-items: center;
+  justify-content: center;
+  margin: 0 auto;
 
   @at-root .loading & {
     visibility: hidden;
+  }
+}
+
+.icon {
+  width: 1em;
+  height: 1em;
+  margin-right: 0.25em;
+  flex: none;
+  position: relative;
+
+  svg {
+    width: 2.2em;
+    height: 2.2em;
+    position: absolute;
+    inset: 50% 0 0 0;
+    margin-top: 0.05em;
+    transform: translateY(-50%);
+    display: block;
   }
 }
 

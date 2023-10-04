@@ -1,7 +1,7 @@
+import { useMemo, type ReactNode } from 'react';
 import styles from './Tetris.module.scss';
 import { GridDot } from '@elements';
 import classNames from 'classnames';
-import type { ReactNode } from 'react';
 
 export default function TetrisBox({
   className,
@@ -9,18 +9,20 @@ export default function TetrisBox({
   dots,
   children
 }: TetrisBoxProps) {
-  const borderClassName = Array.isArray(border)
-    ? border.join(' ')
-    : border ?? '';
+  const borderClassName = useMemo(() => {
+    return Array.isArray(border) ? border.join(' ') : border ?? '';
+  }, [border]);
 
-  const dotComponents = !dots
-    ? null
-    : (typeof dots === 'string' ? [dots] : dots).map((position, i) => (
-        <GridDot
-          key={`${position}-${i}`}
-          className={classNames(styles.dot, position)}
-        />
-      ));
+  const dotComponents = useMemo(() => {
+    return !dots
+      ? null
+      : (typeof dots === 'string' ? [dots] : dots).map((position, i) => (
+          <GridDot
+            key={`${position}-${i}`}
+            className={classNames(styles.dot, position)}
+          />
+        ));
+  }, [dots]);
 
   return (
     <div className={classNames(styles.box, className)}>
@@ -35,7 +37,7 @@ export default function TetrisBox({
 type BorderSide = 'top' | 'right' | 'bottom' | 'left';
 type DotPosition = 'top-left' | 'top-right' | 'bottom-right' | 'bottom-left';
 
-type TetrisBoxProps = {
+export type TetrisBoxProps = {
   className?: string;
   border?: BorderSide | BorderSide[];
   dots?: DotPosition | DotPosition[];

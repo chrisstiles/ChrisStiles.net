@@ -24,7 +24,9 @@ export default class TetrisBoard {
   rows = 10;
   blockSize = 0;
   blockRadius = 0;
+  blockStrokeWidth = 2.2;
   offset = 1.8;
+  gridLineWidth = 1;
   grid: TetrisGrid = [];
   trails: Trail[] = [];
   timeline = gsap.timeline({ autoRemoveChildren: true });
@@ -492,6 +494,7 @@ export default class TetrisBoard {
     const blocksPerColumn = style.getPropertyValue('--blocks-per-col');
     const blockOffset = style.getPropertyValue('--block-offset');
     const blockRadius = style.getPropertyValue('--block-border-radius');
+    const strokeWidth = style.getPropertyValue('--block-stroke-width');
     const dpr = window.devicePixelRatio || 1;
     const width = canvas.parentElement.offsetWidth;
 
@@ -500,6 +503,8 @@ export default class TetrisBoard {
     this.blockSize = (width / this.columns) * dpr;
     this.blockRadius = this.pxToCanvas(parseFloat(blockRadius) || 0);
     this.offset = this.pxToCanvas(parseFloat(blockOffset) || 1.8);
+    this.blockStrokeWidth = this.pxToCanvas(parseFloat(strokeWidth) || 2.2);
+    this.gridLineWidth = this.pxToCanvas(1);
 
     const height = (this.blockSize / dpr) * this.rows;
 

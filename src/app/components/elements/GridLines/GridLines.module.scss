@@ -35,6 +35,7 @@
   flex-grow: 1;
   display: flex;
   justify-content: flex-end;
+  position: relative;
 
   svg {
     width: 1px;
@@ -43,6 +44,18 @@
 
   .solid {
     margin-right: auto;
+  }
+}
+
+.subLine {
+  --color: var(--sub-line-color, var(--grid-line-color));
+
+  position: absolute;
+  inset: 0 0 0 50%;
+  margin-left: -1px;
+
+  line {
+    stroke: var(--color);
   }
 }
 

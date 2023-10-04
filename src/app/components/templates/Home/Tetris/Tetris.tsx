@@ -1,11 +1,13 @@
 import { useEffect, useRef, useMemo, useSyncExternalStore } from 'react';
 import styles from './Tetris.module.scss';
 import TetrisBoard from './TetrisBoard';
-import TetrisBox from './TetrisBox';
+import TetrisBox, { type TetrisBoxProps } from './TetrisBox';
 import TetrisHeader from './TetrisHeader';
+import TetrisSidebar from './TetrisSidebar';
+import GamePad from './gamepad.svg';
 import useIsVisible from '@hooks/useIsVisible';
 import { useGlobalState } from '@templates/Home';
-import { Section } from '@elements';
+import { Section, Button, GridLines } from '@elements';
 import classNames from 'classnames';
 
 // TODO Implement high score system (icons/filters for mobile vs desktop)
@@ -35,60 +37,57 @@ export default function Tetris() {
           'game-over': game.isGameOver
         })}
       >
-        {/* <header> */}
-        <TetrisBox
-          className={styles.top}
-          border={['top', 'right', 'left']}
-          // dots={['top-right', 'top-left']}
-          dots={['top-right']}
-          // border={['right', 'left']}
-        >
+        <header>
           <TetrisBox
-            className={styles.header}
-            border={['bottom', 'right']}
-            // border="bottom"
-            dots={['top-right', 'top-left', 'bottom-left', 'bottom-right']}
+            className={styles.top}
+            {...boxes.top}
           >
-            <TetrisHeader
-              // className={styles.header}
-              preview={game.preview}
-              isGameOver={game.isGameOver}
-              isBotPlaying={game.isBotPlaying}
-            />
+            <TetrisBox
+              className={styles.header}
+              {...boxes.header}
+            >
+              <TetrisHeader
+                preview={game.preview}
+                isGameOver={game.isGameOver}
+                isBotPlaying={game.isBotPlaying}
+              />
+            </TetrisBox>
+            <TetrisBox className={styles.play}>
+              <h3 className={styles.playTitle}>Want to play?</h3>
+              <Button
+                className={styles.playButton}
+                icon={<GamePad />}
+              >
+                Start new game
+              </Button>
+            </TetrisBox>
           </TetrisBox>
-          <TetrisBox
-            className={styles.play}
-            // dots="top-right"
-          >
-            Play game here
-          </TetrisBox>
-        </TetrisBox>
-        {/* </header> */}
+        </header>
 
         <TetrisBox
           className={styles.content}
-          border={['left', 'right']}
-          // dots="bottom-left"
-          // border="left"
+          {...boxes.content}
         >
           <TetrisBox
             className={styles.game}
-            border="right"
-            dots="bottom-left"
+            {...boxes.game}
           >
             <canvas
               tabIndex={-1}
               ref={canvas}
               className={styles.canvas}
             />
+            <GridLines
+              className={styles.grid}
+              showSubGrid
+            />
           </TetrisBox>
+
           <TetrisBox
             className={styles.sidebar}
-            border="right"
-            dots={['bottom-left', 'bottom-right']}
-            // border={['left', 'right']}
+            {...boxes.sidebar}
           >
-            Right content
+            <TetrisSidebar />
           </TetrisBox>
         </TetrisBox>
 
@@ -109,3 +108,25 @@ export default function Tetris() {
     </Section>
   );
 }
+
+const boxes: { [key: string]: TetrisBoxProps } = {
+  top: {
+    border: ['top', 'right', 'left'],
+    dots: ['top-right']
+  },
+  header: {
+    border: ['bottom', 'right'],
+    dots: ['top-right', 'top-left', 'bottom-left', 'bottom-right']
+  },
+  content: {
+    border: ['left', 'right'],
+    dots: 'bottom-left'
+  },
+  game: {
+    border: ['right', 'bottom']
+  },
+  sidebar: {
+    border: 'right',
+    dots: ['bottom-left', 'bottom-right']
+  }
+};

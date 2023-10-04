@@ -7,6 +7,7 @@
 .wrapper {
   padding: 40px;
   font-size: var(--h2-size);
+  min-height: 181px;
 
   &.hidden {
     visibility: hidden;
@@ -42,7 +43,6 @@
 
   position: relative;
   display: inline-block;
-  // margin: var(--text-spacing) 8px 0 0;
   line-height: 1;
   padding-left: calc(
     (var(--size) + var(--offset)) * var(--cols, 3) - var(--offset)
@@ -156,13 +156,3 @@
     background-color: currentColor;
   }
 }
-
-// .divider {
-//   &:first-child {
-//     margin-bottom: var(--tetris-header-padding);
-//   }
-
-//   &:last-child {
-//     margin-top: calc(var(--tetris-header-padding) - 5px);
-//   }
-// }

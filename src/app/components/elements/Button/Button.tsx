@@ -1,14 +1,20 @@
-import { useState, useEffect, useRef, forwardRef } from 'react';
+import {
+  useState,
+  useEffect,
+  useRef,
+  forwardRef,
+  type ComponentProps,
+  type ReactNode
+} from 'react';
 import styles from './Button.module.scss';
 import useIsMounted from '@hooks/useIsMounted';
 import { Spinner } from '@elements';
 import Link, { type LinkProps } from 'next/link';
 import classNames from 'classnames';
-import type { ComponentProps, ReactNode } from 'react';
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   function Button(
-    { className, disabled, children, isLoading, theme, ...props },
+    { className, disabled, children, isLoading, theme, icon, ...props },
     ref
   ) {
     const [disableTransition, setDisableTransition] = useState(!!disabled);
@@ -32,6 +38,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         className={classNames('button', styles.button, className, {
           [styles.noTransition]: disabled || disableTransition,
+          [styles.hasIcon]: !!icon,
           [styles.loading]: isLoading,
           [styles.secondary]: theme === 'secondary'
         })}
@@ -47,6 +54,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             <Spinner />
           </span>
         )}
+        {icon && <span className={styles.icon}>{icon}</span>}
         <span className={styles.text}>{children}</span>
       </button>
     );
@@ -74,6 +82,7 @@ export const LinkButton = forwardRef<HTMLAnchorElement, LinkButtonProps>(
 
 type ButtonPropsShared = {
   theme?: 'primary' | 'secondary';
+  icon?: ReactNode;
 };
 
 type ButtonProps = ButtonPropsShared &

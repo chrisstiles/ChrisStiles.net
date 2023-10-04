@@ -11,7 +11,8 @@ const GridLines = memo(
       {
         className,
         dashColor = 'var(--grid-line-color)',
-        solidColor = 'var(--grid-line-color)'
+        solidColor = 'var(--grid-line-color)',
+        showSubGrid
       },
       ref
     ) => {
@@ -27,10 +28,14 @@ const GridLines = memo(
               isSolid
             />
           )}
-          <Line
-            color={dashColor}
-            className={styles.dash}
-          />
+          <Line color={dashColor} />
+          {showSubGrid && (
+            <Line
+              color={dashColor}
+              className={styles.subLine}
+              isSolid
+            />
+          )}
         </div>
       ));
 
@@ -39,7 +44,9 @@ const GridLines = memo(
           className={classNames(styles.wrapper, className)}
           role="presentation"
         >
-          <Content className={styles.linesWrapper}>
+          <Content
+            className={classNames('grid-lines-wrapper', styles.linesWrapper)}
+          >
             <Grid ref={ref}>{lines}</Grid>
           </Content>
         </div>
@@ -70,6 +77,7 @@ type GridLinesProps = {
   className?: string;
   dashColor?: string;
   solidColor?: string;
+  showSubGrid?: boolean;
 };
 
 export { GridLines as default, Grid };

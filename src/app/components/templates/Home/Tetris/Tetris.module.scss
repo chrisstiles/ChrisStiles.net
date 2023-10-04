@@ -5,19 +5,19 @@
 @use 'app';
 
 .wrapper {
-  // We need to set the initial height of the canvas
-  // based on the block size. Since block size changes with
-  // device width we need to do some really ugly CSS calculations
   --game-rows: 10;
   --game-cols: 10;
   --block-border-radius: 6.5px;
   --blocks-per-col: 2;
   --block-offset: 5.6px;
+  --block-stroke-width: 2.2px;
   --block-size: calc(var(--grid-col-width) / var(--blocks-per-col));
   --game-width: #{app.grid-cols(var(--game-cols))};
   --game-height: calc(var(--block-size) * var(--game-rows));
   --border-color: #454d69;
+  --dark-blue-color: #101423;
   --border-width: 2px;
+  --game-color: var(--dark-blue-color);
   --sidebar-color: #181c31;
 
   padding-bottom: 0;
@@ -101,13 +101,13 @@
   &:global(.bottom-right) {
     @include get-offset('+', '+');
 
-    // bottom: 0;
     bottom: calc(var(--border-width) / 2);
     right: 0;
 
     @at-root .header & {
       --outline-top-right-color: var(--sidebar-color);
       --outline-bottom-right-color: var(--sidebar-color);
+      --outline-bottom-left-color: var(--game-color);
 
       bottom: 0;
     }
@@ -126,21 +126,27 @@
     left: 0;
 
     @at-root .header & {
+      --outline-bottom-right-color: var(--game-color);
+
       bottom: 0;
     }
 
-    @at-root .game & {
-      --outline-bottom-right-color: var(--page-background-dark-color);
-      --outline-bottom-left-color: var(--page-background-dark-color);
-    }
-
-    @at-root .sidebar & {
-      --outline-top-right-color: var(--sidebar-color);
+    @at-root .content > .border & {
+      --offsetX: -50%;
+      --outline-top-right-color: var(--game-color);
       --outline-bottom-right-color: var(--page-background-dark-color);
       --outline-bottom-left-color: var(--page-background-dark-color);
 
       left: calc(var(--border-width) / -2);
-      // left: 0;
+    }
+
+    @at-root .sidebar & {
+      --outline-top-right-color: var(--sidebar-color);
+      --outline-top-left-color: var(--game-color);
+      --outline-bottom-right-color: var(--page-background-dark-color);
+      --outline-bottom-left-color: var(--page-background-dark-color);
+
+      left: calc(var(--border-width) / -2);
     }
   }
 }
@@ -170,25 +176,31 @@
   }
 }
 
-// .header {
-//   // opacity: 0;
-//   :global(.grid-dot.top-right) {
-//     --dot-color: green;
-//     opacity: 0;
-//   }
-// }
-
 .play {
-  padding: 30px;
+  padding: 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
-// .game {
-//   width: var(--game-width);
-//   flex: none;
-// }
+.playTitle {
+  font-size: 16px;
+  margin-bottom: 14px;
+  font-weight: 600;
+}
 
-.sidebar {
-  padding: 10px;
+.playButton {
+  --button-font-size: 16px;
+
+  width: 100%;
+  padding: 1.2em 2em 1.3em 2.6em;
+}
+
+.game {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  background-color: var(--game-color);
 }
 
 .canvas {
@@ -196,4 +208,9 @@
   height: var(--game-height);
   display: block;
   outline: none;
+}
+
+.grid {
+  --grid-line-color: #2c3250;
+  --sub-line-color: #242943;
 }

@@ -2,9 +2,6 @@ import TetrisBoard from './TetrisBoard';
 import pieces from './pieces';
 
 export default class Block {
-  // static borderRadius = 7;
-  // static borderRadius = 7;
-
   board: TetrisBoard;
   x: number;
   y: number;
@@ -25,51 +22,27 @@ export default class Block {
   }
 
   draw(x = this.x, y = this.y, isProjection = false) {
-    const { ctx, blockSize, blockRadius, offset } = this.board;
+    const {
+      ctx,
+      blockSize,
+      blockRadius,
+      offset,
+      gridLineWidth,
+      blockStrokeWidth
+    } = this.board;
+
     if (!ctx || !blockSize) return;
 
-    // const gridLineWidth = this.board.pxToCanvas(1);
-    // const offset = this.board.pxToCanvas(this.board.offset);
-    // const strokeWidth = isProjection ? this.board.pxToCanvas(2.2) : 0;
-    // const size = 1 - gridLineWidth - offset * 2 - strokeWidth * 2;
-    // const scaledSize = size * this.scale;
-    // const scaleOffset = (size - scaledSize) / 2;
-    // // const borderRadius =
-    // //   this.board.pxToCanvas(Block.borderRadius) * this.scale * 2;
-    // const borderRadius = blockRadius * this.scale * 2;
-
-    // drawSquircle(
-    //   ctx,
-    //   x + gridLineWidth + offset + scaleOffset + strokeWidth,
-    //   y + scaleOffset + strokeWidth,
-    //   scaledSize,
-    //   borderRadius
-    // );
-
-    // const offset = this.board.pxToCanvas(this.board.offset);
-    const strokeWidth = isProjection ? this.board.pxToCanvas(2.2) : 0;
-    // const size = 1 - gridLineWidth - offset * 2 - strokeWidth * 2;
-    // const size = 1 - offset;
+    const strokeWidth = isProjection ? blockStrokeWidth : 0;
     const size = 1 - offset - strokeWidth * 2;
-    // const size = 1 - offset - strokeWidth * 2 - gridLineWidth * 2;
     const scaledSize = size * this.scale;
     const scaleOffset = (size - scaledSize) / 2;
     const borderRadius = blockRadius * this.scale * 2;
 
     drawSquircle(
       ctx,
-      // WORKING
-      // x + gridLineWidth + offset / 2,
-      // y + offset,
-      // 1 - gridLineWidth * 2 - offset,
-
-      // x + offset / 2,
-      // y + offset / 2,
-      // 1 - offset,
-
       x + offset / 2 + scaleOffset + strokeWidth,
-      // x + offset / 2 + scaleOffset + strokeWidth + gridLineWidth,
-      y + offset / 2 + scaleOffset + strokeWidth,
+      y + offset / 2 - gridLineWidth + scaleOffset + strokeWidth,
       scaledSize,
       borderRadius
     );
