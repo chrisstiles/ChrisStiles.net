@@ -2,10 +2,11 @@ import { useMemo } from 'react';
 import styles from './TetrisHeader.module.scss';
 import PiecePreview from '../PiecePreview';
 import useHasRendered from '@hooks/useHasRendered';
-import { GridDivider, BoundingBox } from '@elements';
+import { BoundingBox } from '@elements';
 import classNames from 'classnames';
 
 export default function TetrisHeader({
+  className,
   preview,
   isGameOver
 }: TetrisHeaderProps) {
@@ -17,29 +18,17 @@ export default function TetrisHeader({
     isGameOver && preview.currentLabel.length >= preview.label.length - 1;
 
   return (
-    <div className={styles.wrapper}>
-      <GridDivider
-        className={styles.divider}
-        offsetLeft={0}
-        offsetRight="calc(var(--grid-offset) * -2)"
-      />
-      <div
-        className={classNames(styles.contentWrapper, {
-          [styles.hidden]: !hasRendered,
-          [styles.hideCursor]: shouldHideCursor
-        })}
-      >
-        <p className={styles.eyebrow}>Making modern applications is hard</p>
-        <h2 className={styles.content}>
-          <span className={styles.text}>Your website has to&nbsp;be</span>{' '}
-          <PieceLabel preview={preview} />
-        </h2>
-      </div>
-      <GridDivider
-        className={styles.divider}
-        offsetLeft={0}
-        offsetRight="calc(var(--grid-offset) * -2)"
-      />
+    <div
+      className={classNames(styles.wrapper, className, {
+        [styles.hidden]: !hasRendered,
+        [styles.hideCursor]: shouldHideCursor
+      })}
+    >
+      <p className={styles.eyebrow}>Making modern applications is hard</p>
+      <h2 className={styles.content}>
+        <span className={styles.text}>Your website has to&nbsp;be</span>{' '}
+        <PieceLabel preview={preview} />
+      </h2>
     </div>
   );
 }
@@ -110,6 +99,7 @@ function PieceLabel({ preview }: PiecePreviewProps) {
 }
 
 type TetrisHeaderProps = {
+  className?: string;
   preview: PiecePreview;
   isGameOver: boolean;
   isBotPlaying: boolean;

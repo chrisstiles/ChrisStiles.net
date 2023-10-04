@@ -5,12 +5,8 @@
 @use 'app';
 
 .wrapper {
-  --tetris-header-padding: 40px;
-}
-
-.contentWrapper {
+  padding: 40px;
   font-size: var(--h2-size);
-  padding: 0 var(--content-padding);
 
   &.hidden {
     visibility: hidden;
@@ -46,7 +42,7 @@
 
   position: relative;
   display: inline-block;
-  margin: var(--text-spacing) 8px 0 0;
+  // margin: var(--text-spacing) 8px 0 0;
   line-height: 1;
   padding-left: calc(
     (var(--size) + var(--offset)) * var(--cols, 3) - var(--offset)
@@ -161,12 +157,12 @@
   }
 }
 
-.divider {
-  &:first-child {
-    margin-bottom: var(--tetris-header-padding);
-  }
+// .divider {
+//   &:first-child {
+//     margin-bottom: var(--tetris-header-padding);
+//   }
 
-  &:last-child {
-    margin-top: calc(var(--tetris-header-padding) - 5px);
-  }
-}
+//   &:last-child {
+//     margin-top: calc(var(--tetris-header-padding) - 5px);
+//   }
+// }

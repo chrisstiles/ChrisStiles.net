@@ -34,7 +34,7 @@ export default class Trail {
   async init() {
     this._hasRendered = true;
 
-    const { ctx } = this.board;
+    const { ctx, offset } = this.board;
     const numRowsWithBlocks = this.piece.shape.filter(r =>
       r.some(b => b)
     ).length;
@@ -45,7 +45,6 @@ export default class Trail {
     }
 
     const gridLineWidth = this.board.pxToCanvas(1);
-    const offset = this.board.pxToCanvas(this.board.offset);
     const width = 1 - gridLineWidth - offset * 2;
 
     for (let x = 0; x < this.piece.shape[0].length; x++) {

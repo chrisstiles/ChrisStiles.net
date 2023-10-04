@@ -492,25 +492,23 @@ export default class TetrisBoard {
     const blocksPerColumn = style.getPropertyValue('--blocks-per-col');
     const blockOffset = style.getPropertyValue('--block-offset');
     const blockRadius = style.getPropertyValue('--block-border-radius');
+    const dpr = window.devicePixelRatio || 1;
+    const width = canvas.parentElement.offsetWidth;
 
     this.rows = parseInt(numRows) || 10;
     this.columns = (parseInt(numCols) || 12) * (parseInt(blocksPerColumn) || 1);
-    this.offset = parseFloat(blockOffset) || 1.8;
-
-    const dpr = window.devicePixelRatio || 1;
-    const width = canvas.parentElement.offsetWidth - 1;
-
     this.blockSize = (width / this.columns) * dpr;
     this.blockRadius = this.pxToCanvas(parseFloat(blockRadius) || 0);
+    this.offset = this.pxToCanvas(parseFloat(blockOffset) || 1.8);
 
-    const height = (this.blockSize / dpr) * this.rows - this.offset - 1;
-    const gridLineWidth = this.pxToCanvas(1);
+    const height = (this.blockSize / dpr) * this.rows;
 
     canvas.width = width * dpr;
     canvas.height = height * dpr;
     canvas.style.width = `${width}px`;
     canvas.style.height = `${height}px`;
-    ctx.scale(this.blockSize, this.blockSize - gridLineWidth);
+
+    ctx.scale(this.blockSize, this.blockSize);
 
     this.trails.forEach(t => t.refreshParticleSizes());
 

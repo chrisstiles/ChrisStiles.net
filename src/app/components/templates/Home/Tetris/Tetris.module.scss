@@ -2,6 +2,8 @@
 /* Tetris */
 /* --------------------------- */
 
+@use 'app';
+
 .wrapper {
   // We need to set the initial height of the canvas
   // based on the block size. Since block size changes with
@@ -10,34 +12,187 @@
   --game-cols: 10;
   --block-border-radius: 6.5px;
   --blocks-per-col: 2;
-  --block-offset: 1.8px;
+  --block-offset: 5.6px;
   --block-size: calc(var(--grid-col-width) / var(--blocks-per-col));
-  --game-width: calc(var(--grid-col-width) * var(--game-cols));
-  --game-height: calc(
-    var(--block-size) * var(--game-rows) - var(--block-offset) - 1px
-  );
+  --game-width: #{app.grid-cols(var(--game-cols))};
+  --game-height: calc(var(--block-size) * var(--game-rows));
+  --border-color: #454d69;
+  --border-width: 2px;
+  --sidebar-color: #181c31;
 
   padding-bottom: 0;
 }
 
-.content {
+.contentWrapper {
   width: calc(100% + var(--grid-offset) * 2);
   margin-left: calc(var(--grid-offset) * -1);
+}
+
+.box {
+  position: relative;
+}
+
+.border {
+  position: absolute;
+  inset: 0 calc(0.5px + (var(--border-width) / -2));
+  pointer-events: none;
+  border: 0px solid var(--border-color);
+
+  &:global(.top) {
+    border-top-width: var(--border-width);
+  }
+
+  &:global(.right) {
+    border-right-width: var(--border-width);
+  }
+
+  &:global(.bottom) {
+    border-bottom-width: var(--border-width);
+  }
+
+  &:global(.left) {
+    border-left-width: var(--border-width);
+  }
+}
+
+.dot {
+  --dot-color: var(--border-color);
+
+  position: absolute !important;
+  transform: translate(var(--offsetX), var(--offsetY));
+
+  @mixin get-offset($x, $y, $offsetX: 50%, $offsetY: 50%) {
+    --offsetX: calc(var(--border-width) / 2 #{$x} #{$offsetX});
+    --offsetY: calc(var(--border-width) / 2 #{$y} #{$offsetY});
+  }
+
+  @mixin parent($selector) {
+    @at-root #{$selector} > .border & {
+      @content;
+    }
+  }
+
+  &:global(.top-left) {
+    @include get-offset('-', '-');
+
+    top: 0;
+    left: 0;
+  }
+
+  &:global(.top-right) {
+    @include get-offset('+', '-');
+
+    top: 0;
+    right: 0;
+
+    @at-root :global(.border.top) & {
+      top: calc(var(--border-width) * -1);
+    }
+
+    @at-root .header & {
+      --outline-bottom-right-color: var(--sidebar-color);
+    }
+
+    @at-root .top > .border & {
+      --outline-bottom-left-color: var(--sidebar-color);
+    }
+  }
+
+  &:global(.bottom-right) {
+    @include get-offset('+', '+');
+
+    // bottom: 0;
+    bottom: calc(var(--border-width) / 2);
+    right: 0;
+
+    @at-root .header & {
+      --outline-top-right-color: var(--sidebar-color);
+      --outline-bottom-right-color: var(--sidebar-color);
+
+      bottom: 0;
+    }
+
+    @at-root .sidebar & {
+      --outline-top-left-color: var(--sidebar-color);
+      --outline-bottom-right-color: var(--page-background-dark-color);
+      --outline-bottom-left-color: var(--page-background-dark-color);
+    }
+  }
+
+  &:global(.bottom-left) {
+    @include get-offset('-', '+');
+
+    bottom: calc(var(--border-width) / 2);
+    left: 0;
+
+    @at-root .header & {
+      bottom: 0;
+    }
+
+    @at-root .game & {
+      --outline-bottom-right-color: var(--page-background-dark-color);
+      --outline-bottom-left-color: var(--page-background-dark-color);
+    }
+
+    @at-root .sidebar & {
+      --outline-top-right-color: var(--sidebar-color);
+      --outline-bottom-right-color: var(--page-background-dark-color);
+      --outline-bottom-left-color: var(--page-background-dark-color);
+
+      left: calc(var(--border-width) / -2);
+      // left: 0;
+    }
+  }
+}
+
+.top,
+.content {
   display: flex;
 }
 
+.header,
 .game {
   width: var(--game-width);
   flex: none;
 }
 
+.play,
 .sidebar {
   flex-grow: 1;
+  position: relative;
+
+  &:before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -30;
+    background: var(--sidebar-color);
+  }
+}
+
+// .header {
+//   // opacity: 0;
+//   :global(.grid-dot.top-right) {
+//     --dot-color: green;
+//     opacity: 0;
+//   }
+// }
+
+.play {
+  padding: 30px;
+}
+
+// .game {
+//   width: var(--game-width);
+//   flex: none;
+// }
+
+.sidebar {
+  padding: 10px;
 }
 
 .canvas {
-  margin-top: var(--block-offset);
-  width: calc(100% - 1px);
+  width: 100%;
   height: var(--game-height);
   display: block;
   outline: none;

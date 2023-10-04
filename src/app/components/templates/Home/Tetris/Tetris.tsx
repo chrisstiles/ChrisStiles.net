@@ -1,6 +1,7 @@
 import { useEffect, useRef, useMemo, useSyncExternalStore } from 'react';
 import styles from './Tetris.module.scss';
 import TetrisBoard from './TetrisBoard';
+import TetrisBox from './TetrisBox';
 import TetrisHeader from './TetrisHeader';
 import useIsVisible from '@hooks/useIsVisible';
 import { useGlobalState } from '@templates/Home';
@@ -29,25 +30,68 @@ export default function Tetris() {
     <Section className={styles.wrapper}>
       <div
         ref={ref}
-        className={classNames(styles.content, {
+        className={classNames(styles.contentWrapper, {
           'game-paused': game.isPaused,
           'game-over': game.isGameOver
         })}
       >
-        <div className={styles.game}>
-          <TetrisHeader
-            preview={game.preview}
-            isGameOver={game.isGameOver}
-            isBotPlaying={game.isBotPlaying}
-          />
-          <canvas
-            tabIndex={-1}
-            ref={canvas}
-            className={styles.canvas}
-          />
-        </div>
+        {/* <header> */}
+        <TetrisBox
+          className={styles.top}
+          border={['top', 'right', 'left']}
+          // dots={['top-right', 'top-left']}
+          dots={['top-right']}
+          // border={['right', 'left']}
+        >
+          <TetrisBox
+            className={styles.header}
+            border={['bottom', 'right']}
+            // border="bottom"
+            dots={['top-right', 'top-left', 'bottom-left', 'bottom-right']}
+          >
+            <TetrisHeader
+              // className={styles.header}
+              preview={game.preview}
+              isGameOver={game.isGameOver}
+              isBotPlaying={game.isBotPlaying}
+            />
+          </TetrisBox>
+          <TetrisBox
+            className={styles.play}
+            // dots="top-right"
+          >
+            Play game here
+          </TetrisBox>
+        </TetrisBox>
+        {/* </header> */}
 
-        <div className={styles.sidebar}>Right content</div>
+        <TetrisBox
+          className={styles.content}
+          border={['left', 'right']}
+          // dots="bottom-left"
+          // border="left"
+        >
+          <TetrisBox
+            className={styles.game}
+            border="right"
+            dots="bottom-left"
+          >
+            <canvas
+              tabIndex={-1}
+              ref={canvas}
+              className={styles.canvas}
+            />
+          </TetrisBox>
+          <TetrisBox
+            className={styles.sidebar}
+            border="right"
+            dots={['bottom-left', 'bottom-right']}
+            // border={['left', 'right']}
+          >
+            Right content
+          </TetrisBox>
+        </TetrisBox>
+
         <button
           style={{ position: 'absolute', top: 0, left: 0 }}
           onClick={() => {

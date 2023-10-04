@@ -21,18 +21,18 @@ $borderRadius: 8px;
   background-color: var(--editor-background-color);
   border-radius: $borderRadius;
 
-  &:before {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: -1;
-    border-radius: $borderRadius;
-    transform: translate(15px, 15px);
-    background-color: rgba(#121820, 0.55);
-  }
+  // &:before {
+  //   content: '';
+  //   position: absolute;
+  //   top: 0;
+  //   bottom: 0;
+  //   left: 0;
+  //   right: 0;
+  //   z-index: -30;
+  //   border-radius: $borderRadius;
+  //   transform: translate(20px, 15px);
+  //   background-color: rgba(#121820, 0.25);
+  // }
 }
 
 /* --------------------------- */
