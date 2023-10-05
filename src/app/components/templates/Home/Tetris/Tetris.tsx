@@ -88,7 +88,12 @@ export default function Tetris() {
             className={styles.sidebar}
             {...boxes.sidebar}
           >
-            <TetrisSidebar />
+            <TetrisSidebar
+              level={game.level}
+              score={game.score}
+              lines={game.clearedLines}
+              linesUntilNextLevel={game.linesUntilNextLevel}
+            />
           </TetrisBox>
         </TetrisBox>
       </div>

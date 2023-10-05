@@ -9,8 +9,7 @@ import gsap from 'gsap';
 import BezierEasing from 'bezier-easing';
 import type { RefObject } from 'react';
 
-// TODO Implement scoring system
-// TODO Speed up game as score increases
+// TODO Add UI for game controls
 // TODO Add music and sound effects
 
 export default class TetrisBoard {
@@ -24,6 +23,7 @@ export default class TetrisBoard {
   isPaused = false;
   columns = 24;
   rows = 10;
+  linesPerLevel = 5;
   blockSize = 0;
   blockRadius = 0;
   blockStrokeWidth = 2.2;
@@ -32,8 +32,9 @@ export default class TetrisBoard {
   grid: TetrisGrid = [];
   trails: Trail[] = [];
   timeline = gsap.timeline({ autoRemoveChildren: true });
-  clearedRows = 0;
-  dropInterval = 1100 / 1000;
+  level = 1;
+  score = 0;
+  clearedLines = 0;
   intervalStart = 0;
   elapsedTime = 0;
 
@@ -45,6 +46,7 @@ export default class TetrisBoard {
   private _isClearingBoard = false;
   private _isVisible = false;
   private _isDestroyed = false;
+  private _clearedRowsAtCurrentLevel = 0;
   private _animatingRows: Nullable<Block>[][] = [];
   private _numQueuedPieces: number;
 
@@ -111,13 +113,11 @@ export default class TetrisBoard {
     if (value && !this._hasStarted) this.play();
 
     if (!value && !this._isClearingBoard) {
-      this.timeline.pause();
-      gsap.ticker.remove(this.tick);
+      this.toggleTicker(false);
     }
 
     if (value && (this.isAnimating || this.isGameActive) && !this.isPaused) {
-      this.timeline.play();
-      gsap.ticker.add(this.tick);
+      this.toggleTicker(true);
     }
 
     this._isVisible = value;
@@ -141,6 +141,11 @@ export default class TetrisBoard {
     return this._isClearingBoard;
   }
 
+  get dropInterval() {
+    const index = Math.min(this.level - 1, dropIntervals.length - 1);
+    return dropIntervals[index] / 1000;
+  }
+
   subscribe(listener: () => void) {
     this._listeners.add(listener);
     return () => this._listeners.delete(listener);
@@ -158,6 +163,11 @@ export default class TetrisBoard {
       isGameOver: this.isGameOver,
       isGameActive: this.isGameActive,
       isBotPlaying: this.isBotPlaying,
+      score: this.score,
+      level: this.level,
+      clearedLines: this.clearedLines,
+      linesUntilNextLevel: this.linesUntilNextLevel,
+      preview: this.preview,
       ...state
     };
 
@@ -206,8 +216,7 @@ export default class TetrisBoard {
     this._isClearingBoard = true;
 
     // Ensure animations get drawn to canvas
-    this.timeline.play();
-    gsap.ticker.add(this.tick);
+    this.toggleTicker(true);
 
     this.timeline.getTweensOf(this.piece).forEach(a => a.kill());
 
@@ -232,6 +241,7 @@ export default class TetrisBoard {
       this.piece.hasCleared = true;
     }
 
+    // TODO Could probably optimize/combine a few of these loops
     const emptyColumns = (board[0] || []).map((_, i) => board.some(r => r[i]));
 
     const grid = board
@@ -248,24 +258,27 @@ export default class TetrisBoard {
 
     if (grid.length) {
       const blocks = grid.flat();
-      const stagger: gsap.StaggerVars = {
-        each: 0.04,
-        from: [0, grid.length - 1],
-        grid: [grid.length, grid[0]?.length ?? 0]
+      const vars: gsap.TweenVars = {
+        immediateRender: true,
+        stagger: {
+          each: 0.035,
+          from: [0, grid.length - 1],
+          grid: [grid.length, grid[0]?.length ?? 0]
+        }
       };
 
       await Promise.all([
         this.animate(blocks, {
-          scale: 0,
-          duration: 0.4,
+          scale: 0.2,
+          duration: 0.35,
           ease: blockEaseOut,
-          stagger
+          ...vars
         }),
         this.animate(blocks, {
           opacity: 0,
           duration: 0.25,
           delay: 0.03,
-          stagger
+          ...vars
         })
       ]);
     }
@@ -284,9 +297,7 @@ export default class TetrisBoard {
     this.isPaused = false;
 
     this.draw();
-
-    gsap.ticker.add(this.tick);
-    this.timeline.play();
+    this.toggleTicker(true);
 
     if (!this.isBotPlaying) this.canvas?.focus();
 
@@ -306,7 +317,7 @@ export default class TetrisBoard {
 
     // Don't cancel animation frame if game was
     // unpaused while waiting for animations to finish
-    if (this.isPaused) gsap.ticker.remove(this.tick);
+    if (this.isPaused) this.toggleTicker(false);
   }
 
   async gameOver() {
@@ -322,7 +333,9 @@ export default class TetrisBoard {
 
     await this.waitUntilAnimationsComplete(300);
 
-    if (!this.isGameActive) gsap.ticker.remove(this.tick);
+    if (!this.isGameActive && !this._isClearingBoard) {
+      this.toggleTicker(false);
+    }
   }
 
   reset(emitChange = true) {
@@ -330,7 +343,10 @@ export default class TetrisBoard {
     this.grid = this.getEmptyBoard();
     this.setNextPiece(false, true);
     this.intervalStart = gsap.ticker.time;
-    this.clearedRows = 0;
+    this.level = 1;
+    this.score = 0;
+    this.clearedLines = 0;
+    this._clearedRowsAtCurrentLevel = 0;
     this.elapsedTime = 0;
 
     if (emitChange) this.emitChange();
@@ -371,7 +387,7 @@ export default class TetrisBoard {
     this.preview.typeLabel();
 
     if (this.isBotPlaying) {
-      await this.wait(200);
+      await this.wait(this.dropInterval * 1000 * 0.18);
       this.bot.moveToBestPosition(piece);
     }
   }
@@ -382,7 +398,7 @@ export default class TetrisBoard {
       return;
     }
 
-    if (this.isPlaying) {
+    if (this.isPlaying && !this.isClearingBoard) {
       const hasHardDropped = this.piece?.hasHardDropped;
 
       this.elapsedTime = timestamp - this.intervalStart;
@@ -396,12 +412,24 @@ export default class TetrisBoard {
     this.draw();
   }
 
+  private toggleTicker(isActive: boolean) {
+    if (isActive) {
+      this.intervalStart = gsap.ticker.time - this.elapsedTime;
+
+      this.timeline.play();
+      gsap.ticker.add(this.tick);
+    } else {
+      this.timeline.pause();
+      gsap.ticker.remove(this.tick);
+    }
+  }
+
   private drop() {
     if (!this.piece) return;
 
     if (!this.piece.drop() && this.piece.x === this.piece.currentX) {
       this.freezePiece();
-      this.clearCompletedRows();
+      this.clearCompletedLines();
 
       if (this.piece.getShapeY() <= 0) return false;
 
@@ -427,7 +455,11 @@ export default class TetrisBoard {
     });
   }
 
-  private clearCompletedRows() {
+  get linesUntilNextLevel() {
+    return this.linesPerLevel - this._clearedRowsAtCurrentLevel;
+  }
+
+  private clearCompletedLines() {
     const newGrid: Nullable<Block>[][] = [];
     let clearCount = 0;
 
@@ -458,6 +490,40 @@ export default class TetrisBoard {
         )
       )
       .reverse();
+
+    this.updateScore(clearCount);
+  }
+
+  private updateScore(clearedLines: number) {
+    if (this.piece) {
+      this.score += this.piece.hasHardDropped ? 2 : 1;
+    }
+
+    this.clearedLines += clearedLines;
+    this._clearedRowsAtCurrentLevel += clearedLines;
+
+    switch (clearedLines) {
+      case 1:
+        this.score += 100 * this.level;
+        break;
+      case 2:
+        this.score += 300 * this.level;
+        break;
+      case 3:
+        this.score += 500 * this.level;
+        break;
+      case 4:
+        this.score += 800 * this.level;
+        break;
+    }
+
+    if (this._clearedRowsAtCurrentLevel >= this.linesPerLevel) {
+      this.level++;
+
+      this._clearedRowsAtCurrentLevel -= this.linesPerLevel;
+    }
+
+    this.emitChange();
   }
 
   // GSAP seems to have weird behavior with promises,
@@ -468,7 +534,6 @@ export default class TetrisBoard {
         target,
         {
           immediateRender: true,
-          // overwrite: true,
           ...vars,
           onComplete: () => {
             requestAnimationFrame(() => {
@@ -529,7 +594,6 @@ export default class TetrisBoard {
   }
 
   private clearRow(row: Nullable<Block>[]) {
-    this.clearedRows++;
     this.animateRow(row, {
       scale: 0,
       opacity: 0,
@@ -663,21 +727,21 @@ export default class TetrisBoard {
 
   private handleKeyDown(e: KeyboardEvent) {
     if (
-      this.isBotPlaying ||
       !this.isVisible ||
       e.metaKey ||
       e.shiftKey ||
-      e.ctrlKey
+      e.ctrlKey ||
+      !keymap.includes(e.key)
     ) {
       return;
     }
 
-    // Move current tetromino
+    // Movement keys
     if (
       this.isPlaying &&
+      !this.isBotPlaying &&
       this.piece &&
-      !this.piece.hasHardDropped &&
-      movementKeys.includes(e.key)
+      !this.piece.hasHardDropped
     ) {
       e.preventDefault();
 
@@ -706,6 +770,19 @@ export default class TetrisBoard {
           break;
       }
     }
+
+    // Game controls
+    if (this.isGameActive) {
+      switch (e.key) {
+        case 'p':
+          if (this.isPlaying) {
+            this.pause();
+          } else {
+            this.play();
+          }
+          break;
+      }
+    }
   }
 
   destroy() {
@@ -727,7 +804,7 @@ export default class TetrisBoard {
   }
 }
 
-const movementKeys = [
+const keymap = [
   'ArrowLeft',
   'Left',
   'ArrowRight',
@@ -737,11 +814,16 @@ const movementKeys = [
   'ArrowUp',
   'x',
   'z',
-  ' '
+  ' ',
+  'p'
 ];
 
-// const blockEaseOut = BezierEasing(0.67, -0.58, 0.2, 1);
 const blockEaseOut = BezierEasing(0.48, -0.52, 0, 0.98);
+
+const dropIntervals = [
+  1100, 800, 720, 630, 550, 470, 380, 300, 220, 130, 100, 80, 80, 80, 70, 70,
+  70, 50, 50, 50, 30, 30
+];
 
 export type TetrisGrid = Nullable<Block>[][];
 
@@ -756,5 +838,10 @@ type GameState = {
   isGameOver: boolean;
   isGameActive: boolean;
   isBotPlaying: boolean;
+  level: number;
+  score: number;
+  // score: bigint;
+  clearedLines: number;
+  linesUntilNextLevel: number;
   preview: PiecePreview;
 };
