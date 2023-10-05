@@ -119,6 +119,7 @@ button {
     outline-style: solid;
     outline-offset: 3px;
     outline-width: 2px;
+    mask: none;
   }
 
   &.no-outline {

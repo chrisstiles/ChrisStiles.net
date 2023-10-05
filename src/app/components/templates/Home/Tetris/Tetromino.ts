@@ -13,6 +13,7 @@ export default class Tetromino {
   currentX: number;
   currentY: number;
   hasHardDropped = false;
+  hasCleared = false;
 
   constructor(
     board: TetrisBoard,
@@ -134,6 +135,7 @@ export default class Tetromino {
   get isAnimating() {
     return (
       !this.hasHardDropped &&
+      !this.hasCleared &&
       (this.x !== this.currentX || this.y !== this.currentY)
     );
   }
@@ -141,6 +143,8 @@ export default class Tetromino {
   private _entranceAnimations: (gsap.core.Tween | gsap.core.Timeline)[] = [];
 
   move(direction: 'left' | 'right' | 'down') {
+    if (this.board.isClearingBoard) return false;
+
     const { x: prevX, y: prevY } = this;
     let { x, y } = this;
 

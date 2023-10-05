@@ -57,6 +57,7 @@ export default function Tetris() {
               <Button
                 className={styles.playButton}
                 icon={<GamePad />}
+                onClick={() => game.startNewGame(false)}
               >
                 Start new game
               </Button>
@@ -90,20 +91,6 @@ export default function Tetris() {
             <TetrisSidebar />
           </TetrisBox>
         </TetrisBox>
-
-        <button
-          style={{ position: 'absolute', top: 0, left: 0 }}
-          onClick={() => {
-            if (!game.isGameActive || game.isPaused) {
-              canvas.current?.focus({ preventScroll: true });
-              game.play();
-            } else {
-              game.pause();
-            }
-          }}
-        >
-          {game.isPlaying ? 'Pause' : 'Play'}
-        </button>
       </div>
     </Section>
   );

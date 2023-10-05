@@ -40,8 +40,11 @@ export default class TetrisBot {
     while (
       this.board.isBotPlaying &&
       this.board.piece === piece &&
+      this.board.isGameActive &&
       (!isDoneRotating || !isDoneMoving)
     ) {
+      if (this.board.isClearingBoard) return;
+
       const isAtRotateX = !hasRotateXPosition || x === rotateX;
 
       if (!isDoneRotating && isAtRotateX) {
@@ -67,7 +70,12 @@ export default class TetrisBot {
 
     if (hasRotateXPosition) await this.board.wait(50, 70);
 
-    if (this.board.isBotPlaying && this.board.piece === piece) {
+    if (
+      this.board.isBotPlaying &&
+      this.board.piece === piece &&
+      this.board.isGameActive &&
+      !this.board.isClearingBoard
+    ) {
       this.board.hardDrop();
     }
   }

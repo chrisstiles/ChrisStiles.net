@@ -6,10 +6,12 @@ import PiecePreview from './PiecePreview';
 import { isSSR, sleep } from '@helpers';
 import { random, uniqueId } from 'lodash';
 import gsap from 'gsap';
+import BezierEasing from 'bezier-easing';
 import type { RefObject } from 'react';
 
 // TODO Implement scoring system
 // TODO Speed up game as score increases
+// TODO Add music and sound effects
 
 export default class TetrisBoard {
   piece: Nullable<Tetromino> = null;
@@ -40,6 +42,7 @@ export default class TetrisBoard {
   private _canvas: RefObject<HTMLCanvasElement>;
   private _hasInitialized = false;
   private _hasStarted = false;
+  private _isClearingBoard = false;
   private _isVisible = false;
   private _isDestroyed = false;
   private _animatingRows: Nullable<Block>[][] = [];
@@ -57,6 +60,7 @@ export default class TetrisBoard {
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.setBoardSize = this.setBoardSize.bind(this);
     this.tick = this.tick.bind(this);
+    this.startNewGame = this.startNewGame.bind(this);
     this.play = this.play.bind(this);
     this.pause = this.pause.bind(this);
     this.hardDrop = this.hardDrop.bind(this);
@@ -106,10 +110,12 @@ export default class TetrisBoard {
     if (value === this._isVisible) return;
     if (value && !this._hasStarted) this.play();
 
-    if (!value) {
+    if (!value && !this._isClearingBoard) {
       this.timeline.pause();
       gsap.ticker.remove(this.tick);
-    } else if ((this.isAnimating || this.isGameActive) && !this.isPaused) {
+    }
+
+    if (value && (this.isAnimating || this.isGameActive) && !this.isPaused) {
       this.timeline.play();
       gsap.ticker.add(this.tick);
     }
@@ -122,12 +128,17 @@ export default class TetrisBoard {
       !this._isDestroyed &&
       !!(
         this.isPlaying ||
+        this._isClearingBoard ||
         (this.timeline.isActive() && !this.timeline.paused()) ||
-        this.piece?.isAnimating ||
+        (this.piece?.isAnimating && !this._isClearingBoard) ||
         this._animatingRows.length ||
         this.trails.length
       )
     );
+  }
+
+  get isClearingBoard() {
+    return this._isClearingBoard;
   }
 
   subscribe(listener: () => void) {
@@ -170,10 +181,102 @@ export default class TetrisBoard {
     window.addEventListener('keydown', this.handleKeyDown, { capture: true });
   }
 
+  async startNewGame(isBotPlaying = false) {
+    this.isBotPlaying = isBotPlaying;
+    this.isGameActive = true;
+
+    if (this._isClearingBoard) return;
+
+    this.isGameActive = false;
+
+    if (!this.isBotPlaying) this.canvas?.focus();
+
+    await this.wipeBoard();
+
+    this.reset(false);
+    this.play();
+
+    if (!this.isVisible) {
+      this.timeline.pause();
+      gsap.ticker.remove(this.tick);
+    }
+  }
+
+  async wipeBoard() {
+    this._isClearingBoard = true;
+
+    // Ensure animations get drawn to canvas
+    this.timeline.play();
+    gsap.ticker.add(this.tick);
+
+    this.timeline.getTweensOf(this.piece).forEach(a => a.kill());
+
+    const board = this.grid.slice().map(row => row.slice());
+
+    // Add blocks from piece's shape to board
+    if (this.piece) {
+      this.piece.shape.forEach((row, y) => {
+        row.forEach((block, x) => {
+          if (!this.piece) return;
+
+          const blockX = this.piece.x + x;
+          const blockY = this.piece.y + y;
+
+          if (block && blockY >= 0) {
+            this.timeline.killTweensOf(block);
+            board[blockY][blockX] = block;
+          }
+        });
+      });
+
+      this.piece.hasCleared = true;
+    }
+
+    const emptyColumns = (board[0] || []).map((_, i) => board.some(r => r[i]));
+
+    const grid = board
+      .map((row, y) => {
+        // Remove empty columns
+        row = row.filter((_, i) => emptyColumns[i]);
+
+        // Add hidden blocks to remaining empty spaces
+        return row.some(value => !!value)
+          ? row.map((block, x) => block ?? new Block(this, x, y, null))
+          : null;
+      })
+      .filter(row => row);
+
+    if (grid.length) {
+      const blocks = grid.flat();
+      const stagger: gsap.StaggerVars = {
+        each: 0.04,
+        from: [0, grid.length - 1],
+        grid: [grid.length, grid[0]?.length ?? 0]
+      };
+
+      await Promise.all([
+        this.animate(blocks, {
+          scale: 0,
+          duration: 0.4,
+          ease: blockEaseOut,
+          stagger
+        }),
+        this.animate(blocks, {
+          opacity: 0,
+          duration: 0.25,
+          delay: 0.03,
+          stagger
+        })
+      ]);
+    }
+
+    this._isClearingBoard = false;
+  }
+
   play() {
     this._hasStarted = true;
 
-    if (!this.isGameActive && !this.isPaused) {
+    if (!this.isGameActive && !this.isPaused && !this._isClearingBoard) {
       this.reset();
     }
 
@@ -181,8 +284,11 @@ export default class TetrisBoard {
     this.isPaused = false;
 
     this.draw();
+
     gsap.ticker.add(this.tick);
     this.timeline.play();
+
+    if (!this.isBotPlaying) this.canvas?.focus();
 
     this.emitChange();
   }
@@ -215,10 +321,11 @@ export default class TetrisBoard {
     this.emitChange();
 
     await this.waitUntilAnimationsComplete(300);
+
     if (!this.isGameActive) gsap.ticker.remove(this.tick);
   }
 
-  reset() {
+  reset(emitChange = true) {
     this.isGameOver = false;
     this.grid = this.getEmptyBoard();
     this.setNextPiece(false, true);
@@ -226,7 +333,7 @@ export default class TetrisBoard {
     this.clearedRows = 0;
     this.elapsedTime = 0;
 
-    this.emitChange();
+    if (emitChange) this.emitChange();
   }
 
   private getEmptyBoard() {
@@ -272,7 +379,6 @@ export default class TetrisBoard {
   private tick(timestamp = 0) {
     if (!this.isAnimating || !this.ctx) {
       gsap.ticker.remove(this.tick);
-
       return;
     }
 
@@ -362,6 +468,7 @@ export default class TetrisBoard {
         target,
         {
           immediateRender: true,
+          // overwrite: true,
           ...vars,
           onComplete: () => {
             requestAnimationFrame(() => {
@@ -632,6 +739,9 @@ const movementKeys = [
   'z',
   ' '
 ];
+
+// const blockEaseOut = BezierEasing(0.67, -0.58, 0.2, 1);
+const blockEaseOut = BezierEasing(0.48, -0.52, 0, 0.98);
 
 export type TetrisGrid = Nullable<Block>[][];
 

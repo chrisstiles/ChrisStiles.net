@@ -5,12 +5,12 @@
 @use 'app';
 
 .wrapper {
-  --game-rows: 10;
+  --game-rows: 12;
   --game-cols: 10;
   --block-border-radius: 6.5px;
   --blocks-per-col: 2;
   --block-offset: 5.6px;
-  --block-stroke-width: 2.2px;
+  --block-stroke-width: 2px;
   --block-size: calc(var(--grid-col-width) / var(--blocks-per-col));
   --game-width: #{app.grid-cols(var(--game-cols))};
   --game-height: calc(var(--block-size) * var(--game-rows));
@@ -212,5 +212,5 @@
 
 .grid {
   --grid-line-color: #2c3250;
-  --sub-line-color: #242943;
+  --sub-line-color: #1a1e33;
 }

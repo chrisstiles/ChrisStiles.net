@@ -8,9 +8,14 @@ export default class Block {
   scale = 1;
   opacity = 1;
 
-  private _colorIndex: number;
+  private _colorIndex: Nullable<number>;
 
-  constructor(board: TetrisBoard, x: number, y: number, colorIndex: number) {
+  constructor(
+    board: TetrisBoard,
+    x: number,
+    y: number,
+    colorIndex: Nullable<number>
+  ) {
     this.board = board;
     this.x = x;
     this.y = y;
@@ -18,12 +23,14 @@ export default class Block {
   }
 
   get color() {
+    if (this._colorIndex === null) return 'transparent';
     return pieces[this._colorIndex].color;
   }
 
   draw(x = this.x, y = this.y, isProjection = false) {
     const {
       ctx,
+      piece,
       blockSize,
       blockRadius,
       offset,
@@ -33,11 +40,13 @@ export default class Block {
 
     if (!ctx || !blockSize) return;
 
+    const isClearingProjection = isProjection && piece?.hasCleared;
     const strokeWidth = isProjection ? blockStrokeWidth : 0;
     const size = 1 - offset - strokeWidth * 2;
-    const scaledSize = size * this.scale;
+    const scale = isClearingProjection ? 1 : this.scale;
+    const scaledSize = isClearingProjection ? size : size * scale;
     const scaleOffset = (size - scaledSize) / 2;
-    const borderRadius = blockRadius * this.scale * 2;
+    const borderRadius = blockRadius * scale * 2;
 
     drawSquircle(
       ctx,
@@ -48,7 +57,12 @@ export default class Block {
     );
 
     if (isProjection) {
-      ctx.globalAlpha = 0.45;
+      const strokeOpacity = 0.45;
+
+      ctx.globalAlpha = isClearingProjection
+        ? strokeOpacity * this.opacity
+        : strokeOpacity;
+
       ctx.strokeStyle = this.color;
       ctx.lineWidth = strokeWidth;
       ctx.stroke();
