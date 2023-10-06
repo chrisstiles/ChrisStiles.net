@@ -34,7 +34,7 @@ export default class TetrisBot {
     // before hard dropping and moving to the next piece
     const canHardDrop = (async () => {
       await this.board.preview.isDoneTyping;
-      await this.board.wait(260);
+      await this.board.wait(Math.min(200, this.board.dropInterval * 1000));
     })();
 
     while (

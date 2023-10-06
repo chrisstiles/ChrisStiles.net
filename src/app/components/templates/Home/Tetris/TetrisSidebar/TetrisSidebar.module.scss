@@ -2,6 +2,110 @@
 /* Tetris Sidebar */
 /* --------------------------- */
 
+// TODO Fix padding being different in wrapper boxes with border lines
+
 .wrapper {
-  padding: 0 30px 30px 30px;
+  --padding: 20px;
+
+  padding: 0 calc(var(--padding) + var(--border-width)) 0 var(--padding);
+}
+
+.box {
+  background-color: #101423;
+  padding: 15px 20px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  line-height: 1;
+}
+
+.scoreBox {
+  margin-bottom: 8px;
+  justify-content: space-between;
+}
+
+.scoreTitle {
+  color: #979dc6;
+  font-size: 14px;
+}
+
+.score {
+  color: #fff;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.levelWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--text-color);
+  text-align: center;
+  margin-top: 30px;
+}
+
+.level {
+  --progress-size: 140px;
+  --path-length: 275.67718505859375;
+
+  width: var(--progress-size);
+  height: var(--progress-size);
+  position: relative;
+
+  svg {
+    width: 100%;
+    height: auto;
+    position: absolute;
+    inset: 0;
+  }
+
+  path {
+    stroke: var(--stroke-color);
+  }
+
+  .progress {
+    --stroke-color: var(--green-accent-color);
+
+    path {
+      transition: stroke-dashoffset 0.3s ease-in-out;
+      stroke-dasharray: var(--path-length);
+      stroke-dashoffset: calc(
+        var(--path-length) - (var(--path-length) * var(--progress, 0))
+      );
+    }
+  }
+
+  .track {
+    --stroke-color: #2b3051;
+  }
+}
+
+.levelText {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  position: relative;
+  z-index: 10;
+  height: 100%;
+  line-height: 1;
+  font-size: 15px;
+  font-weight: 500;
+  padding-top: 10px;
+}
+
+.levelTitle {
+  font-size: 59px;
+  font-weight: 800;
+  color: #fff;
+  margin-top: 5px;
+  letter-spacing: -0.03em;
+}
+
+.levelNumLines {
+  font-size: 14px;
+
+  strong {
+    color: #fff;
+  }
 }

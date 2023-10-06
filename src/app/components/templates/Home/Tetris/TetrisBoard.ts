@@ -167,6 +167,7 @@ export default class TetrisBoard {
       level: this.level,
       clearedLines: this.clearedLines,
       linesUntilNextLevel: this.linesUntilNextLevel,
+      linesPerLevel: this.linesPerLevel,
       preview: this.preview,
       ...state
     };
@@ -185,6 +186,7 @@ export default class TetrisBoard {
     this._hasInitialized = true;
     this._isDestroyed = false;
 
+    this.timeline = gsap.timeline({ autoRemoveChildren: true });
     this.setBoardSize();
 
     window.addEventListener('resize', this.setBoardSize);
@@ -310,9 +312,6 @@ export default class TetrisBoard {
 
     if (finishAnimations) {
       await this.waitUntilAnimationsComplete();
-      this.timeline.pause();
-    } else {
-      this.timeline.pause();
     }
 
     // Don't cancel animation frame if game was
@@ -387,7 +386,7 @@ export default class TetrisBoard {
     this.preview.typeLabel();
 
     if (this.isBotPlaying) {
-      await this.wait(this.dropInterval * 1000 * 0.18);
+      await this.wait(Math.min(this.dropInterval * 1000 * 0.18, 20));
       this.bot.moveToBestPosition(piece);
     }
   }
@@ -518,8 +517,7 @@ export default class TetrisBoard {
     }
 
     if (this._clearedRowsAtCurrentLevel >= this.linesPerLevel) {
-      this.level++;
-
+      this.level = Math.min(this.level + 1, 999);
       this._clearedRowsAtCurrentLevel -= this.linesPerLevel;
     }
 
@@ -788,11 +786,12 @@ export default class TetrisBoard {
   destroy() {
     this._isDestroyed = true;
     this._hasInitialized = false;
-    this.timeline.kill();
     this._animatingRows = [];
     this.trails = [];
     this._listeners.clear();
+    this.timeline.getChildren(true, true, true).forEach(a => a.kill());
     this.timeline.kill();
+    this.grid = this.getEmptyBoard();
 
     window.removeEventListener('resize', this.setBoardSize);
     window.removeEventListener('keydown', this.handleKeyDown);
@@ -840,8 +839,8 @@ type GameState = {
   isBotPlaying: boolean;
   level: number;
   score: number;
-  // score: bigint;
   clearedLines: number;
   linesUntilNextLevel: number;
+  linesPerLevel: number;
   preview: PiecePreview;
 };

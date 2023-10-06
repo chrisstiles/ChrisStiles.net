@@ -93,6 +93,7 @@ export default function Tetris() {
               score={game.score}
               lines={game.clearedLines}
               linesUntilNextLevel={game.linesUntilNextLevel}
+              linesPerLevel={game.linesPerLevel}
             />
           </TetrisBox>
         </TetrisBox>
