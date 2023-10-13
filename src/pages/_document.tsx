@@ -49,6 +49,7 @@ export default class Document extends NextDocument {
             name="theme-color"
             content="#1e2236"
           />
+          <FontPreloads />
         </Head>
         <body>
           <Main />
@@ -57,4 +58,23 @@ export default class Document extends NextDocument {
       </Html>
     );
   }
+}
+
+function FontPreloads() {
+  const fonts = ['Mundial-Regular', 'Mundial-Bold', 'Mundial-DemiBold'];
+
+  return (
+    <>
+      {fonts.map((font, index) => (
+        <link
+          key={index}
+          rel="preload"
+          href={`/fonts/${font}.woff2`}
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        ></link>
+      ))}
+    </>
+  );
 }
