@@ -9,6 +9,9 @@
     calc(0.5px + var(--padding));
 }
 
+/* --------------------------- */
+/* Headings */
+
 .heading {
   --color: var(--heading-color, #fff);
   --text-offset: 18px;
@@ -17,7 +20,7 @@
   line-height: 1;
   font-weight: 600;
   width: calc(100% + var(--padding) * 2);
-  margin: 0 0 calc(var(--padding) - 4px) calc(var(--padding) * -1);
+  margin: 35px 0 calc(var(--padding) - 4px) calc(var(--padding) * -1);
   display: flex;
   align-items: center;
   position: relative;
@@ -114,18 +117,51 @@
   display: flex;
   align-items: center;
   line-height: 1;
+  font-size: 16px;
+  font-weight: 500;
+  min-height: 50px;
 }
 
-.scoreSection {
+/* --------------------------- */
+/* Player */
+
+.playerSection {
   --heading-color: var(--green-accent-color);
-}
 
-.scoreHeading {
-  margin-top: calc(-0.5em - var(--border-width) / 2);
+  .heading {
+    margin-top: calc(-0.5em - var(--border-width) / 2);
+  }
 
   .leftDot {
     --outline-top-left-color: var(--page-background-color);
   }
+}
+
+.playerBox {
+  display: flex;
+  align-items: center;
+  letter-spacing: 0.01em;
+}
+
+.playerIconWrapper {
+  width: 20px;
+  margin: 0 13px 0 -1px;
+  position: relative;
+  flex: none;
+}
+
+.playerIcon {
+  position: absolute;
+  top: 50%;
+  height: 20px;
+  transform: translateY(-50%);
+}
+
+/* --------------------------- */
+/* Score */
+
+.scoreSection {
+  --heading-color: var(--red-accent-color);
 }
 
 .scoreBox {
@@ -136,6 +172,7 @@
 .scoreTitle {
   color: #979dc6;
   font-size: 14px;
+  font-weight: 400;
 }
 
 .score {
@@ -154,7 +191,8 @@
 }
 
 .level {
-  --progress-size: 150px;
+  // --progress-size: 150px;
+  --progress-size: 130px;
   --path-length: 275.67718505859375;
 
   width: var(--progress-size);
@@ -198,13 +236,13 @@
   z-index: 10;
   height: 100%;
   line-height: 1;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
   padding-top: 10px;
 }
 
 .levelTitle {
-  font-size: 59px;
+  font-size: 55px;
   font-weight: 800;
   color: #fff;
   margin-top: 5px;
@@ -212,7 +250,7 @@
 }
 
 .levelNumLines {
-  font-size: 14px;
+  font-size: 13px;
 
   strong {
     color: #fff;

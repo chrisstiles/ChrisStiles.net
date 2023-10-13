@@ -90,6 +90,7 @@ export default function Tetris() {
           >
             <TetrisSidebar
               game={game}
+              isBotPlaying={game.isBotPlaying}
               level={game.level}
               score={game.score}
               lines={game.clearedLines}

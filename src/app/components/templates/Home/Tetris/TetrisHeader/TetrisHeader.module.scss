@@ -5,9 +5,8 @@
 @use 'app';
 
 .wrapper {
-  padding: 40px;
-  font-size: var(--h2-size);
-  min-height: 181px;
+  padding: 38px 42px;
+  font-size: 35px;
 
   &.hidden {
     visibility: hidden;
@@ -21,7 +20,7 @@
 }
 
 .content {
-  --text-spacing: 25px;
+  --text-spacing: 20px;
 
   display: inline-block;
   margin-top: -5px;

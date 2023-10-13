@@ -22,7 +22,7 @@ export default class TetrisBoard {
   isGameOver = false;
   isPaused = false;
   columns = 24;
-  rows = 10;
+  rows = 12;
   linesPerLevel = 5;
   blockSize = 0;
   blockRadius = 0;

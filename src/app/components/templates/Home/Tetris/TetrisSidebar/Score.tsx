@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect } from 'react';
 import styles from './TetrisSidebar.module.scss';
 import SidebarHeading from './SidebarHeading';
-import Progress from './progress.svg';
+import { Progress } from './icons';
 import useIsMounted from '@hooks/useIsMounted';
 import classNames from 'classnames';
 import gsap from 'gsap';
@@ -47,10 +47,7 @@ export default function Score({
 
   return (
     <section className={styles.scoreSection}>
-      <SidebarHeading
-        label="Score"
-        className={styles.scoreHeading}
-      />
+      <SidebarHeading label="Score" />
       <div className={classNames(styles.box, styles.scoreBox)}>
         <div className={styles.scoreTitle}>Points</div>
         <div className={styles.score}>{format(score)}</div>
