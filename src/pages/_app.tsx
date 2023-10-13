@@ -30,13 +30,13 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
           name="viewport"
           content="initial-scale=1.0, width=device-width, minimum-scale=1.0"
         />
-        <link
+        {/* <link
           rel="preload"
           href="/fonts/Mundial-Bold.woff2"
           as="font"
           type="font/woff2"
           crossOrigin="anonymous"
-        ></link>
+        ></link> */}
       </Head>
       <Component {...pageProps} />
       <SquircleMask />

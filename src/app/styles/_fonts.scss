@@ -1,0 +1,21 @@
+/* --------------------------- */
+/* Fonts */
+/* --------------------------- */
+
+@mixin font($family, $file, $weight, $style: normal) {
+  @font-face {
+    font-family: '#{$family}';
+    src: url('/fonts/#{$file}.woff2') format('woff2'),
+      url('/fonts/#{$file}.woff') format('woff');
+    font-weight: $weight;
+    font-style: $style;
+    font-display: swap;
+    font-stretch: normal;
+  }
+}
+
+@include font('Mundial', 'Mundial-Regular', 400);
+@include font('Mundial', 'Mundial-Regular-Italic', 400, italic);
+@include font('Mundial', 'Mundial-Demibold', 500);
+@include font('Mundial', 'Mundial-Bold', 600);
+@include font('Mundial', 'Mundial-Black', 700);

@@ -25,7 +25,7 @@
 
     &.cta {
       margin-left: 22px;
-      margin-right: -8px;
+      margin-right: calc(var(--grid-offset) / -2);
 
       button {
         margin-top: -1px;

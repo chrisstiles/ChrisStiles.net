@@ -6,6 +6,7 @@
 @use 'app';
 @use 'abstracts/colors.module';
 @use 'abstracts/variables.module';
+@use 'fonts';
 @use 'layout';
 @use 'syntax-highlighting';
 
@@ -15,17 +16,6 @@
 :root {
   @include app.css-properties(module-variables(variables));
   @include app.css-properties(module-variables(colors), '-color');
-}
-
-@font-face {
-  font-family: 'Mundial';
-  // src: url('/fonts/Mundial-Bold.woff2') format('woff2'),
-  //   url('/fonts/Mundial-Bold.woff') format('woff');
-  src: url('/fonts/Mundial-Bold-old.woff2') format('woff2');
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-  font-stretch: normal;
 }
 
 /* --------------------------- */
@@ -58,7 +48,6 @@ body {
   padding: 0;
   font-weight: 400;
   font-family: var(--font);
-  font-family: Mundial;
   background-color: var(--page-background-color);
   color: var(--body-text-color);
   position: relative;
@@ -90,11 +79,12 @@ h3,
 h4 {
   line-height: 1.2;
   color: #fff;
+  font-weight: 600;
 }
 
 h1,
 h2 {
-  margin-bottom: 0.88em;
+  margin-bottom: 0.8em;
 }
 
 h1 {
@@ -109,7 +99,7 @@ h2 {
 h3 {
   font-size: var(--h3-size);
   font-weight: 500;
-  margin-bottom: 0.68em;
+  margin-bottom: 0.6em;
 }
 
 h4 {
@@ -139,6 +129,10 @@ button {
   }
 }
 
+strong {
+  font-weight: 600;
+}
+
 @include app.highlight {
   background-color: app.$highlightDark;
   color: #fff;
@@ -154,8 +148,7 @@ button {
   display: flex;
   align-items: center;
   font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.03em;
+  font-weight: 500;
   color: #fff;
   margin-top: auto;
 }

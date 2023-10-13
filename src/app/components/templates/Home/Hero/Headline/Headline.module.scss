@@ -9,7 +9,7 @@
   --transition-duration: 0.3s;
   --skew: -3.5deg;
 
-  font-weight: 700;
+  font-weight: 600;
   font-size: var(--font-size);
   line-height: 1;
   transition: {
@@ -48,7 +48,8 @@
   }
 
   &.grow {
-    --font-size: 75px;
+    // --font-size: 75px;
+    --font-size: 77px;
   }
 
   &.skew {

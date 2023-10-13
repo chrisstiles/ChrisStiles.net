@@ -11,7 +11,7 @@ $handleOffset: -$handleSize / 2;
   $offset: -12px;
 
   position: absolute;
-  inset: $offset + 3px $offset $offset - 3px $offset;
+  inset: $offset - 1px $offset $offset + 4px $offset;
   border: 1px solid #2aa5fc;
   pointer-events: none;
   transform-origin: 2px 2px;

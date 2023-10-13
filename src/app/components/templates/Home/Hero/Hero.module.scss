@@ -3,7 +3,8 @@
 /* --------------------------- */
 
 .wrapper {
-  padding-bottom: 0 !important;
+  --section-top-padding: 10px;
+  --section-bottom-padding: 0;
 }
 
 .top {
@@ -12,6 +13,6 @@
 }
 
 .content {
-  // padding-right: 80px;
   flex-grow: 1;
+  padding-top: 70px;
 }

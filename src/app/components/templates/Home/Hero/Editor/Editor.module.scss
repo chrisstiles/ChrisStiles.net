@@ -15,7 +15,7 @@ $borderRadius: 8px;
 
   width: app.grid-cols(6, calc(var(--offsetX) * -1));
   padding-bottom: var(--offsetY);
-  margin: -90px calc(var(--offsetX) / -2) calc(var(--offsetY) / -2) 0;
+  margin: 0 calc(var(--offsetX) / -2) calc(var(--offsetY) / -2) 0;
   flex: none;
   position: relative;
   background-color: var(--editor-background-color);

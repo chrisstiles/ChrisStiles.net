@@ -61,14 +61,14 @@
 
     content: '';
     line-height: 0;
-    height: 0.85em;
+    height: 0.82em;
     width: var(--cursor-width);
     margin: 0 calc(var(--cursor-width) * -1 + 2px) 0 2px;
     display: inline-block;
     vertical-align: bottom;
     background: currentColor;
     position: relative;
-    top: -2px;
+    top: -3px;
     animation: blink 0.75s step-end infinite;
 
     @at-root .typing & {
@@ -110,7 +110,7 @@
 }
 
 .boundingBox {
-  inset: 3px -8px -1px -7px;
+  inset: -6px -8px -6px -7px;
 
   @at-root .empty & {
     right: -20px;
@@ -123,13 +123,8 @@
   flex: none;
   position: absolute;
   top: 50%;
-  margin-top: 2px;
   left: 0;
   transform: translateY(-50%);
-
-  @at-root .linePiece & {
-    margin-top: 1px;
-  }
 }
 
 .blockRow {

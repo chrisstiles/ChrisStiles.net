@@ -16,9 +16,9 @@
   --color: var(--heading-color, #fff);
   --text-offset: 18px;
 
-  font-size: 22px;
+  font-size: 21px;
   line-height: 1;
-  font-weight: 600;
+  font-weight: 500;
   width: calc(100% + var(--padding) * 2);
   margin: 35px 0 calc(var(--padding) - 4px) calc(var(--padding) * -1);
   display: flex;
@@ -30,8 +30,6 @@
 .headingText {
   flex: none;
   margin-right: var(--text-offset);
-  position: relative;
-  top: -1px;
 }
 
 .headingLine {
@@ -178,7 +176,7 @@
 .score {
   color: #fff;
   font-size: 20px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .levelWrapper {
@@ -191,8 +189,7 @@
 }
 
 .level {
-  // --progress-size: 150px;
-  --progress-size: 130px;
+  --progress-size: 140px;
   --path-length: 275.67718505859375;
 
   width: var(--progress-size);
