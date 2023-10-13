@@ -89,6 +89,7 @@ export default function Tetris() {
             {...boxes.sidebar}
           >
             <TetrisSidebar
+              game={game}
               level={game.level}
               score={game.score}
               lines={game.clearedLines}
@@ -109,17 +110,17 @@ const boxes: { [key: string]: TetrisBoxProps } = {
   },
   header: {
     border: ['bottom', 'right'],
-    dots: ['top-right', 'top-left', 'bottom-left', 'bottom-right']
+    dots: ['top-right', 'top-left', 'bottom-left']
   },
   content: {
     border: ['left', 'right'],
     dots: 'bottom-left'
   },
   game: {
-    border: ['right', 'bottom']
+    border: 'bottom'
   },
   sidebar: {
-    border: 'right',
+    border: ['left', 'right'],
     dots: ['bottom-left', 'bottom-right']
   }
 };

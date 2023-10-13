@@ -193,7 +193,8 @@ export default class Tetromino {
       this._entranceAnimations.push(animation);
     }
 
-    return true;
+    // return true;
+    return animation;
   }
 
   drop() {

@@ -1,1 +1,1 @@
-export { default } from './TetrisSidebar';
+export { default, type TetrisSidebarProps } from './TetrisSidebar';

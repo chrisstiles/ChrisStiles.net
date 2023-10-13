@@ -48,14 +48,14 @@ export default class TetrisBot {
       const isAtRotateX = !hasRotateXPosition || x === rotateX;
 
       if (!isDoneRotating && isAtRotateX) {
+        await this.board.wait(60, 80);
         piece.rotate('right');
-        await this.board.wait(50, 70);
         isDoneRotating = piece.isSameShape(shape);
       }
 
       if (!isDoneMoving) {
         const didMove = piece.move(direction);
-        await this.board.wait(45, 70);
+        await this.board.wait(45, 75);
 
         x = piece.x;
         isDoneMoving = x === bestMove.x && isAtRotateX;

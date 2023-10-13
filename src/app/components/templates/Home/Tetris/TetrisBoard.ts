@@ -821,7 +821,7 @@ const blockEaseOut = BezierEasing(0.48, -0.52, 0, 0.98);
 
 const dropIntervals = [
   1100, 800, 720, 630, 550, 470, 380, 300, 220, 130, 100, 80, 80, 80, 70, 70,
-  70, 50, 50, 50, 30, 30
+  70, 50, 50, 50, 40, 35
 ];
 
 export type TetrisGrid = Nullable<Block>[][];

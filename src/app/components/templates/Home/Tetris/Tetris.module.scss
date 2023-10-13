@@ -53,6 +53,10 @@
   &:global(.left) {
     border-left-width: var(--border-width);
   }
+
+  @at-root .sidebar & {
+    left: calc(var(--border-width) / -2 - 0.5px);
+  }
 }
 
 .dot {
@@ -146,7 +150,7 @@
       --outline-bottom-right-color: var(--page-background-dark-color);
       --outline-bottom-left-color: var(--page-background-dark-color);
 
-      left: calc(var(--border-width) / -2);
+      left: calc(var(--border-width) / -2 - 1px);
     }
   }
 }

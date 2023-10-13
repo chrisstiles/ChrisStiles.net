@@ -2,12 +2,109 @@
 /* Tetris Sidebar */
 /* --------------------------- */
 
-// TODO Fix padding being different in wrapper boxes with border lines
-
 .wrapper {
-  --padding: 20px;
+  --padding: 22px;
 
-  padding: 0 calc(var(--padding) + var(--border-width)) 0 var(--padding);
+  padding: 0 calc(var(--border-width) - 0.5px + var(--padding)) 0
+    calc(0.5px + var(--padding));
+}
+
+.heading {
+  --color: var(--heading-color, #fff);
+  --text-offset: 18px;
+
+  font-size: 22px;
+  line-height: 1;
+  font-weight: 600;
+  width: calc(100% + var(--padding) * 2);
+  margin: 0 0 calc(var(--padding) - 4px) calc(var(--padding) * -1);
+  display: flex;
+  align-items: center;
+  position: relative;
+  z-index: 30;
+}
+
+.headingText {
+  flex: none;
+  margin-right: var(--text-offset);
+  position: relative;
+  top: -1px;
+}
+
+.headingLine {
+  --dot-color: var(--sidebar-color);
+  --dot-size: 10px;
+  --outline-size: 6px;
+  --dot-total-size: calc(var(--dot-size) + var(--outline-size) * 2);
+  --dot-outline-offset: calc(var(--outline-size) * -1);
+  --dot-grid-offset: calc(
+    var(--border-width) / -2 - calc(var(--dot-total-size) / 2)
+  );
+
+  position: relative;
+
+  &:before {
+    content: '';
+    display: block;
+    height: 2px;
+    width: 100%;
+    background-color: var(--color);
+    z-index: 30;
+    position: absolute;
+    inset: 50% 0 0 auto;
+    margin-top: -1px;
+  }
+
+  &.left {
+    width: 30px;
+    flex: none;
+    flex-direction: row-reverse;
+    margin-right: var(--text-offset);
+
+    &:before {
+      left: 3px;
+    }
+  }
+
+  &.right {
+    flex-grow: 1;
+    width: 100%;
+
+    &:before {
+      right: 3px;
+    }
+  }
+}
+
+.dot {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+
+  &:after {
+    content: '';
+    position: absolute;
+    inset: var(--outline-size);
+    box-shadow: inset 0 0 0 2px var(--color);
+    border-radius: 50%;
+  }
+}
+
+.leftDot {
+  --outline-top-left-color: var(--game-color);
+  --outline-bottom-left-color: var(--game-color);
+  --outline-top-right-color: var(--sidebar-color);
+  --outline-bottom-right-color: var(--sidebar-color);
+
+  left: var(--dot-grid-offset);
+}
+
+.rightDot {
+  --outline-top-left-color: var(--sidebar-color);
+  --outline-bottom-left-color: var(--sidebar-color);
+
+  left: auto;
+  right: var(--dot-grid-offset);
 }
 
 .box {
@@ -17,6 +114,18 @@
   display: flex;
   align-items: center;
   line-height: 1;
+}
+
+.scoreSection {
+  --heading-color: var(--green-accent-color);
+}
+
+.scoreHeading {
+  margin-top: calc(-0.5em - var(--border-width) / 2);
+
+  .leftDot {
+    --outline-top-left-color: var(--page-background-color);
+  }
 }
 
 .scoreBox {
@@ -45,7 +154,7 @@
 }
 
 .level {
-  --progress-size: 140px;
+  --progress-size: 150px;
   --path-length: 275.67718505859375;
 
   width: var(--progress-size);
