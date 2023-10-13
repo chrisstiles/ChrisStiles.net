@@ -17,6 +17,17 @@
   @include app.css-properties(module-variables(colors), '-color');
 }
 
+@font-face {
+  font-family: 'Mundial';
+  // src: url('/fonts/Mundial-Bold.woff2') format('woff2'),
+  //   url('/fonts/Mundial-Bold.woff') format('woff');
+  src: url('/fonts/Mundial-Bold-old.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+  font-stretch: normal;
+}
+
 /* --------------------------- */
 /* Shared Styles */
 
@@ -47,6 +58,7 @@ body {
   padding: 0;
   font-weight: 400;
   font-family: var(--font);
+  font-family: Mundial;
   background-color: var(--page-background-color);
   color: var(--body-text-color);
   position: relative;
