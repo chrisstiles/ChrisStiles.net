@@ -14,8 +14,13 @@
   }
 }
 
+// Primary body font
 @include font('Mundial', 'Mundial-Regular', 400);
 @include font('Mundial', 'Mundial-Regular-Italic', 400, italic);
 @include font('Mundial', 'Mundial-DemiBold', 500);
 @include font('Mundial', 'Mundial-Bold', 600);
 @include font('Mundial', 'Mundial-Black', 700);
+
+// Secondary monospace code font
+@include font('Source Code Pro', 'SourceCodePro-Regular', 400);
+@include font('Source Code Pro', 'SourceCodePro-SemiBold', 500);

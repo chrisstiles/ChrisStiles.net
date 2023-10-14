@@ -5,10 +5,7 @@ export default class Document extends NextDocument {
     return (
       <Html lang="en">
         <Head>
-          <link
-            rel="stylesheet"
-            href="https://use.typekit.net/gse1fwz.css"
-          />
+          <FontPreloads />
           <link
             rel="apple-touch-icon"
             sizes="180x180"
@@ -49,7 +46,6 @@ export default class Document extends NextDocument {
             name="theme-color"
             content="#1e2236"
           />
-          <FontPreloads />
         </Head>
         <body>
           <Main />
@@ -61,7 +57,13 @@ export default class Document extends NextDocument {
 }
 
 function FontPreloads() {
-  const fonts = ['Mundial-Regular', 'Mundial-Bold', 'Mundial-DemiBold'];
+  const fonts = [
+    'Mundial-Regular',
+    'Mundial-Bold',
+    'Mundial-DemiBold',
+    'SourceCodePro-Regular',
+    'SourceCodePro-SemiBold'
+  ];
 
   return (
     <>
