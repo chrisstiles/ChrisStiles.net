@@ -62,7 +62,7 @@ function FontPreloads() {
     'Mundial-Bold',
     'Mundial-DemiBold',
     'SourceCodePro-Regular',
-    'SourceCodePro-SemiBold'
+    'SourceCodePro-Medium'
   ];
 
   return (
