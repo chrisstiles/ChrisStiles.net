@@ -142,7 +142,7 @@ export type FieldProps = {
   controlEl?: Nullable<ReactNode>;
   theme?: 'light' | 'dark';
   placeholder?: string;
-  autoComplete?: 'on' | 'off';
+  autoComplete?: string;
   autoCorrect?: 'on' | 'off';
   autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
   spellCheck?: Booleanish;

@@ -276,14 +276,16 @@ const fields: Field[] = [
     name: 'name',
     label: 'Your name',
     icon: <Icon.Person />,
-    placeholder: 'Enter your name'
+    placeholder: 'Enter your name',
+    autoComplete: 'name'
   },
   {
     name: 'email',
     label: 'Email address',
     type: 'email',
     icon: <Icon.Email />,
-    placeholder: 'Enter your email address'
+    placeholder: 'Enter your email address',
+    autoComplete: 'email'
   },
   {
     name: 'message',
@@ -299,6 +301,7 @@ type Field = {
   name: FormFieldName;
   label: string;
   placeholder: string;
+  autoComplete?: string;
   type?: string;
   icon?: ReactNode;
 };
