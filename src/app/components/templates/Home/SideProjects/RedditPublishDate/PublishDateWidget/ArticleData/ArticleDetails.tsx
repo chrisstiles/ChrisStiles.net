@@ -79,7 +79,7 @@ function DetailRow({
       <td>
         <span className={styles.detail}>
           <>
-            {valueIcon} {value}
+            <span className={styles.detailIcon}>{valueIcon}</span> {value}
           </>
         </span>
       </td>
