@@ -31,6 +31,8 @@ import {
   type TimelineSegment
 } from 'motion';
 
+// TODO Fix shifting content on Windows when scrollbar hides
+
 export default memo(function ContactModal({
   isOpen,
   openButton,

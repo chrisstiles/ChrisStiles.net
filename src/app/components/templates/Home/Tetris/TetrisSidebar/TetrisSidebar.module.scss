@@ -2,11 +2,16 @@
 /* Tetris Sidebar */
 /* --------------------------- */
 
+@use 'app';
+
 .wrapper {
   --padding: 22px;
+  --padding-left: calc(0.5px + var(--padding));
+  --padding-right: calc(var(--border-width) - 0.5px + var(--padding));
 
-  padding: 0 calc(var(--border-width) - 0.5px + var(--padding)) 0
-    calc(0.5px + var(--padding));
+  padding: 0 var(--padding-right) var(--padding) var(--padding-left);
+  display: flex;
+  flex-direction: column;
 }
 
 /* --------------------------- */
@@ -33,6 +38,7 @@
 }
 
 .headingLine {
+  --line-offset: 3px;
   --dot-color: var(--sidebar-color);
   --dot-size: 10px;
   --outline-size: 6px;
@@ -57,13 +63,14 @@
   }
 
   &.left {
-    width: 30px;
+    width: calc(var(--padding) - var(--line-offset));
     flex: none;
     flex-direction: row-reverse;
     margin-right: var(--text-offset);
 
     &:before {
-      left: 3px;
+      left: var(--line-offset);
+      border-radius: 0 1px 1px 0;
     }
   }
 
@@ -72,7 +79,9 @@
     width: 100%;
 
     &:before {
-      right: 3px;
+      // right: 3px;
+      right: var(--line-offset);
+      border-radius: 1px 0 0 1px;
     }
   }
 }
@@ -189,7 +198,7 @@
 }
 
 .level {
-  --progress-size: 140px;
+  --progress-size: 132px;
   --path-length: 275.67718505859375;
 
   width: var(--progress-size);
@@ -239,7 +248,7 @@
 }
 
 .levelTitle {
-  font-size: 55px;
+  font-size: 53px;
   font-weight: 800;
   color: #fff;
   margin-top: 5px;
@@ -252,4 +261,66 @@
   strong {
     color: #fff;
   }
+}
+
+/* --------------------------- */
+/* Piece Queue */
+
+.pieceQueueSection {
+  --heading-color: var(--yellow-accent-color);
+}
+
+.pieceQueueWrapper {
+  --box-color: #101423;
+
+  width: calc(100% + var(--padding) * 2);
+  margin: 0 calc(var(--padding) * -1);
+  overflow: hidden;
+  contain: content;
+  position: relative;
+}
+
+.pieceQueueTrack {
+  position: absolute;
+  inset: 50% 0 auto 0;
+  z-index: -1;
+  margin-top: -3px;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+  contain: content;
+  overflow: hidden;
+}
+
+.pieceQueueLine {
+  width: calc(100% + 4px);
+  margin-left: -4px;
+
+  @include app.retina {
+    margin-left: -3.5px;
+  }
+}
+
+.pieceQueue {
+  display: flex;
+  width: 100%;
+}
+
+.pieceBoxWrapper {
+  padding: 0 12px;
+  width: 33.333333%;
+  flex: none;
+}
+
+.pieceBox {
+  --box-size: calc(var(--grid-col-width) - 0.5px);
+
+  background-color: var(--box-color);
+  flex: none;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }

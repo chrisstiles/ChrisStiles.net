@@ -14,6 +14,7 @@ module.exports = {
     ...prodOnlyPlugins,
     'postcss-flexbugs-fixes': {},
     'postcss-font-variant': {},
+    'postcss-aspect-ratio-polyfill': {},
     'postcss-preset-env': {
       autoprefixer: {
         flexbox: 'no-2009'

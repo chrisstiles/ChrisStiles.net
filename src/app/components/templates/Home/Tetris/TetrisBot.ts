@@ -16,7 +16,7 @@ export default class TetrisBot {
   }
 
   async moveToBestPosition(piece: Tetromino) {
-    if (!this.board.isBotPlaying) return false;
+    if (!this.board.isBotPlaying || this.board.isGameOver) return false;
 
     const bestMove = this.getBestMove(piece);
     if (!bestMove) return false;

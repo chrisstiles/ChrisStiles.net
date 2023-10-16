@@ -25,6 +25,7 @@ export default function Tetris() {
 
   useEffect(() => {
     game.init();
+    game.startNewGame(true);
     return () => game.destroy();
   }, [game]);
 
@@ -96,6 +97,7 @@ export default function Tetris() {
               lines={game.clearedLines}
               linesUntilNextLevel={game.linesUntilNextLevel}
               linesPerLevel={game.linesPerLevel}
+              pieceQueue={game.pieceQueue}
             />
           </TetrisBox>
         </TetrisBox>

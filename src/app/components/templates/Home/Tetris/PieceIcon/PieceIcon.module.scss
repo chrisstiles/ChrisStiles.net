@@ -1,0 +1,43 @@
+/* --------------------------- */
+/* Piece Icon */
+/* --------------------------- */
+
+.wrapper,
+.piece,
+.row {
+  display: inline-flex;
+}
+
+.wrapper {
+  --size: var(--piece-block-size, 12px);
+  --offset: var(--piece-block-offset, 2px);
+
+  width: calc((var(--size) + var(--offset)) * var(--cols, 3) - var(--offset));
+}
+
+.piece {
+  flex-direction: column;
+}
+
+.row {
+  margin-bottom: var(--offset);
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.block {
+  width: var(--size);
+  height: var(--size);
+  border-radius: 2px;
+  margin-right: var(--offset);
+
+  &:last-child {
+    margin-right: 0;
+  }
+
+  &.filled {
+    background-color: var(--color, #fff);
+  }
+}

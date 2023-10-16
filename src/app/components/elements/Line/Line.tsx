@@ -6,26 +6,32 @@ export default function Line({
   direction = 'vertical',
   color = 'var(--grid-line-color)',
   isSolid,
-  strokeDashArray = '6 10'
+  strokeDashArray = '6 10',
+  strokeWidth = 1
 }: LineProps) {
   const isVertical = direction === 'vertical';
+  const halfStrokeWidth = strokeWidth / 2;
+  const strokeWidthStyle = strokeWidth !== 1 ? `${strokeWidth}px` : undefined;
 
   return (
     <svg
-      viewBox="0 0 1 1"
+      viewBox={`0 0 ${strokeWidth} ${strokeWidth}`}
       preserveAspectRatio="none"
+      style={{
+        '--stroke-width': strokeWidthStyle
+      }}
       className={classNames(
         isVertical ? styles.vertical : styles.horizontal,
         className
       )}
     >
       <line
-        x1={isVertical ? '0.5' : '0'}
-        y1={isVertical ? '0' : '0.5'}
-        x2={isVertical ? '0.5' : '1'}
-        y2={isVertical ? '1' : '0.5'}
+        x1={isVertical ? halfStrokeWidth : 0}
+        y1={isVertical ? 0 : halfStrokeWidth}
+        x2={isVertical ? halfStrokeWidth : strokeWidth}
+        y2={isVertical ? strokeWidth : halfStrokeWidth}
         stroke={color}
-        strokeWidth="1"
+        strokeWidth={strokeWidth}
         strokeDasharray={isSolid ? undefined : strokeDashArray}
         vectorEffect="non-scaling-stroke"
       />
@@ -39,4 +45,5 @@ type LineProps = {
   color?: string;
   isSolid?: boolean;
   strokeDashArray?: string;
+  strokeWidth?: number;
 };

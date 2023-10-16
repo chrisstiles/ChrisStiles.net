@@ -12,8 +12,8 @@ export default class PiecePreview {
   isTyping = false;
   isDoneTyping = Promise.resolve();
   initialDelay = 300;
-  minTypingDelay = 40;
-  maxTypingDelay = 65;
+  minTypingDelay = 30;
+  maxTypingDelay = 50;
 
   constructor(board: TetrisBoard, piece: Tetromino) {
     this.board = board;

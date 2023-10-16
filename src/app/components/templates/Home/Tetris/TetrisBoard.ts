@@ -108,9 +108,16 @@ export default class TetrisBoard {
     return this.pieceQueue[0];
   }
 
+  get hasInitialized() {
+    return this._hasInitialized;
+  }
+
+  get hasStarted() {
+    return this._hasStarted;
+  }
+
   set isVisible(value: boolean) {
     if (value === this._isVisible) return;
-    if (value && !this._hasStarted) this.play();
 
     if (!value && !this._isClearingBoard) {
       this.toggleTicker(false);
@@ -169,6 +176,7 @@ export default class TetrisBoard {
       linesUntilNextLevel: this.linesUntilNextLevel,
       linesPerLevel: this.linesPerLevel,
       preview: this.preview,
+      pieceQueue: this.pieceQueue,
       ...state
     };
 
@@ -291,12 +299,14 @@ export default class TetrisBoard {
   play() {
     this._hasStarted = true;
 
-    if (!this.isGameActive && !this.isPaused && !this._isClearingBoard) {
-      this.reset();
-    }
+    const hasActiveGame = this.isGameActive;
 
     this.isGameActive = true;
     this.isPaused = false;
+
+    if (!hasActiveGame && !this.isPaused && !this._isClearingBoard) {
+      this.reset();
+    }
 
     this.draw();
     this.toggleTicker(true);
@@ -326,7 +336,6 @@ export default class TetrisBoard {
     this.piece = null;
     this.isGameActive = false;
     this.isPaused = false;
-    this.isBotPlaying = false;
 
     this.emitChange();
 
@@ -385,7 +394,7 @@ export default class TetrisBoard {
 
     this.preview.typeLabel();
 
-    if (this.isBotPlaying) {
+    if (this.isBotPlaying && this.isGameActive) {
       await this.wait(Math.min(this.dropInterval * 1000 * 0.18, 20));
       this.bot.moveToBestPosition(piece);
     }
@@ -843,4 +852,5 @@ type GameState = {
   linesUntilNextLevel: number;
   linesPerLevel: number;
   preview: PiecePreview;
+  pieceQueue: Tetromino[];
 };

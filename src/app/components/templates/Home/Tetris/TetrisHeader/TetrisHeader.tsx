@@ -1,6 +1,6 @@
-import { useMemo } from 'react';
 import styles from './TetrisHeader.module.scss';
 import PiecePreview from '../PiecePreview';
+import PieceIcon from '../PieceIcon';
 import useHasRendered from '@hooks/useHasRendered';
 import { BoundingBox } from '@elements';
 import classNames from 'classnames';
@@ -34,20 +34,10 @@ export default function TetrisHeader({
 }
 
 function PieceLabel({ preview }: PiecePreviewProps) {
-  const { piece, shape, color, label, currentLabel } = preview;
+  const { piece, color, label, currentLabel } = preview;
 
   const hasRendered = useHasRendered();
   const isLinePiece = piece.shapeIndex === 0;
-
-  const icon = useMemo(() => {
-    // Display line piece vertically
-    if (isLinePiece) return [['■'], ['■'], ['■'], ['■']];
-
-    return shape
-      .filter(row => row.some(value => !!value))
-      .map(row => row.slice());
-  }, [shape, isLinePiece]);
-
   const isTyping = currentLabel && currentLabel !== label;
 
   return !hasRendered ? (
@@ -60,29 +50,13 @@ function PieceLabel({ preview }: PiecePreviewProps) {
         [styles.linePiece]: isLinePiece,
         [styles.typing]: isTyping
       })}
-      style={{
-        '--cols': icon[0].length,
-        color: hasRendered ? color : undefined
-      }}
+      style={{ color: hasRendered ? color : undefined }}
       aria-live="polite"
     >
-      <span className={styles.piece}>
-        {icon.map((row, rowIndex) => (
-          <span
-            key={rowIndex}
-            className={styles.blockRow}
-          >
-            {row.map((block, colIndex) => (
-              <span
-                key={colIndex}
-                className={classNames(styles.block, {
-                  [styles.filled]: !!block
-                })}
-              />
-            ))}
-          </span>
-        ))}
-      </span>{' '}
+      <PieceIcon
+        shapeIndex={piece.shapeIndex}
+        pieceClassName={styles.piece}
+      />
       <span
         className={classNames(styles.label, {
           [styles.empty]: !currentLabel

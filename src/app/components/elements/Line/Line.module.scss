@@ -3,11 +3,11 @@
 /* --------------------------- */
 
 :where(.vertical) {
-  width: 1px;
+  width: var(--stroke-width, 1px);
   height: 100%;
 }
 
 :where(.horizontal) {
   width: 100%;
-  height: 1px;
+  height: var(--stroke-width, 1px);
 }
