@@ -1,7 +1,6 @@
-import { type FunctionComponent, type HTMLAttributes } from 'react';
 import styles from './Heading.module.scss';
 import classNames from 'classnames';
-import type { ReactNode } from 'react';
+import type { ReactNode, FunctionComponent, HTMLAttributes } from 'react';
 
 const Heading: FunctionComponent<HeadingComponentProps> = ({
   align,

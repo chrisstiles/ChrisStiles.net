@@ -7,16 +7,18 @@
 .center {
   @media (width > app.bp(md)) {
     text-align: center;
-    margin-bottom: 0.7em;
+    margin-bottom: 0.6em;
   }
 }
 
 .eyebrow {
   color: var(--green-accent-color);
   display: block;
-  font-size: max(0.5em, 18px);
+  // font-size: max(0.4em, 18px);
+  font-size: 19px;
   font-weight: 400;
-  margin-bottom: 1.1em;
+  // margin-bottom: 1.1em;
+  margin-bottom: 1.25em;
   line-height: 1;
 
   :global(.sr) {

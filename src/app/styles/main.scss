@@ -40,7 +40,7 @@ html {
   -webkit-text-size-adjust: 100%;
   -webkit-overflow-scrolling: touch;
   -moz-osx-font-smoothing: grayscale;
-  font-size: 19px;
+  font-size: 20px;
   font-feature-settings: 'ss01', 'calt';
 }
 
@@ -80,17 +80,22 @@ h3,
 h4 {
   line-height: 1.2;
   color: #fff;
-  font-weight: 600;
 }
 
 h1,
 h2 {
-  margin-bottom: 0.8em;
+  margin-bottom: 0.7em;
 }
 
 h1 {
   font-size: var(--h1-size);
   font-weight: 800;
+}
+
+h2,
+h3,
+h4 {
+  font-weight: 500;
 }
 
 h2 {

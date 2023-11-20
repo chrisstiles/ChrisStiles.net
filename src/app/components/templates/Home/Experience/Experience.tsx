@@ -27,13 +27,13 @@ export default memo(function Experience({
         <Content className={styles.content}>
           <div className={styles.text}>
             <H2 eyebrow="Experience matters">
-              If your only tool is a hammer, every project looks like a nail
+              There&apos;s no one size fits all in software development
             </H2>
 
             <p>
-              Vestibulum nec nulla rutrum nine years semper. Donec quis orci
-              maximus, efficitur guam in, ultrices massa. Lorem ipsum dolor sit
-              amet, consectetur adipiscing elit.
+              Text about how every project is different, and how with my
+              multiple decades of experience I know the right tools for each
+              project&apos;s unique requirements and constraints.
             </p>
           </div>
           {iconFileNames?.length && (

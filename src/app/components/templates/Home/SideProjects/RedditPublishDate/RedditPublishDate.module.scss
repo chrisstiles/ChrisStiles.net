@@ -23,7 +23,7 @@
   }
 
   p {
-    max-width: 720px;
+    max-width: 710px;
   }
 }
 
@@ -38,23 +38,18 @@
   display: flex;
 }
 
-.col {
+.content {
   flex-grow: 1;
-  width: 50%;
-
-  &:nth-child(even) {
-    padding-left: 40px;
-  }
-
-  &:nth-child(odd) {
-    padding-right: 20px;
-  }
+  margin-right: var(--grid-col-width);
+  padding-right: 30px;
 }
 
-.content {
-  p {
-    max-width: 550px;
-  }
+.widget {
+  --offsetX: var(--grid-offset, 20px);
+
+  width: app.grid-cols(6, calc(var(--offsetX) * -1));
+  margin-right: calc(var(--offsetX) / -2);
+  flex: none;
 }
 
 .divider {

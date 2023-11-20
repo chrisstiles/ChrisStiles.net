@@ -3,9 +3,7 @@ import ProjectFeatures from './ProjectFeatures';
 import ProjectHighlights from './ProjectHighlights';
 import PublishDateWidget from './PublishDateWidget';
 import Logo from './rpd.svg';
-import { Section, H2, GridDivider } from '@elements';
-import classNames from 'classnames';
-import type { ReactNode } from 'react';
+import { Section, H2 } from '@elements';
 
 export default function RedditPublishDate() {
   return (
@@ -15,37 +13,24 @@ export default function RedditPublishDate() {
           align="center"
           eyebrow={<Logo className={styles.logo} />}
         >
-          What have I been up to lately?
+          What I&apos;ve been working on
         </H2>
         <p>
-          Vestibulum nec nulla rutrum semper. Donec quis orci maximus, efficitur
-          guam in, ultrices massa. Lorem dolor sit amet, consectetur adipiscing
-          elit.
+          Reddit Publish Date is an API and Chrome extension that parses the
+          content of news articles to determine when they were originally
+          published
         </p>
       </div>
       <ProjectFeatures />
       <div className={styles.contentWrapper}>
-        <Column className={styles.content}>
+        <div className={styles.content}>
           <ProjectHighlights />
-          <GridDivider
-            columns={5}
-            className={styles.divider}
-            outlineColor="var(--page-background-dark-color)"
-          />
-        </Column>
-        <Column>
+        </div>
+
+        <div className={styles.widget}>
           <PublishDateWidget />
-        </Column>
+        </div>
       </div>
     </Section>
   );
 }
-
-function Column({ className, children }: ColumnProps) {
-  return <div className={classNames(styles.col, className)}>{children}</div>;
-}
-
-type ColumnProps = {
-  className?: string;
-  children: ReactNode;
-};
