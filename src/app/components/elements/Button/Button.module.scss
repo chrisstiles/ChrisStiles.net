@@ -29,9 +29,10 @@
   border-radius: var(--border-radius);
   text-align: center;
 
-  @include app.supports-css-paint {
-    mask: paint(squircle);
-  }
+  // TODO add back squircle when I figure out why it sometimes doesn't render until refreshing
+  // @include app.supports-css-paint {
+  //   mask: paint(squircle);
+  // }
 
   &:hover {
     background-color: #ffe983;
