@@ -70,19 +70,21 @@ export default function Tetris() {
           className={styles.content}
           {...boxes.content}
         >
-          <TetrisBox
-            className={styles.game}
-            {...boxes.game}
-          >
-            <canvas
-              tabIndex={-1}
-              ref={canvas}
-              className={styles.canvas}
-            />
-            <GridLines
-              className={styles.grid}
-              showSubGrid
-            />
+          <TetrisBox className={styles.gameWrapper}>
+            <TetrisBox
+              className={styles.game}
+              {...boxes.game}
+            >
+              <canvas
+                tabIndex={-1}
+                ref={canvas}
+                className={styles.canvas}
+              />
+              <GridLines
+                className={styles.grid}
+                showSubGrid
+              />
+            </TetrisBox>
           </TetrisBox>
 
           <TetrisBox
@@ -112,15 +114,22 @@ const boxes: { [key: string]: TetrisBoxProps } = {
     dots: ['top-right']
   },
   header: {
-    border: ['bottom', 'right'],
-    dots: ['top-right', 'top-left', 'bottom-left']
+    // border: ['bottom', 'right'],
+    border: 'right',
+    // dots: ['top-right', 'top-left', 'bottom-left']
+    dots: ['top-right', 'top-left']
   },
   content: {
     border: ['left', 'right'],
     dots: 'bottom-left'
   },
   game: {
-    border: 'bottom'
+    // border: 'bottom'
+    // NEW
+    // dots: ['top-right', 'top-left'],
+    dots: 'top-left',
+
+    border: ['top', 'bottom']
   },
   sidebar: {
     border: ['left', 'right'],

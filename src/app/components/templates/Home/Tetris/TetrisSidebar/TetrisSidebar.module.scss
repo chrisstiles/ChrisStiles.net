@@ -136,7 +136,9 @@
   --heading-color: var(--green-accent-color);
 
   .heading {
-    margin-top: calc(-0.5em - var(--border-width) / 2);
+    // margin-top: calc(-0.5em - var(--border-width) / 2);
+    margin-top: calc(-0.5em + var(--border-width) / 2);
+    // margin-top: -0.5em;
   }
 
   .leftDot {
@@ -323,4 +325,23 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+}
+
+/* --------------------------- */
+/* Media Queries */
+
+@media (width <= 1415px) {
+  .heading {
+    margin-top: 20px;
+    font-size: 18px;
+  }
+
+  .level {
+    --progress-size: 120px;
+  }
+
+  .levelTitle {
+    font-size: 45px;
+    font-weight: 500;
+  }
 }

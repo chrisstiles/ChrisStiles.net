@@ -82,6 +82,12 @@
 
     top: 0;
     left: 0;
+
+    @at-root .game & {
+      --outline-bottom-right-color: var(--game-color);
+
+      top: calc(var(--border-width) * -1);
+    }
   }
 
   &:global(.top-right) {
@@ -94,8 +100,13 @@
       top: calc(var(--border-width) * -1);
     }
 
-    @at-root .header & {
+    // @at-root .header & {
+    //   --outline-bottom-right-color: var(--sidebar-color);
+    // }
+    @at-root .game & {
+      --outline-top-right-color: var(--sidebar-color);
       --outline-bottom-right-color: var(--sidebar-color);
+      --outline-bottom-left-color: var(--game-color);
     }
 
     @at-root .top > .border & {
@@ -162,7 +173,7 @@
 }
 
 .header,
-.game {
+.gameWrapper {
   width: var(--game-width);
   flex: none;
 }
@@ -203,9 +214,10 @@
   padding: 1.2em 2em 1.2em 2.6em;
 }
 
-.game {
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-  background-color: var(--game-color);
+.gameWrapper {
+  display: flex;
+  justify-content: flex-end;
+  flex-direction: column;
 }
 
 .canvas {
@@ -218,6 +230,9 @@
 .grid {
   --grid-line-color: #2c3250;
   --sub-line-color: #1a1e33;
+
+  background-color: var(--game-color);
+  z-index: -1;
 }
 
 .sidebar {
