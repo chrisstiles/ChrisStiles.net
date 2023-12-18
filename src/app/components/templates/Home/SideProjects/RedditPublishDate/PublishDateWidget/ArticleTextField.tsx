@@ -24,26 +24,47 @@ export default memo(function ArticleTextField({
   if (!favicon?.url) favicon = defaultIcon;
 
   const [inputValue, setInputValue] = useState('');
+  const isFocused = useRef(false);
   const [isValid, setIsValid] = useState<ValidationState>({
     value: true,
     message: ''
   });
 
-  const validUrlTimer = useRef<number>();
   const checkUrl = useCallback(
     (value: string, shouldUpdateUrl: boolean = true) => {
       if (value) {
+        const handleInvalidUrl = () => {
+          setIsValid({ value: false, message: 'Please enter a valid URL' });
+          if (shouldUpdateUrl) setUrl(null);
+        };
+
+        // URL constructor will allow certain URLs that the API
+        // considers invalid. For example: 'https://www.chrisstiles.'
+        // would trigger an exception from the URL constructor
+        if (
+          value.endsWith('.') ||
+          /^(https?:\/\/)?((www\.[^.]+)|([^.]+))\.?$/.test(value)
+        ) {
+          handleInvalidUrl();
+          return;
+        }
+
         if (!value.startsWith('http') && isValidURL(value)) {
           value = `https://${value}`;
         }
 
         try {
           const url = new URL(value);
-          if (shouldUpdateUrl) setUrl(url);
+
+          if (url.hostname.endsWith('.')) {
+            handleInvalidUrl();
+            return;
+          }
+
           setIsValid({ value: true, message: '' });
+          if (shouldUpdateUrl) setUrl(url);
         } catch {
-          if (shouldUpdateUrl) setUrl(null);
-          setIsValid({ value: false, message: 'Please enter a valid URL' });
+          handleInvalidUrl();
         }
       }
     },
@@ -59,7 +80,6 @@ export default memo(function ArticleTextField({
       if (value) {
         checkUrl(value);
       } else {
-        clearTimeout(validUrlTimer.current);
         setUrl(null);
         setIsValid({ value: false, message: '' });
       }
@@ -69,7 +89,7 @@ export default memo(function ArticleTextField({
 
   useEffect(() => {
     if (article) {
-      setInputValue(article.url.href);
+      if (!isFocused.current) setInputValue(article.url.href);
       checkUrl(article.url.href, false);
     }
   }, [article, checkUrl]);
@@ -90,6 +110,11 @@ export default memo(function ArticleTextField({
       showInlineValidIndicator={false}
       onChange={handleChange}
       onPaste={onPaste}
+      onFocus={() => (isFocused.current = true)}
+      onBlur={() => {
+        isFocused.current = false;
+        if (article) setInputValue(article.url.href);
+      }}
       controlEl={
         <RandomArticleButton
           isLoading={article?.isLoading}
