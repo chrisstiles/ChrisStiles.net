@@ -65,7 +65,7 @@
     --border-radius: 5px;
     --squircle-radius: 5px;
 
-    margin: 10px;
+    margin: 10px 10px 10px 0;
     padding: 0.95em 1.3em 0.93em 1.3em;
     min-height: 40px;
     font-size: 14px;
@@ -99,6 +99,10 @@
     }
   }
 
+  &.hideEllipsis {
+    text-overflow: clip;
+  }
+
   &.hasIcon {
     padding-left: 57px;
   }
@@ -124,6 +128,10 @@
         color: #a599a6;
       }
     }
+  }
+
+  @at-root input.input {
+    overflow-x: auto;
   }
 
   @at-root textarea.input {

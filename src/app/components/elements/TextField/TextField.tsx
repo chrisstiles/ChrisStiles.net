@@ -8,7 +8,9 @@ import {
   type ChangeEvent,
   type FocusEvent,
   type FocusEventHandler,
-  type ClipboardEventHandler
+  type ClipboardEventHandler,
+  type UIEvent,
+  type UIEventHandler
 } from 'react';
 import styles from './TextField.module.scss';
 import * as Icon from './icons';
@@ -31,6 +33,7 @@ export default memo(function TextField({
   forceShowValidation = false,
   onChange: handleChange,
   onBlur: handleBlur,
+  onScroll: handleScroll,
   ...restProps
 }: FieldProps) {
   const id = useId();
@@ -41,10 +44,12 @@ export default memo(function TextField({
     hasInput.current = true;
   }
 
-  const Component = type === 'textarea' ? 'textarea' : 'input';
+  const isTextArea = type === 'textarea';
+  const Component = isTextArea ? 'textarea' : 'input';
   const hasServerError = !!error?.trim();
   const isValid = validationState.value && !hasServerError;
   const hasInteracted = hasBlurred && hasInput.current;
+  const [showEllipsis, setShowEllipsis] = useState(!isTextArea);
   const shouldShowInvalid =
     !isValid &&
     ((hasInteracted && (required || !!value.trim())) || forceShowValidation);
@@ -61,17 +66,30 @@ export default memo(function TextField({
     name,
     value,
     required,
-    type: type === 'textarea' ? undefined : type,
+    type: isTextArea ? undefined : type,
     className: classNames(styles.input, className, {
-      [styles.hasIcon]: !!icon
+      [styles.hasIcon]: !!icon,
+      [styles.hideEllipsis]: !showEllipsis
     }),
     onChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       handleChange(e.target.value, name);
     },
     onBlur: (e: FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      handleChange(value, name);
-      if (hasInput.current) setHasBlurred(true);
+      // Hacky way to avoid React error when blur is triggered
+      // by the same action that closes the contact modal
+      setTimeout(() => {
+        if (hasInput.current) setHasBlurred(true);
+      }, 0);
+
       handleBlur?.(e);
+    },
+    onScroll: (e: UIEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      if (!isTextArea) {
+        const target = e.target as HTMLInputElement;
+        setShowEllipsis(target.scrollLeft <= 0);
+      }
+
+      handleScroll?.(e);
     },
     'aria-invalid': shouldShowInvalid,
     'aria-errormessage':
@@ -118,7 +136,7 @@ export default memo(function TextField({
               {icon}
             </div>
           )}
-          {showInlineValidIndicator && type !== 'textarea' && (
+          {showInlineValidIndicator && !isTextArea && (
             <div className={styles.validityIcon}>
               {isValid ? <Icon.Valid /> : <Icon.Invalid />}
             </div>
@@ -154,6 +172,7 @@ export type FieldProps = {
   onFocus?: FocusEventHandler;
   onBlur?: FocusEventHandler;
   onPaste?: ClipboardEventHandler;
+  onScroll?: UIEventHandler<HTMLInputElement | HTMLTextAreaElement>;
 };
 
 export type ValidationState = {
