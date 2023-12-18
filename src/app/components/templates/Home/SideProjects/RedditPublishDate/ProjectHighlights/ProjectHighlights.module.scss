@@ -14,14 +14,15 @@
 }
 
 .bullet {
-  $size: 6px;
-  width: $size;
-  height: $size;
+  --bullet-size: 6px;
+
+  width: var(--bullet-size);
+  height: var(--bullet-size);
   border-radius: 50%;
   background-color: var(--page-background-dark-color);
   position: absolute;
   top: 12px;
-  left: calc(var(--grid-offset) * -1 - #{$size / 2});
+  left: calc(var(--grid-offset) * -1 - var(--bullet-size) / 2);
   box-shadow: 0 0 0 2px currentColor,
     0 0 0 7px var(--page-background-dark-color);
 

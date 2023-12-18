@@ -2,10 +2,12 @@
 /* Bounding Box */
 /* --------------------------- */
 
+@use 'sass:math';
+
 $boxInitialScale: 0;
 $boxEnterTransition: transform 0.35s cubic-bezier(0.47, 0.01, 0.16, 1);
 $handleSize: 10px;
-$handleOffset: -$handleSize / 2;
+$handleOffset: math.div(-$handleSize, 2);
 
 .box {
   $offset: -12px;

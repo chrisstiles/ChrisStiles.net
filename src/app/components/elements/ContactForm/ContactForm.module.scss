@@ -2,6 +2,8 @@
 /* Contact Form */
 /* --------------------------- */
 
+@use 'sass:math';
+
 .formWrapper {
   position: relative;
 
@@ -154,7 +156,7 @@ $checkmarkShowDelay: 0.3s;
 
 @keyframes checkmarkFill {
   100% {
-    box-shadow: inset 0px 0px 0px #{$checkmarkSize / 2} $checkmarkGreen;
+    box-shadow: inset 0px 0px 0px #{math.div($checkmarkSize, 2)} $checkmarkGreen;
   }
 }
 

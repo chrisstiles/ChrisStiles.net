@@ -2,6 +2,7 @@
 /* Article Error  */
 /* --------------------------- */
 
+@use 'sass:math';
 @use 'app';
 
 .wrapper {
@@ -82,9 +83,10 @@
 
   &:before {
     $size: 10px;
+
     width: $size;
     height: $size;
-    margin-top: -$size / 2;
+    margin-top: math.div(-$size, 2);
     background-color: #25293f;
     border: 2px solid currentColor;
     box-shadow: 0 0 0 3px #25293f;
