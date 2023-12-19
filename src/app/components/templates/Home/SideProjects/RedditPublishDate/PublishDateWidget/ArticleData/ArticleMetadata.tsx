@@ -29,7 +29,10 @@ function MetaData({ article, isClone }: ArticleMetadataProps) {
 
   const subheadline =
     description ??
-    (headline !== url.hostname ? url.origin : url.origin + url.pathname);
+    (headline !== url.hostname
+      ? url.origin
+      : url.origin + url.pathname
+    ).replace(/\/$/, '');
 
   return !headline ? null : (
     <a
