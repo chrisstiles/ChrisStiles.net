@@ -6,11 +6,19 @@ import classNames from 'classnames';
 import type { ArticleDataProps } from './ArticleData';
 import type { Article, ArticleData } from '../PublishDateWidget';
 
-export default function ArticleMetadataWrapper({ article }: ArticleDataProps) {
-  return hasMetadata(article) ? <MetaData article={article} /> : null;
+export default function ArticleMetadataWrapper({
+  article,
+  isClone
+}: ArticleDataProps) {
+  return !hasMetadata(article) ? null : (
+    <MetaData
+      article={article}
+      isClone={isClone}
+    />
+  );
 }
 
-function MetaData({ article }: { article: ArticleWithData }) {
+function MetaData({ article, isClone }: ArticleMetadataProps) {
   const { url, data, favicon } = article;
   const headline = data.title ?? data.organization ?? url.hostname;
 
@@ -27,6 +35,10 @@ function MetaData({ article }: { article: ArticleWithData }) {
     <a
       href={url.href}
       className={styles.metadata}
+      target="_blank"
+      rel="noreferrer"
+      tabIndex={isClone ? -1 : undefined}
+      aria-hidden={isClone}
     >
       <div
         className={classNames(styles.faviconWrapper, {
@@ -68,6 +80,10 @@ function MetaData({ article }: { article: ArticleWithData }) {
 
 type ArticleWithData = Article & {
   data: ArticleData;
+};
+
+type ArticleMetadataProps = ArticleDataProps & {
+  article: ArticleWithData;
 };
 
 function hasMetadata(article?: Nullable<Article>): article is ArticleWithData {

@@ -6,7 +6,7 @@ import exampleArticlesData from './example-articles.json';
 import useVariableRef from '@hooks/useVariableRef';
 import useIsMounted from '@hooks/useIsMounted';
 import { H3 } from '@elements';
-import { isSameUrl } from '@helpers';
+import { isSameUrl, isValidURL } from '@helpers';
 import { shuffle } from 'lodash';
 import type { FaviconResponse } from '@api/favicon';
 
@@ -22,8 +22,12 @@ const maxCacheSize = 30;
 export default memo(function PublishDateWidget() {
   const isMounted = useIsMounted();
 
+  const [inputValue, setInputValue] = useState('');
+  const isInputFocused = useRef(false);
+  const [isValid, setIsValid] = useState(false);
   const [article, _setArticle] = useState<Nullable<Article>>(null);
   const articleRef = useVariableRef(article);
+  const [hasFirstArticle, setHasFirstArticle] = useState(false);
   const cachedArticles = useRef<Map<string, Nullable<Article>>>(new Map());
   const shouldDebounceArticle = useRef(true);
   const articleTimer = useRef<number>();
@@ -35,11 +39,19 @@ export default memo(function PublishDateWidget() {
 
   const setArticle = useCallback(
     (article: Nullable<Article>, forceUpdateState: boolean = true) => {
+      const isSameArticle = isSameUrl(articleRef.current, article);
+
       // If the current article changed while a previous one's
       // data was being fetched, we only update the cached data
       const shouldUpdateState =
-        isMounted() &&
-        (forceUpdateState || isSameUrl(articleRef.current, article));
+        isMounted() && (forceUpdateState || isSameArticle);
+
+      setHasFirstArticle(prevHasFirstArticle => {
+        return (
+          prevHasFirstArticle ||
+          !!(isSameArticle && article && !article.isLoading)
+        );
+      });
 
       if (!article?.url) {
         if (shouldUpdateState) _setArticle(null);
@@ -149,8 +161,6 @@ export default memo(function PublishDateWidget() {
 
   const fetchArticleData = useCallback(
     async (article: Article) => {
-      clearTimeout(articleTimer.current);
-
       const fetchArticle = async () => {
         setArticle({ ...article, isLoading: true });
 
@@ -186,13 +196,44 @@ export default memo(function PublishDateWidget() {
     [setArticle]
   );
 
+  const handleFocus = useCallback(() => {
+    isInputFocused.current = true;
+  }, []);
+
+  const handleBlur = useCallback(() => {
+    isInputFocused.current = false;
+
+    if (articleRef.current) {
+      const { href } = articleRef.current.url;
+
+      // Format user's input (IE with the URL protocol)
+      setInputValue(prevValue => {
+        return !prevValue.trim().endsWith('/') ? href.replace(/\/$/, '') : href;
+      });
+    }
+  }, [articleRef]);
+
+  const handlePaste = useCallback(() => {
+    shouldDebounceArticle.current = false;
+    shouldDebounceFavicon.current = false;
+  }, []);
+
   const setUrl = useCallback(
-    (url: Nullable<URL>, immediate?: boolean) => {
+    (href: string, immediate?: boolean) => {
+      clearTimeout(articleTimer.current);
+      setInputValue(href);
+
+      const url = getUrlObject(href);
+
       if (!url) {
         setArticle(null);
         setFavicon(null);
+        setIsValid(false);
+
         return;
       }
+
+      setIsValid(true);
 
       if (immediate) {
         shouldDebounceArticle.current = false;
@@ -205,6 +246,7 @@ export default memo(function PublishDateWidget() {
 
       if (cachedArticle) {
         setArticle(cachedArticle);
+        if (!cachedArticle.isLoading) setHasFirstArticle(true);
       } else {
         fetchArticleData({ url, data: null });
       }
@@ -243,7 +285,7 @@ export default memo(function PublishDateWidget() {
       randomArticles.current = exampleArticles.slice();
     }
 
-    setUrl(new URL(randomArticles.current.pop()!), true);
+    setUrl(randomArticles.current.pop()!, true);
 
     if (shouldPreloadFavicon.current) {
       const url = randomArticles.current[randomArticles.current.length - 1];
@@ -255,28 +297,57 @@ export default memo(function PublishDateWidget() {
     <article className={styles.wrapper}>
       <H3 eyebrow="Publish date service">Try out my publish date API</H3>
       <ArticleTextField
-        article={article}
+        value={inputValue}
         favicon={favicon}
+        isLoading={!!article?.isLoading}
+        isValid={isValid}
         setUrl={setUrl}
         setRandomArticle={setRandomArticle}
-        onPaste={() => {
-          shouldDebounceArticle.current = false;
-          shouldDebounceFavicon.current = false;
-        }}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+        onPaste={handlePaste}
       />
       <ArticleData
         article={article}
+        hasFirstArticle={hasFirstArticle}
         setRandomArticle={setRandomArticle}
       />
     </article>
   );
 });
 
-function getEndpoint(url: string) {
-  return `https://www.redditpublishdate.com/api/get-date?url=${url}`;
+function getEndpoint(href: string) {
+  return `https://www.redditpublishdate.com/api/get-date?url=${href}`;
   // return `https://www.redditpublishdate.com/api/get-date?cache=false&url=${url}`;
   // return `http://localhost:8000/api/get-date?url=${url}`;
   // return `http://localhost:8000/api/get-date?cache=false&url=${url}`;
+}
+
+function getUrlObject(href: Nullable<string>) {
+  href = href?.trim() ?? null;
+
+  if (!href) return null;
+
+  // The URL constructor will allow certain URLs that the API
+  // considers invalid. For example: 'https://www.chrisstiles.'
+  // would trigger an exception from the URL constructor
+  if (
+    href.endsWith('.') ||
+    /^(https?:\/\/)?((www\.[^.]+)|([^.]+))\.?$/.test(href)
+  ) {
+    return null;
+  }
+
+  if (!href.startsWith('http') && isValidURL(href)) {
+    href = `https://${href}`;
+  }
+
+  try {
+    const url = new URL(href);
+    return url.hostname.endsWith('.') ? null : url;
+  } catch {
+    return null;
+  }
 }
 
 function getArticleCacheKey(url: URL) {

@@ -20,6 +20,7 @@ import type { Article } from '../PublishDateWidget';
 
 export default memo(function ArticleData({
   article: currentArticle,
+  hasFirstArticle,
   className,
   setRandomArticle
 }: ArticleDataWrapperProps) {
@@ -42,7 +43,6 @@ export default memo(function ArticleData({
     !isSameUrl(currentArticle, prevArticle.current);
 
   const wrapperHeight = useRef(0);
-  const [hasFirstArticle, setHasFirstArticle] = useState(false);
   const [firstAnimationComplete, setFirstAnimationComplete] = useState(false);
   const animation = useRef<gsap.core.Timeline | null>(null);
   const hasAnimated = useRef(false);
@@ -149,21 +149,13 @@ export default memo(function ArticleData({
     prevArticle.current = currentArticle;
   }, [currentArticle, isNewArticle, hasFirstArticle, updateWrapperHeight]);
 
-  useEffect(() => {
-    if (!hasFirstArticle && currentArticle && !currentArticle?.isLoading) {
-      setHasFirstArticle(true);
-    }
-  }, [currentArticle, hasFirstArticle]);
-
-  useEffect(() => {
-    if (
-      currentArticle &&
-      prevArticle.current &&
-      isSameUrl(currentArticle, prevArticle.current)
-    ) {
-      prevArticle.current.favicon = currentArticle.favicon;
-    }
-  }, [currentArticle]);
+  if (
+    currentArticle &&
+    prevArticle.current &&
+    isSameUrl(currentArticle, prevArticle.current)
+  ) {
+    prevArticle.current.favicon = currentArticle.favicon;
+  }
 
   useMemo(() => {
     if (
@@ -187,7 +179,7 @@ export default memo(function ArticleData({
     >
       <ArticlePlaceholder
         ref={placeholder}
-        isLoading={article?.isLoading}
+        isLoading={hasFirstArticle || article?.isLoading}
         setRandomArticle={setRandomArticle}
       />
       <div
@@ -222,12 +214,6 @@ export default memo(function ArticleData({
 
 const ArticlePlaceholder = forwardRef<HTMLDivElement, ArticlePlaceholderProps>(
   function ArticlePlaceholder({ isLoading, setRandomArticle }, ref) {
-    const [showLoading, setShowLoading] = useState(!!isLoading);
-
-    useEffect(() => {
-      if (isLoading) setShowLoading(true);
-    }, [isLoading]);
-
     return (
       <div
         ref={ref}
@@ -238,13 +224,9 @@ const ArticlePlaceholder = forwardRef<HTMLDivElement, ArticlePlaceholderProps>(
           first published, and when it was last&nbsp;modified.
         </p>
         <Button
-          isLoading={showLoading}
-          disabled={showLoading}
-          onClick={() => {
-            setShowLoading(true);
-            if (isLoading) return;
-            setRandomArticle();
-          }}
+          isLoading={isLoading}
+          disabled={isLoading}
+          onClick={setRandomArticle}
         >
           Choose an article for me
         </Button>
@@ -266,7 +248,10 @@ const ArticleContent = memo(function ArticleContent({
         [styles.hidden]: !article.data
       })}
     >
-      <ArticleMetadata article={article} />
+      <ArticleMetadata
+        article={article}
+        isClone={isClone}
+      />
       <ArticleDetails article={article} />
       <ArticleCode article={article} />
     </div>
@@ -275,10 +260,12 @@ const ArticleContent = memo(function ArticleContent({
 
 export type ArticleDataProps = {
   article: Nullable<Article>;
+  isClone?: boolean;
 };
 
 type ArticleDataWrapperProps = ArticleDataProps & {
   className?: string;
+  hasFirstArticle: boolean;
   setRandomArticle: () => void;
 };
 

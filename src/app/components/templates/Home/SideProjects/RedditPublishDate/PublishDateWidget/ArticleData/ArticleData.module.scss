@@ -9,8 +9,10 @@
   position: relative;
   will-change: height;
   contain: content;
-  width: calc(100% + 10px);
-  margin-left: -5px;
+
+  &:focus-within {
+    contain: none;
+  }
 
   p {
     font-size: 14px;
@@ -23,7 +25,6 @@
 
 .contentWrapper {
   position: relative;
-  padding: 0 5px;
 
   @at-root .wrapper:not(.hasArticle) & {
     position: absolute;
@@ -70,7 +71,6 @@
   text-decoration: none;
   color: inherit;
   max-width: 100%;
-  border-radius: 1px;
 
   &:hover {
     h3 {

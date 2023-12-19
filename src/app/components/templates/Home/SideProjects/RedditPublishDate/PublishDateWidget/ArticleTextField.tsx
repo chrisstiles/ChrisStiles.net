@@ -3,100 +3,42 @@ import {
   useCallback,
   useEffect,
   useRef,
+  useMemo,
   memo,
+  type FocusEventHandler,
   type ClipboardEventHandler
 } from 'react';
 import styles from './PublishDateWidget.module.scss';
 import useIsMounted from '@hooks/useIsMounted';
-import { TextField, Button, type ValidationState } from '@elements';
-import { isValidURL } from '@helpers';
+import { TextField, Button } from '@elements';
 import classNames from 'classnames';
-import type { Article } from '../PublishDateWidget';
 import type { FaviconResponse } from '@api/favicon';
 
 export default memo(function ArticleTextField({
-  article,
+  value,
   favicon,
+  isLoading,
+  isValid,
   setUrl,
   setRandomArticle,
+  onFocus,
+  onBlur,
   onPaste
 }: ArticleTextFieldProps) {
   if (!favicon?.url) favicon = defaultIcon;
 
-  const [inputValue, setInputValue] = useState('');
-  const isFocused = useRef(false);
-  const [isValid, setIsValid] = useState<ValidationState>({
-    value: true,
-    message: ''
-  });
+  const handleChange = useCallback((value: string) => setUrl(value), [setUrl]);
 
-  const checkUrl = useCallback(
-    (value: string, shouldUpdateUrl: boolean = true) => {
-      if (value) {
-        const handleInvalidUrl = () => {
-          setIsValid({ value: false, message: 'Please enter a valid URL' });
-          if (shouldUpdateUrl) setUrl(null);
-        };
-
-        // URL constructor will allow certain URLs that the API
-        // considers invalid. For example: 'https://www.chrisstiles.'
-        // would trigger an exception from the URL constructor
-        if (
-          value.endsWith('.') ||
-          /^(https?:\/\/)?((www\.[^.]+)|([^.]+))\.?$/.test(value)
-        ) {
-          handleInvalidUrl();
-          return;
-        }
-
-        if (!value.startsWith('http') && isValidURL(value)) {
-          value = `https://${value}`;
-        }
-
-        try {
-          const url = new URL(value);
-
-          if (url.hostname.endsWith('.')) {
-            handleInvalidUrl();
-            return;
-          }
-
-          setIsValid({ value: true, message: '' });
-          if (shouldUpdateUrl) setUrl(url);
-        } catch {
-          handleInvalidUrl();
-        }
-      }
-    },
-    [setUrl]
-  );
-
-  const handleChange = useCallback(
-    (value: string) => {
-      setInputValue(value);
-
-      value = value.trim();
-
-      if (value) {
-        checkUrl(value);
-      } else {
-        setUrl(null);
-        setIsValid({ value: false, message: '' });
-      }
-    },
-    [checkUrl, setUrl]
-  );
-
-  useEffect(() => {
-    if (article) {
-      if (!isFocused.current) setInputValue(article.url.href);
-      checkUrl(article.url.href, false);
-    }
-  }, [article, checkUrl]);
+  const validationState = useMemo(() => {
+    return {
+      value: isValid,
+      message: isValid ? '' : 'Please enter a valid URL'
+    };
+  }, [isValid]);
 
   return (
     <TextField
-      value={inputValue}
+      value={value}
       type="url"
       label="News article link"
       placeholder="Paste an article URL"
@@ -106,18 +48,15 @@ export default memo(function ArticleTextField({
       autoComplete="off"
       autoCapitalize="none"
       spellCheck={false}
-      validationState={isValid}
+      validationState={validationState}
       showInlineValidIndicator={false}
       onChange={handleChange}
       onPaste={onPaste}
-      onFocus={() => (isFocused.current = true)}
-      onBlur={() => {
-        isFocused.current = false;
-        if (article) setInputValue(article.url.href);
-      }}
+      onFocus={onFocus}
+      onBlur={onBlur}
       controlEl={
         <RandomArticleButton
-          isLoading={article?.isLoading}
+          isLoading={isLoading}
           setRandomArticle={setRandomArticle}
         />
       }
@@ -215,11 +154,15 @@ const defaultIcon = {
 };
 
 type ArticleTextFieldProps = {
-  setUrl: (url: Nullable<URL>, immediate?: boolean) => void;
-  setRandomArticle: () => void;
-  article: Nullable<Article>;
+  value: string;
   favicon: Nullable<FaviconResponse>;
-  onPaste?: ClipboardEventHandler;
+  isLoading: boolean;
+  isValid: boolean;
+  setUrl: (href: string, immediate?: boolean) => void;
+  setRandomArticle: () => void;
+  onFocus: FocusEventHandler;
+  onBlur: FocusEventHandler;
+  onPaste: ClipboardEventHandler;
 };
 
 type RandomArticleButtonProps = {
