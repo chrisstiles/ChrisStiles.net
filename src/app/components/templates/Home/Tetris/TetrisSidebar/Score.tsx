@@ -41,9 +41,16 @@ export default function Score({
 
   if (level === 1 && prevLevel !== 1) setPrevLevel(1);
 
-  const progress = showAsComplete
-    ? 1
-    : (linesPerLevel - linesUntilNextLevel) / linesPerLevel;
+  const linesThisLevel = linesPerLevel - linesUntilNextLevel;
+  const progress = showAsComplete ? 1 : linesThisLevel / linesPerLevel;
+
+  const linesRemainingText = `${linesUntilNextLevel} ${
+    linesUntilNextLevel === 1 ? 'line' : 'lines'
+  }`;
+
+  const progressText = `${
+    showAsComplete ? 0 : progress * 100
+  }% (${linesRemainingText} remaining)`;
 
   return (
     <section className={styles.scoreSection}>
@@ -61,18 +68,28 @@ export default function Score({
           className={styles.level}
           style={{ '--progress': progress }}
         >
-          <div className={styles.levelText}>
+          <label
+            id="game-level-label"
+            className={styles.levelText}
+          >
             <span>Level</span>
             <strong className={styles.levelTitle}>{level}</strong>
-          </div>
+          </label>
           <Progress className={styles.track} />
-          <Progress className={styles.progress} />
+          <Progress
+            className={styles.progress}
+            role="progressbar"
+            aria-labelledby="game-level-label"
+            aria-valuetext={progressText}
+            aria-valuemin={0}
+            aria-valuemax={linesPerLevel}
+          />
         </div>
-        <div className={styles.levelNumLines}>
-          Next level:{' '}
-          <strong>
-            {linesUntilNextLevel} {linesUntilNextLevel === 1 ? 'line' : 'lines'}
-          </strong>
+        <div
+          className={styles.levelNumLines}
+          aria-hidden="true"
+        >
+          Next level: <strong>{linesRemainingText}</strong>
         </div>
       </div>
     </section>
