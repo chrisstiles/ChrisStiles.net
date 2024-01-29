@@ -4,6 +4,7 @@ import TetrisBoard from './TetrisBoard';
 import TetrisBox, { type TetrisBoxProps } from './TetrisBox';
 import TetrisHeader from './TetrisHeader';
 import TetrisSidebar from './TetrisSidebar';
+import TetrisOverlay from './TetrisOverlay';
 import GamePad from './gamepad.svg';
 import useIsVisible from '@hooks/useIsVisible';
 import { useGlobalState } from '@templates/Home';
@@ -75,6 +76,7 @@ export default function Tetris() {
               className={styles.game}
               {...boxes.game}
             >
+              <TetrisOverlay game={game} />
               <canvas
                 tabIndex={-1}
                 ref={canvas}

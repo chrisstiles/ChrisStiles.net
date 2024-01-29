@@ -16,9 +16,10 @@
   --sidebar-width: #{app.grid-cols(calc(var(--grid-cols) - var(--game-cols)))};
   --game-height: calc(var(--block-size) * var(--game-rows));
   --border-color: #454d69;
-  --dark-blue-color: #101423;
+  // --dark-blue-color: #101423;
   --border-width: 2px;
-  --game-color: var(--dark-blue-color);
+  // --game-color: var(--dark-blue-color);
+  --game-color: #101423;
   --sidebar-color: #181c31;
 
   padding-bottom: 0;
