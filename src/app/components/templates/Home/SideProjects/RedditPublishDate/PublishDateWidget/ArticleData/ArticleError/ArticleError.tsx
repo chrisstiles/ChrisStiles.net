@@ -5,8 +5,6 @@ import type { ArticleDataProps } from '../ArticleData';
 // TODO: Add useful error message
 
 export default function ArticleError({ article }: ArticleDataProps) {
-  console.log('Failed to fetch article', article);
-
   return (
     <div className={styles.wrapper}>
       <div className={styles.top}>

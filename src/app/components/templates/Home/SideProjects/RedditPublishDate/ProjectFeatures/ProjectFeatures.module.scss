@@ -5,7 +5,7 @@
 @use 'app';
 
 .wrapper {
-  width: calc(var(--grid-width) - 1px);
+  width: calc(var(--grid-width) - 2px);
   margin: 60px 0 70px calc((var(--grid-offset) - 1px) * -1);
   position: relative;
   overflow: hidden;

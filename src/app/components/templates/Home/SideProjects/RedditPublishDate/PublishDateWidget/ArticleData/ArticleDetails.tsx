@@ -13,7 +13,7 @@ export default function ArticleDetails({ article }: ArticleDataProps) {
   const hasDate = article && !article.isLoading && isValidDate(publishDate);
   const hasModifyDate = shouldShowModifyDate(publishDate, modifyDate);
 
-  return !article ? null : (
+  return !article || article.isLoading ? null : (
     <>
       {hasDate ? (
         <table className={styles.table}>

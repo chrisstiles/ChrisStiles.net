@@ -116,3 +116,9 @@ export function isSafari() {
 
   return !!cachedIsSafari;
 }
+
+export function decodeString(str: string) {
+  const textarea = document.createElement('textarea');
+  textarea.innerHTML = str;
+  return textarea.value;
+}

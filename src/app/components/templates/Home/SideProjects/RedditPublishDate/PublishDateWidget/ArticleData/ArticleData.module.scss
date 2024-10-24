@@ -9,6 +9,7 @@
   position: relative;
   will-change: height;
   contain: content;
+  text-wrap: pretty;
 
   &:focus-within {
     contain: none;

@@ -1,7 +1,7 @@
 import styles from './ArticleData.module.scss';
 import { DefaultFavicon } from './icons';
 import { Spinner } from '@elements';
-import { preventOrphanedWord } from '@helpers';
+import { decodeString } from '@helpers';
 import classNames from 'classnames';
 import type { ArticleDataProps } from './ArticleData';
 import type { Article, ArticleData } from '../PublishDateWidget';
@@ -72,8 +72,8 @@ function MetaData({ article, isClone }: ArticleMetadataProps) {
       <div className={styles.text}>
         {(headline || subheadline) && (
           <div>
-            {headline && <h3>{formatText(headline)}</h3>}
-            {subheadline && headline && <p>{formatText(subheadline)}</p>}
+            {headline && <h3>{decodeString(headline)}</h3>}
+            {subheadline && headline && <p>{decodeString(subheadline)}</p>}
           </div>
         )}
       </div>
@@ -95,10 +95,4 @@ function hasMetadata(article?: Nullable<Article>): article is ArticleWithData {
     !article?.isLoading &&
     !!(data?.title || data?.organization || data?.description)
   );
-}
-
-// Interpolating the string into a template literal
-// automatically decodes certain special characters
-function formatText(str: Nullable<string>) {
-  return !str ? null : preventOrphanedWord(`${str}`);
 }
