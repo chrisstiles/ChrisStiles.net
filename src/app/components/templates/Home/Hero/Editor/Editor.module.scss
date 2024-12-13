@@ -13,7 +13,7 @@ $borderRadius: 8px;
   --offsetX: var(--grid-offset, 20px);
   --offsetY: 200px;
 
-  width: app.grid-cols(6, calc(var(--offsetX) * -1));
+  width: app.grid-cols(6, calc(var(--offsetX) * -1 + 1px));
   padding-bottom: var(--offsetY);
   margin: 0 calc(var(--offsetX) / -2) calc(var(--offsetY) / -2) 0;
   flex: none;

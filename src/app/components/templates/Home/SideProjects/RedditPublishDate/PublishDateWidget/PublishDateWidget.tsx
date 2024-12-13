@@ -15,7 +15,7 @@ const maxCacheSize = 30;
 
 // TODO: Make widget accessible
 // TODO: Add handling for both success/failure when searching root URLs
-// TODO: Add custom text for each type of error
+// TODO: Add custom text for each type of error, need to differentiate between not found vs unauthorized
 // TODO: Finalize text
 // TODO: Preload example articles
 
@@ -166,6 +166,7 @@ export default memo(function PublishDateWidget() {
 
         try {
           const apiUrl = getEndpoint(article.url.href);
+          console.log(apiUrl);
           const res = await fetch(apiUrl);
           const data = await res.json();
 
@@ -318,9 +319,9 @@ export default memo(function PublishDateWidget() {
 
 function getEndpoint(href: string) {
   return `https://www.redditpublishdate.com/api/get-date?url=${href}`;
-  // return `https://www.redditpublishdate.com/api/get-date?cache=false&url=${url}`;
-  // return `http://localhost:8000/api/get-date?url=${url}`;
-  // return `http://localhost:8000/api/get-date?cache=false&url=${url}`;
+  // return `https://www.redditpublishdate.com/api/get-date?cache=false&url=${href}`;
+  // return `http://localhost:8000/api/get-date?url=${href}`;
+  // return `http://localhost:8000/api/get-date?cache=false&url=${href}`;
 }
 
 function getUrlObject(href: Nullable<string>) {

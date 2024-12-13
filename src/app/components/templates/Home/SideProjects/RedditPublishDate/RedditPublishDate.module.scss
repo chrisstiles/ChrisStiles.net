@@ -47,7 +47,7 @@
 .widget {
   --offsetX: var(--grid-offset, 20px);
 
-  width: app.grid-cols(6, calc(var(--offsetX) * -1));
+  width: app.grid-cols(6, calc(var(--offsetX) * -1 + 1px));
   margin-right: calc(var(--offsetX) / -2);
   flex: none;
 }
