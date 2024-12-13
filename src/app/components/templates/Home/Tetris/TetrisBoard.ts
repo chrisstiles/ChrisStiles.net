@@ -4,7 +4,7 @@ import Trail from './Trail';
 import TetrisBot from './TetrisBot';
 import PiecePreview from './PiecePreview';
 import { isSSR, sleep } from '@helpers';
-import { random, uniqueId } from 'lodash';
+import { random, uniqueId, round } from 'lodash';
 import gsap from 'gsap';
 import BezierEasing from 'bezier-easing';
 import type { RefObject } from 'react';
@@ -676,13 +676,30 @@ export default class TetrisBoard {
     const dpr = window.devicePixelRatio || 1;
     const width = canvas.parentElement.offsetWidth;
 
+    // Get base desktop width to calculate certain scaling values
+    const gridOffset = parseInt(style.getPropertyValue('--grid-offset')) || 0;
+    const baseGameCols =
+      parseInt(style.getPropertyValue('--base-game-cols')) || 13;
+    const maxGridCols =
+      parseInt(style.getPropertyValue('--max-grid-cols')) || 10;
+    const contentWidth =
+      parseInt(style.getPropertyValue('--content-width')) || 1400;
+    const contentPadding =
+      parseInt(style.getPropertyValue('--content-padding')) || 0;
+
+    const baseGridWidth = contentWidth - (contentPadding * 2 - gridOffset * 2);
+    const baseWidth = (baseGridWidth / maxGridCols) * baseGameCols;
+    const scale = round(width / baseWidth, 5);
+
     this.rows = parseInt(numRows) || 10;
     this.columns = (parseInt(numCols) || 12) * (parseInt(blocksPerColumn) || 1);
-    this.blockSize = (width / this.columns) * dpr;
-    this.blockRadius = this.pxToCanvas(parseFloat(blockRadius) || 0);
-    this.offset = this.pxToCanvas(parseFloat(blockOffset) || 1.8);
-    this.blockStrokeWidth = this.pxToCanvas(parseFloat(strokeWidth) || 2.2);
     this.gridLineWidth = this.pxToCanvas(1);
+    this.blockSize = (width / this.columns) * dpr;
+    this.blockRadius = this.pxToCanvas((parseFloat(blockRadius) || 0) * scale);
+    this.offset = this.pxToCanvas((parseFloat(blockOffset) || 1.8) * scale);
+    this.blockStrokeWidth = this.pxToCanvas(
+      (parseFloat(strokeWidth) || 2.2) * scale
+    );
 
     const height = (this.blockSize / dpr) * this.rows;
 

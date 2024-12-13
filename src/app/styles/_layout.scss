@@ -10,6 +10,7 @@
   --section-padding: 100px;
 
   // Grid
+  --max-grid-cols: #{app.$maxGridCols};
   --grid-cols: #{app.$maxGridCols};
   --grid-offset: #{app.$maxGridOffset};
   --grid-width-offset: calc((var(--content-padding) * 2) - (var(--grid-offset) * 2));

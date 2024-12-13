@@ -5,8 +5,12 @@
 @use 'app';
 
 .wrapper {
+  // We can use CSS to change parts of the game, IE the number
+  // of columns. However because the canvas scales we use
+  // the base 10 columns to calculate certain scaled values
+  --base-game-cols: 10;
   --game-rows: 12;
-  --game-cols: 10;
+  --game-cols: var(--base-game-cols);
   --block-border-radius: 6.5px;
   --blocks-per-col: 2;
   --block-offset: 5.6px;
