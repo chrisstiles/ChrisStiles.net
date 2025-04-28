@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import styles from './Title.module.scss';
 import classNames from 'classnames';
+import Image from 'next/image';
 
 export default function Title({
   terminalText = '',
@@ -21,7 +22,14 @@ export default function Title({
 
   return (
     <div className={styles.wrapper}>
-      <div className={styles.photo}>{/* <PhotoMask /> */}</div>
+      <div className={styles.photo}>
+        <Image
+          src="/images/headshot.jpg"
+          alt=""
+          width={58}
+          height={58}
+        />
+      </div>
       <div className={styles.content}>
         <strong className={styles.name}>Chris Stiles</strong>
         <code
