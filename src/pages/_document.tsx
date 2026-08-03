@@ -5,7 +5,11 @@ export default class Document extends NextDocument {
     return (
       <Html lang="en">
         <Head>
-          <FontPreloads />
+          {/* <FontPreloads /> */}
+          <link
+            rel="stylesheet"
+            href="https://use.typekit.net/ocw2uyi.css"
+          />
           <link
             rel="apple-touch-icon"
             sizes="180x180"
@@ -56,27 +60,27 @@ export default class Document extends NextDocument {
   }
 }
 
-function FontPreloads() {
-  const fonts = [
-    'Mundial-Regular',
-    'Mundial-Bold',
-    'Mundial-DemiBold',
-    'SourceCodePro-Regular',
-    'SourceCodePro-Medium'
-  ];
+// function FontPreloads() {
+//   const fonts = [
+//     'Mundial-Regular',
+//     'Mundial-Bold',
+//     'Mundial-DemiBold',
+//     'SourceCodePro-Regular',
+//     'SourceCodePro-Medium'
+//   ];
 
-  return (
-    <>
-      {fonts.map((font, index) => (
-        <link
-          key={index}
-          rel="preload"
-          href={`/fonts/${font}.woff2`}
-          as="font"
-          type="font/woff2"
-          crossOrigin="anonymous"
-        ></link>
-      ))}
-    </>
-  );
-}
+//   return (
+//     <>
+//       {fonts.map((font, index) => (
+//         <link
+//           key={index}
+//           rel="preload"
+//           href={`/fonts/${font}.woff2`}
+//           as="font"
+//           type="font/woff2"
+//           crossOrigin="anonymous"
+//         ></link>
+//       ))}
+//     </>
+//   );
+// }

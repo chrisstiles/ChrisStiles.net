@@ -5,7 +5,8 @@
 @use 'sass:meta';
 
 // Fonts
-$font: 'Mundial', sans-serif;
+$font: 'mundial', sans-serif;
+// $font: sans-serif;
 $fontCode: 'Source Code Pro', monospace;
 
 // Desktop values for grid variables to use in SSR
